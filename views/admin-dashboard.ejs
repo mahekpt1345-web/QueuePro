@@ -1581,7 +1581,7 @@
         }
 
         function loadLogs(action) {
-            const url = '/api/admin/activity-logs' + (action ? '?action=' + action : '?limit=80');
+            const url = '/api/admin/activity-logs' + (action ? '?action=' + action : '?limit=1000');
             document.getElementById('logList').innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div>';
 
             fetch(url, { credentials: 'include' })

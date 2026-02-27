@@ -169,6 +169,12 @@ exports.apiMe = async (req, res) => {
 // API: POST /api/auth/logout
 // ─────────────────────────────────────────────
 exports.apiLogout = (req, res) => {
+    if (req.user) {
+        logActivity('LOGOUT', `User ${req.user.username} logged out (API)`, 'USER', req.user.userId, 'success', null, {
+            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
+            ip: req.ip, get: (h) => req.get(h)
+        }).catch(console.error);
+    }
     res.clearCookie('token');
     return res.json({ success: true });
 };
@@ -195,6 +201,12 @@ exports.apiChangePassword = async (req, res) => {
 
         user.password = newPassword;
         await user.save();
+
+        await logActivity('CHANGE_PASSWORD', 'Password updated successfully', 'USER', user._id, 'success', null, {
+            user: { _id: user._id, username: user.username, role: user.role },
+            ip: req.ip, get: (h) => req.get(h)
+        });
+
         return res.json({ success: true, message: 'Password updated successfully' });
     } catch (err) {
         if (err.name === 'JsonWebTokenError') return res.status(401).json({ success: false, message: 'Invalid token' });
@@ -360,6 +372,12 @@ exports.postAdminLogin = async (req, res) => {
 // EJS: GET /logout
 // ─────────────────────────────────────────────
 exports.logout = (req, res) => {
+    if (req.user) {
+        logActivity('LOGOUT', `User ${req.user.username} logged out`, 'USER', req.user._id, 'success', null, {
+            user: { _id: req.user._id, username: req.user.username, role: req.user.role },
+            ip: req.ip, get: (h) => req.get(h)
+        }).catch(console.error);
+    }
     res.clearCookie('token');
     res.redirect('/');
 };

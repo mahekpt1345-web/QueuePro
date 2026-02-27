@@ -150,9 +150,12 @@ exports.getAnalytics = async (req, res) => {
 // ─────────────────────────────────────────────
 exports.getActivityLogs = async (req, res) => {
     try {
-        const { action, limit = 80, page = 1 } = req.query;
+        let { action, limit = 1000, page = 1 } = req.query;
         const filter = {};
         if (action) filter.action = action;
+
+        // "all" support
+        if (limit === 'all') limit = 10000;
 
         const skip = (parseInt(page) - 1) * parseInt(limit);
         const [logs, total] = await Promise.all([
@@ -203,6 +206,12 @@ exports.updateSettings = async (req, res) => {
             { $set: updates },
             { returnDocument: 'after', upsert: true }
         );
+
+        await logActivity('UPDATE_SETTINGS', `System settings updated by ${req.user.username}`, 'USER', req.user.userId, 'success', null, {
+            user: { _id: req.user.userId, username: req.user.username, role: 'admin' },
+            ip: req.ip, get: (h) => req.get(h)
+        });
+
         return res.json({ success: true, message: 'Settings saved', data: settings });
     } catch (err) {
         console.error('PUT /api/admin/settings error:', err);
@@ -226,15 +235,21 @@ exports.getProfileStats = async (req, res) => {
     }
 };
 
-// ─────────────────────────────────────────────
 // GET /api/admin/profile-activity
-// ─────────────────────────────────────────────
 exports.getProfileActivity = async (req, res) => {
     try {
-        const logs = await ActivityLog.find({ userId: req.user.userId })
+        const query = {};
+
+        // If not admin, only show their own logs
+        // Admins can see everything
+        if (req.user.role !== 'admin') {
+            query.userId = req.user.userId;
+        }
+
+        const logs = await ActivityLog.find(query)
             .sort({ createdAt: -1 })
-            .limit(20)
             .lean();
+
         return res.json({ success: true, data: logs });
     } catch (err) {
         console.error('GET /api/admin/profile-activity error:', err);

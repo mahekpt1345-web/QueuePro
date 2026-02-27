@@ -118,8 +118,7 @@ const logActivity = async (action, details = '', resourceType = null, resourceId
             resourceId,
             status,
             errorMessage,
-            ipAddress: req.ip,
-            userAgent: req.get('user-agent')
+            ipAddress: req.ip
         });
 
         await activity.save();

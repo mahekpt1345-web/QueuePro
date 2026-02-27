@@ -168,6 +168,11 @@ exports.serveToken = async (req, res) => {
         token.startedAt = new Date();
         await token.save();
 
+        await logActivity('SERVE_TOKEN', `Started serving token ${token.tokenId}`, 'TOKEN', req.user.userId, 'success', null, {
+            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
+            ip: req.ip, get: (header) => req.get(header)
+        });
+
         res.json({ success: true, message: `Now serving token ${token.tokenId}`, data: token });
     } catch (error) {
         console.error('[OFFICER API] Error serving token:', error);
@@ -229,6 +234,11 @@ exports.skipToken = async (req, res) => {
         token.startedAt = null;
         await token.save();
 
+        await logActivity('SKIP_TOKEN', `Token ${token.tokenId} returned to pending queue`, 'TOKEN', req.user.userId, 'success', null, {
+            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
+            ip: req.ip, get: (header) => req.get(header)
+        });
+
         res.json({ success: true, message: `Token ${token.tokenId} returned to pending queue`, data: token });
     } catch (error) {
         console.error('[OFFICER API] Error skipping token:', error);
@@ -251,6 +261,11 @@ exports.startServing = async (req, res) => {
         token.startedAt = new Date();
         await token.save();
 
+        await logActivity('SERVE_TOKEN', `Started serving token ${token.tokenId} (Legacy)`, 'TOKEN', req.user.userId, 'success', null, {
+            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
+            ip: req.ip, get: (header) => req.get(header)
+        });
+
         res.json({ success: true, message: 'Token status updated to serving', data: token });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Failed to start serving token' });
@@ -270,6 +285,11 @@ exports.completeTokenLegacy = async (req, res) => {
         token.status = 'completed';
         token.completedAt = new Date();
         await token.save();
+
+        await logActivity('COMPLETE_TOKEN', `Token ${token.tokenId} marked as completed (Legacy)`, 'TOKEN', req.user.userId, 'success', null, {
+            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
+            ip: req.ip, get: (header) => req.get(header)
+        });
 
         res.json({ success: true, message: 'Token marked as completed', data: token });
     } catch (error) {
