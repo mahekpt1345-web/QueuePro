@@ -411,3 +411,141 @@ exports.citizenStats = async (req, res) => {
         res.status(500).json({ success: false, message: 'Failed to fetch citizen stats' });
     }
 };
+
+// ─────────────────────────────────────────────
+// GET /api/queue/officer-tokens  (officer/admin)
+// Return all tokens handled by this officer for profile display
+// ─────────────────────────────────────────────
+exports.getOfficerTokens = async (req, res) => {
+    try {
+        const officerUsername = req.user.username;
+        
+        const tokens = await Token.find({ handledBy: officerUsername })
+            .select('_id tokenId userId userName serviceType status createdAt startedAt completedAt actualWaitTime handledBy')
+            .sort({ createdAt: -1 })
+            .lean();
+
+        res.json({
+            success: true,
+            message: `Found ${tokens.length} tokens handled by officer`,
+            data: tokens
+        });
+    } catch (error) {
+        console.error('[OFFICER TOKENS] Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch officer tokens' });
+    }
+};
+
+// ─────────────────────────────────────────────
+// GET /api/queue/citizen-tokens  (citizen)
+// Return all tokens created by this citizen for profile display
+// ─────────────────────────────────────────────
+exports.getCitizenTokens = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        
+        const tokens = await Token.find({ userId })
+            .select('_id tokenId userId userName serviceType description status createdAt completedAt actualWaitTime cancelReason')
+            .sort({ createdAt: -1 })
+            .lean();
+
+        res.json({
+            success: true,
+            message: `Found ${tokens.length} tokens created by citizen`,
+            data: tokens
+        });
+    } catch (error) {
+        console.error('[CITIZEN TOKENS] Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch citizen tokens' });
+    }
+};
+
+// ─────────────────────────────────────────────
+// GET /api/queue/user-activity  (citizen/officer/admin)
+// Return activity logs for the authenticated user
+// ─────────────────────────────────────────────
+exports.getUserActivity = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const limit = req.query.limit ? parseInt(req.query.limit) : 50;
+        
+        const logs = await ActivityLog.find({ userId })
+            .select('_id userId username userRole action details resourceType status createdAt')
+            .sort({ createdAt: -1 })
+            .limit(limit)
+            .lean();
+
+        res.json({
+            success: true,
+            message: `Found ${logs.length} activity logs for user`,
+            data: logs
+        });
+    } catch (error) {
+        console.error('[USER ACTIVITY] Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch user activity logs' });
+    }
+};
+
+// ─────────────────────────────────────────────
+// GET /api/queue/user-prefs  (citizen/officer/admin)
+// Get user notification preferences from User model
+// ─────────────────────────────────────────────
+exports.getUserPrefs = async (req, res) => {
+    try {
+        const User = require('../models/User');
+        const user = await User.findById(req.user.userId).select('preferences').lean();
+        
+        const prefs = user?.preferences || {
+            emailNotif: true,
+            queueNotif: true,
+            announceNotif: true,
+            promoNotif: false
+        };
+
+        res.json({
+            success: true,
+            message: 'User preferences retrieved',
+            data: prefs
+        });
+    } catch (error) {
+        console.error('[USER PREFS GET] Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch user preferences' });
+    }
+};
+
+// ─────────────────────────────────────────────
+// POST /api/queue/user-prefs  (citizen/officer/admin)
+// Save user notification preferences to User model
+// ─────────────────────────────────────────────
+exports.saveUserPrefs = async (req, res) => {
+    try {
+        const User = require('../models/User');
+        const { emailNotif, queueNotif, announceNotif, promoNotif } = req.body;
+        
+        const user = await User.findById(req.user.userId);
+        if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+        user.preferences = {
+            emailNotif: emailNotif !== false,
+            queueNotif: queueNotif !== false,
+            announceNotif: announceNotif !== false,
+            promoNotif: promoNotif === true
+        };
+
+        await user.save();
+
+        await logActivity('UPDATE_PREFERENCES', 'User updated notification preferences', 'USER', req.user.userId, 'success', null, {
+            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
+            ip: req.ip, get: (header) => req.get(header)
+        });
+
+        res.json({
+            success: true,
+            message: 'Preferences saved successfully',
+            data: user.preferences
+        });
+    } catch (error) {
+        console.error('[USER PREFS SAVE] Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to save user preferences' });
+    }
+};

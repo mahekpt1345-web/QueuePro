@@ -54,9 +54,7 @@ async function handleLogin(e) {
 
     if (result.success) {
         UIUtils.showToast(result.message, 'success');
-        if (rememberMe) {
-            sessionStorage.setItem('queuepro_remember_user', username);
-        }
+        // Note: Remember Me functionality removed. Browser autofill handles username persistence.
         setTimeout(() => {
             if (result.role === 'admin') UIUtils.redirectTo('/admin-dashboard');
             else if (result.role === 'officer') UIUtils.redirectTo('/officer-dashboard');
@@ -72,13 +70,10 @@ async function handleLogin(e) {
 
 /**
  * Pre-fill remember me username if available
+ * NOTE: This function is deprecated. Browser autofill handles username persistence.
  */
 function loadRememberedUsername() {
-    const rememberedUser = sessionStorage.getItem('queuepro_remember_user');
-    if (rememberedUser) {
-        const usernameInput = document.getElementById('username');
-        if (usernameInput) usernameInput.value = rememberedUser;
-        const rememberMeCheckbox = document.getElementById('rememberMe');
-        if (rememberMeCheckbox) rememberMeCheckbox.checked = true;
-    }
+    // Legacy function - sessionStorage no longer used
+    // Browser autofill will populate the username field if user chooses
 }
+
