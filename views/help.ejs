@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #9c78c1 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+            padding-top: 40px;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            transition: opacity 0.3s;
+        }
+
+        .back-link:hover {
+            opacity: 0.8;
+        }
+
+        .back-link::before {
+            content: "← ";
+        }
+
+        .search-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .content {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            margin-bottom: 50px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            color: #3B82F6;
+            border-bottom-color: #3B82F6;
+        }
+
+        .tab:hover {
+            color: #3B82F6;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .faq-section {
+            margin-bottom: 30px;
+        }
+
+        .faq-section h3 {
+            color: #3B82F6;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3B82F6;
+        }
+
+        .faq-item {
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            background: #f8f9fa;
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .faq-question:hover {
+            background: #f0f0f0;
+        }
+
+        .faq-question.active {
+            background: #e8f0ff;
+        }
+
+        .faq-question::before {
+            content: '+';
+            font-size: 1.5em;
+            color: #3B82F6;
+            font-weight: bold;
+            margin-right: 10px;
+            transition: transform 0.3s;
+        }
+
+        .faq-question.active::before {
+            content: '−';
+            transform: rotate(0deg);
+        }
+
+        .faq-answer {
+            display: none;
+            padding: 20px;
+            background: white;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .faq-answer.active {
+            display: block;
+        }
+
+        .faq-answer a {
+            color: #3B82F6;
+            text-decoration: none;
+        }
+
+        .faq-answer a:hover {
+            text-decoration: underline;
+        }
+
+        .guide-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3B82F6;
+        }
+
+        .guide-card h3 {
+            color: #3B82F6;
+            margin-bottom: 15px;
+        }
+
+        .guide-card p {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .guide-card ul {
+            margin-left: 20px;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .guide-card li {
+            margin-bottom: 10px;
+        }
+
+        .contact-support {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .contact-support h3 {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .contact-support a {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 10px 25px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: transform 0.3s;
+        }
+
+        .contact-support a:hover {
+            transform: translateY(-2px);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #d4edda;
+            color: #155724;
+            border-radius: 3px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .tabs {
+                flex-direction: column;
+                border-bottom: none;
+            }
+
+            .tab {
+                border-bottom: 2px solid #e0e0e0;
+                border-left: 3px solid transparent;
+                padding-left: 10px;
+            }
+
+            .tab.active {
+                border-left-color: #3B82F6;
+                border-bottom-color: transparent;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="/" class="back-link">Back to Home</a>
+
+        <header>
+            <h1>Help Center</h1>
+            <p>Find Answers and Get Support</p>
+        </header>
+
+        <div class="search-box">
+            <input type="text" id="searchInput"
+                placeholder="Search for help... (Type FAQ keywords like 'login', 'token', 'queue', etc.)">
+        </div>
+
+        <div class="content">
+            <!-- Tab Navigation -->
+            <div class="tabs">
+                <button class="tab active" onclick="showTab(event, 'faq')">FAQ</button>
+                <button class="tab" onclick="showTab(event, 'guides')">Getting Started Guides</button>
+                <button class="tab" onclick="showTab(event, 'troubleshooting')">Troubleshooting</button>
+            </div>
+
+            <!-- FAQ Tab -->
+            <div id="faq" class="tab-content active">
+                <div class="faq-section">
+                    <h3>General Questions</h3>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>What is QueuePro?</span>
+                        </div>
+                        <div class="faq-answer">
+                            QueuePro is a smart queue management system designed to eliminate long waiting times and
+                            improve customer service.
+                            It provides digital tokens, real-time updates, and intelligent queue optimization for
+                            businesses and customers alike.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>Is QueuePro free to use?</span>
+                        </div>
+                        <div class="faq-answer">
+                            QueuePro offers both free and premium tiers. Citizens can register and use basic features
+                            free of charge.
+                            Businesses and organizations can choose from various subscription plans based on their
+                            needs. Contact our sales team for enterprise solutions.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>What are the system requirements?</span>
+                        </div>
+                        <div class="faq-answer">
+                            QueuePro is a web-based application accessible from any modern web browser (Chrome, Firefox,
+                            Safari, Edge).
+                            It works on desktop, tablet, and mobile devices. No additional software installation is
+                            required.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>How secure is QueuePro?</span>
+                        </div>
+                        <div class="faq-answer">
+                            Security is our top priority. QueuePro uses industry-standard encryption, secure
+                            authentication protocols,
+                            and regular security audits. All user data is protected and we comply with data privacy
+                            regulations.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-section">
+                    <h3>Registration & Accounts</h3>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>How do I create a QueuePro account?</span>
+                        </div>
+                        <div class="faq-answer">
+                            Click on the "Register" button on the login page. Fill in your details including username,
+                            email, full name, and password.
+                            Select your role (Citizen, Officer, or Admin). Submit the form and your account will be
+                            created instantly.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>What's the difference between Citizen, Officer, and Admin roles?</span>
+                        </div>
+                        <div class="faq-answer">
+                            <strong>Citizen:</strong> Can generate tokens and join queues across various services.<br>
+                            <strong>Officer:</strong> Services citizens, manages their queue position, and accesses
+                            customer information.<br>
+                            <strong>Admin:</strong> Full system control, user management, analytics, and business
+                            intelligence tools.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>Can I change my account role later?</span>
+                        </div>
+                        <div class="faq-answer">
+                            Contact our support team to change your account role. Different roles have different
+                            permissions and privileges,
+                            so role changes require verification and may require administrative approval.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>How do I reset my password?</span>
+                        </div>
+                        <div class="faq-answer">
+                            On the login page, click "Forgot Password?" and follow the instructions. You'll receive an
+                            email with a password reset link.
+                            Click the link and create a new password.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-section">
+                    <h3>Getting Tokens & Queue Management</h3>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>How do I get a token?</span>
+                        </div>
+                        <div class="faq-answer">
+                            Log in to your account and navigate to the "Get Token" page. Select the service you need and
+                            generate a token.
+                            Your token number will be displayed and saved on your dashboard. You can also use the
+                            dedicated Get Token page from the homepage.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>Can I use one token for multiple services?</span>
+                        </div>
+                        <div class="faq-answer">
+                            Each token is specific to a particular service. If you need multiple services, you'll need
+                            to generate separate tokens for each one.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>How long is my token valid?</span>
+                        </div>
+                        <div class="faq-answer">
+                            Tokens are typically valid for 24 hours from generation. Once expired, you'll need to
+                            generate a new token.
+                            Check your token details for the exact expiration time.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>Can I cancel a token if I don't need it anymore?</span>
+                        </div>
+                        <div class="faq-answer">
+                            Yes, you can cancel a token from your dashboard. Simply find the token you want to cancel
+                            and click the cancel button.
+                            This will free up the slot for other customers.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-section">
+                    <h3>Account Management</h3>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>How do I update my profile?</span>
+                        </div>
+                        <div class="faq-answer">
+                            Click on your profile icon in the dashboard. Select "Edit Profile" and update your
+                            information.
+                            Save your changes. Keep your profile updated for better service.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>How do I delete my account?</span>
+                        </div>
+                        <div class="faq-answer">
+                            Go to Account Settings and select "Delete Account". You'll be asked to confirm this action.
+                            Note: Deleting your account is permanent and cannot be undone. Contact support if you have
+                            concerns.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>Can I have multiple accounts?</span>
+                        </div>
+                        <div class="faq-answer">
+                            For security and system integrity reasons, each person should maintain only one account per
+                            role.
+                            Multiple accounts with the same person may violate our terms of service.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guides Tab -->
+            <div id="guides" class="tab-content">
+                <div class="guide-card">
+                    <h3>Getting Started as a Citizen</h3>
+                    <p>Step-by-step guide to get started with QueuePro:</p>
+                    <ul>
+                        <li><strong>Step 1:</strong> Click the "Register" button and create an account with Citizen role
+                        </li>
+                        <li><strong>Step 2:</strong> Verify your email address</li>
+                        <li><strong>Step 3:</strong> Log in to your dashboard</li>
+                        <li><strong>Step 4:</strong> Go to "Get Token" and select your desired service</li>
+                        <li><strong>Step 5:</strong> Generate your token and wait for your turn</li>
+                        <li><strong>Step 6:</strong> Track your position in real-time through the dashboard</li>
+                    </ul>
+                </div>
+
+                <div class="guide-card">
+                    <h3>Getting Started as an Officer</h3>
+                    <p>Quick start guide for officers managing the queue:</p>
+                    <ul>
+                        <li><strong>Step 1:</strong> Register an account with Officer role</li>
+                        <li><strong>Step 2:</strong> Log in to access the Officer Dashboard</li>
+                        <li><strong>Step 3:</strong> View waiting customers and queue status</li>
+                        <li><strong>Step 4:</strong> Call next customer in queue</li>
+                        <li><strong>Step 5:</strong> Complete service and mark as served</li>
+                        <li><strong>Step 6:</strong> Review your service statistics and performance</li>
+                    </ul>
+                </div>
+
+                <div class="guide-card">
+                    <h3>Understanding Your Dashboard</h3>
+                    <p>Your dashboard displays key information:</p>
+                    <ul>
+                        <li><strong>Active Tokens:</strong> Shows all your current tokens and their positions</li>
+                        <li><strong>Queue Status:</strong> Real-time updates on your position in queues</li>
+                        <li><strong>Service History:</strong> View your past transactions and interactions</li>
+                        <li><strong>Profile Settings:</strong> Update your personal information</li>
+                        <li><strong>Notifications:</strong> Receive real-time alerts about your tokens</li>
+                    </ul>
+                </div>
+
+                <div class="guide-card">
+                    <h3>Tips for Best Experience</h3>
+                    <ul>
+                        <li>Always keep your browser updated for best performance</li>
+                        <li>Enable notifications to receive real-time queue updates</li>
+                        <li>Log out when you're done for security</li>
+                        <li>Review your profile regularly and keep information current</li>
+                        <li>Don't share your login credentials with anyone</li>
+                        <li>Use strong, unique passwords for your account</li>
+                    </ul>
+                </div>
+
+                <div class="contact-support">
+                    <h3>Still need help?</h3>
+                    <p>Our support team is ready to assist you with any questions.</p>
+                    <a href="/contact">Contact Support</a>
+                </div>
+            </div>
+
+            <!-- Troubleshooting Tab -->
+            <div id="troubleshooting" class="tab-content">
+                <div class="faq-section">
+                    <h3>Common Issues & Solutions</h3>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>I can't log in to my account</span>
+                        </div>
+                        <div class="faq-answer">
+                            <strong>Solution:</strong>
+                            <ul style="margin-top: 10px; margin-left: 20px;">
+                                <li>Verify your username and password are correct</li>
+                                <li>Check if CAPS LOCK is on</li>
+                                <li>Click "Forgot Password?" to reset your password</li>
+                                <li>Clear your browser cache and cookies</li>
+                                <li>Try a different browser</li>
+                                <li>If still stuck, contact support: support@queuepro.com</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>I didn't receive my registration confirmation email</span>
+                        </div>
+                        <div class="faq-answer">
+                            <strong>Solution:</strong>
+                            <ul style="margin-top: 10px; margin-left: 20px;">
+                                <li>Check your spam/junk folder</li>
+                                <li>Wait a few minutes; emails can take time to arrive</li>
+                                <li>Request a new confirmation email</li>
+                                <li>Verify you entered the correct email address</li>
+                                <li>Try registering again with a different email</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>My token is not appearing on my dashboard</span>
+                        </div>
+                        <div class="faq-answer">
+                            <strong>Solution:</strong>
+                            <ul style="margin-top: 10px; margin-left: 20px;">
+                                <li>Refresh your browser (F5 or Ctrl+R)</li>
+                                <li>Check if token generation was confirmed</li>
+                                <li>Log out and log back in</li>
+                                <li>Clear browser cache</li>
+                                <li>Try a different browser</li>
+                                <li>Contact support if problem persists</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>The website is loading slowly</span>
+                        </div>
+                        <div class="faq-answer">
+                            <strong>Solution:</strong>
+                            <ul style="margin-top: 10px; margin-left: 20px;">
+                                <li>Check your internet connection</li>
+                                <li>Reduce browser tab count</li>
+                                <li>Clear browser cache and cookies</li>
+                                <li>Disable browser extensions temporarily</li>
+                                <li>Try a different browser</li>
+                                <li>Check QueuePro status page for system alerts</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>I'm experiencing technical errors or crashes</span>
+                        </div>
+                        <div class="faq-answer">
+                            <strong>Solution:</strong>
+                            <ul style="margin-top: 10px; margin-left: 20px;">
+                                <li>Take a screenshot of the error message</li>
+                                <li>Note the time and your actions before the error</li>
+                                <li>Try the action again</li>
+                                <li>Hard refresh your browser (Ctrl+Shift+R)</li>
+                                <li>Clear all browser data</li>
+                                <li>Email details to: support@queuepro.com</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>I'm not receiving real-time queue updates</span>
+                        </div>
+                        <div class="faq-answer">
+                            <strong>Solution:</strong>
+                            <ul style="margin-top: 10px; margin-left: 20px;">
+                                <li>Check that notifications are enabled</li>
+                                <li>Verify browser permission for notifications</li>
+                                <li>Refresh the page</li>
+                                <li>Check internet connection stability</li>
+                                <li>Disable popup blockers</li>
+                                <li>Try again in a few moments</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span>I forgot my security question answer</span>
+                        </div>
+                        <div class="faq-answer">
+                            <strong>Solution:</strong>
+                            <ul style="margin-top: 10px; margin-left: 20px;">
+                                <li>Try clicking "Forgot Password?" on login</li>
+                                <li>Use your email to reset your password</li>
+                                <li>Contact support with verification details</li>
+                                <li>Support can help reset your security settings</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-support">
+                    <h3>Problem not listed?</h3>
+                    <p>Contact our support team for immediate assistance.</p>
+                    <a href="/contact">Get Support Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleFaq(element) {
+            element.classList.toggle('active');
+            element.nextElementSibling.classList.toggle('active');
+        }
+
+        function showTab(event, tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Show the selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('keyup', function (e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const faqItems = document.querySelectorAll('.faq-item');
+
+            faqItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Show FAQ tab when searching
+            if (searchTerm.length > 0) {
+                document.getElementById('faq').classList.add('active');
+                document.getElementById('guides').classList.remove('active');
+                document.getElementById('troubleshooting').classList.remove('active');
+
+                const buttons = document.querySelectorAll('.tab');
+                buttons.forEach(btn => btn.classList.remove('active'));
+                buttons[0].classList.add('active');
+            }
+        });
+    </script>
+</body>
+
+</html>

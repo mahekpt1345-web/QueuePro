@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Profile - QueuePro</title>
+    <link rel="stylesheet" href="/css/dashboard-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-900: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--gray-50);
+            color: var(--gray-700);
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .nav-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background-color: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray-700);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover {
+            background-color: var(--gray-100);
+            color: var(--primary-color);
+        }
+
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background-color: #dc2626;
+        }
+
+        .profile-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .profile-header {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .profile-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-header p {
+            color: var(--gray-600);
+        }
+
+        .profile-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .info-box {
+            padding: 1.5rem;
+            background-color: var(--gray-50);
+            border-radius: 0.5rem;
+        }
+
+        .info-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            background-color: var(--gray-50);
+        }
+
+        .card-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+
+        .card-header p {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-size: 0.875rem;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-group input:disabled {
+            background-color: var(--gray-100);
+            cursor: not-allowed;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-item {
+            padding: 1rem;
+            background-color: var(--gray-50);
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-text {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .log-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .log-entry {
+            border-left: 3px solid var(--primary-color);
+            padding-left: 1rem;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            background-color: var(--gray-50);
+            border-radius: 0.25rem;
+        }
+
+        .log-time {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            font-weight: 600;
+        }
+
+        .log-action {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-top: 0.25rem;
+        }
+
+        .log-ip {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin-top: 0.25rem;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--gray-600);
+            text-align: center;
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: none;
+            max-width: 300px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        .toast.toast-success {
+            border-left: 4px solid var(--success-color);
+            color: #047857;
+        }
+
+        .toast.toast-error {
+            border-left: 4px solid var(--danger-color);
+            color: #991b1b;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-wrap: wrap;
+            }
+
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-info {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">
+                <i class="fas fa-stream"></i>
+                QueuePro
+            </a>
+            <div class="nav-center">
+                <span class="role-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    Administrator
+                </span>
+            </div>
+            <a href="/admin-dashboard" class="menu-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+                Dashboard
+            </a>
+            <div class="nav-right">
+                <div class="user-info">
+                    <span class="user-name" id="userName">
+                        <%= user ? user.name || 'Administrator' : 'Administrator' %>
+                    </span>
+                    <button class="btn-logout" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Profile Container -->
+    <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <h1>Administrator Profile</h1>
+            <p>System administration and security settings</p>
+            <div class="profile-info">
+                <div class="info-box">
+                    <div class="info-label">Member ID</div>
+                    <div class="info-value" id="memberId">-</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Last Login</div>
+                    <div class="info-value" id="lastLoginTime">-</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Session ID</div>
+                    <div class="info-value" id="sessionId">-</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Session Status</div>
+                    <div class="info-value" style="color: var(--success-color);">Active</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="profile-grid">
+            <!-- Administrator Information -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Administrator Information</h2>
+                    <p>Your profile details</p>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="profileName">Name</label>
+                        <input type="text" id="profileName" value="Administrator" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginTime">Login Time</label>
+                        <input type="text" id="loginTime" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminLevel">Admin Level</label>
+                        <input type="text" value="Super Admin" disabled>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Statistics -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>System Statistics</h2>
+                    <p>Overall system metrics</p>
+                </div>
+                <div class="card-content">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number" id="totalUserCount">0</div>
+                            <div class="stat-text">Total Users</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="activeSessionCount">1</div>
+                            <div class="stat-text">Active Sessions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="systemUptime">99.9%</div>
+                            <div class="stat-text">Uptime</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="totalTransactions">0</div>
+                            <div class="stat-text">Transactions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Logs -->
+            <div class="card full-width">
+                <div class="card-header">
+                    <h2>Security Logs</h2>
+                    <p>Administrative access history</p>
+                </div>
+                <div class="card-content">
+                    <div id="securityLog" class="log-list">
+                        <p class="empty-state">
+                            <i class="fas fa-shield-alt"></i>
+                            No security logs yet
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Actions -->
+            <div class="card full-width">
+                <div class="card-header">
+                    <h2>Recent Admin Actions</h2>
+                    <p>Your recent administrative activities</p>
+                </div>
+                <div class="card-content">
+                    <div id="adminActions" class="log-list">
+                        <p class="empty-state">
+                            <i class="fas fa-history"></i>
+                            No recent admin actions
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Scripts -->
+    <script src="/js/auth-system.js"></script>
+    <script src="/js/ui-utils.js"></script>
+    <script>
+        /**
+         * ADMIN PROFILE — All data fetched from API/DB, no localStorage
+         */
+
+        document.addEventListener('DOMContentLoaded', async function () {
+            await loadAdminProfileData();
+
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function () {
+                    UIUtils.logout();
+                });
+            }
+
+            // Refresh logs every 30 seconds
+            setInterval(loadActivityLogs, 30000);
+        });
+
+        /**
+         * Shared fetch helper — uses HttpOnly cookie automatically
+         */
+        async function apiFetch(url) {
+            const res = await fetch(url, { credentials: 'include' });
+            if (!res.ok) return null;
+            return res.json();
+        }
+
+        /**
+         * Load admin profile data
+         */
+        async function loadAdminProfileData() {
+            const data = await apiFetch('/api/auth/me');
+            const user = data ? data.user : null;
+
+            if (user) {
+                const el = id => document.getElementById(id);
+
+                if (el('userName')) el('userName').textContent = user.name || user.username || 'Administrator';
+                if (el('profileName')) el('profileName').value = user.name || 'Administrator';
+
+                // Stable Member ID derived from DB _id — no localStorage
+                if (el('memberId')) el('memberId').textContent = 'MEM-' + user._id.toString().slice(-6).toUpperCase();
+
+                const now = new Date().toLocaleString();
+                if (el('lastLoginTime')) el('lastLoginTime').textContent = user.lastLogin ? new Date(user.lastLogin).toLocaleString() : now;
+                if (el('loginTime')) el('loginTime').value = user.lastLogin ? new Date(user.lastLogin).toLocaleString() : now;
+                if (el('sessionId')) el('sessionId').textContent = 'session_' + user._id.toString().slice(-16);
+            }
+
+            await loadSystemStats();
+            await loadActivityLogs();
+        }
+
+        /**
+         * Load system statistics from /api/admin/profile-stats
+         */
+        async function loadSystemStats() {
+            const data = await apiFetch('/api/admin/profile-stats');
+            const stats = data ? data.data : null;
+            const el = id => document.getElementById(id);
+
+            if (stats) {
+                if (el('totalUserCount')) el('totalUserCount').textContent = stats.totalUsers;
+                if (el('totalTransactions')) el('totalTransactions').textContent = stats.totalTokens;
+            } else {
+                if (el('totalUserCount')) el('totalUserCount').textContent = '0';
+                if (el('totalTransactions')) el('totalTransactions').textContent = '0';
+            }
+            // Active sessions & uptime are static (not tracked in this system)
+            const activeEl = document.getElementById('activeSessionCount');
+            if (activeEl) activeEl.textContent = '1';
+            const uptimeEl = document.getElementById('systemUptime');
+            if (uptimeEl) uptimeEl.textContent = '99.9%';
+        }
+
+        /**
+         * Load activity logs from /api/admin/profile-activity (for both security logs and admin actions)
+         */
+        async function loadActivityLogs() {
+            const data = await apiFetch('/api/admin/profile-activity');
+            const logs = data ? data.data : [];
+
+            renderSecurityLog(logs);
+            renderAdminActions(logs);
+        }
+
+        function renderSecurityLog(logs) {
+            const container = document.getElementById('securityLog');
+            if (!container) return;
+
+            const secLogs = logs.filter(l => ['LOGIN', 'LOGOUT', 'ADMIN_LOGIN'].includes(l.action));
+
+            if (!secLogs.length) {
+                container.innerHTML = `<p class="empty-state"><i class="fas fa-inbox"></i> No security logs yet</p>`;
+                return;
+            }
+
+            container.innerHTML = secLogs.map(log => `
+                <div class="log-entry">
+                    <div class="log-time">
+                        <i class="fas fa-${getLogIcon(log.action)}"></i>
+                        ${log.action}
+                    </div>
+                    <div class="log-action">${log.details || log.action}</div>
+                    <div class="log-ip">${formatDate(log.createdAt)}${log.ipAddress ? ' • IP: ' + log.ipAddress : ''}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderAdminActions(logs) {
+            const container = document.getElementById('adminActions');
+            if (!container) return;
+
+            const actionLogs = logs.filter(l => !['LOGIN', 'LOGOUT', 'ADMIN_LOGIN'].includes(l.action));
+
+            if (!actionLogs.length) {
+                container.innerHTML = `<p class="empty-state"><i class="fas fa-inbox"></i> No recent admin actions</p>`;
+                return;
+            }
+
+            container.innerHTML = actionLogs.map(log => `
+                <div class="log-entry">
+                    <div class="log-time">
+                        <i class="fas fa-check-circle"></i>
+                        ${log.action}
+                    </div>
+                    <div class="log-action">${log.details || ''}</div>
+                    <div class="log-ip">${formatDate(log.createdAt)}</div>
+                </div>
+            `).join('');
+        }
+
+        function getLogIcon(action) {
+            const icons = { LOGIN: 'sign-in-alt', LOGOUT: 'sign-out-alt', ADMIN_LOGIN: 'shield-alt', CREATE_USER: 'plus-circle', DELETE_USER: 'trash', UPDATE: 'edit' };
+            return icons[action] || 'info-circle';
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+    </script>
+
+</body>
+
+</html>

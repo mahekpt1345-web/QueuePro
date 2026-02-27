@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QueuePro - Smart Queue Management System</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo" onclick="window.location.href='/'">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <rect width="32" height="32" rx="8" fill="#3B82F6" />
+                    <rect x="8" y="8" width="6" height="6" rx="1" fill="white" />
+                    <rect x="18" y="8" width="6" height="6" rx="1" fill="white" />
+                    <rect x="8" y="18" width="6" height="6" rx="1" fill="white" />
+                    <rect x="18" y="18" width="6" height="6" rx="1" fill="white" />
+                </svg>
+                <span>QueuePro</span>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#services" class="nav-link">Services</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="/about" class="nav-link">About</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-secondary" onclick="goToLogin()">Login</button>
+                <button class="btn-primary" onclick="goToToken()">Get Token</button>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <div class="badge">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 2L9.5 5.5L13 6L10.5 8.5L11 12L8 10L5 12L5.5 8.5L3 6L6.5 5.5L8 2Z" />
+                        </svg>
+                        <span>Smart Queue Management System</span>
+                    </div>
+                    <h1>Eliminate Wait Time<br><span class="gradient-text">Frustration Forever</span></h1>
+                    <p class="hero-description">A seamless, intelligent queue management solution for government
+                        services. Get your token, track your position, and never waste time in line again.</p>
+                    <div class="hero-buttons">
+                        <button class="btn-large btn-primary" onclick="goToToken()">Get Your Token</button>
+                        <button class="btn-large btn-outline" onclick="scrollToSection('services')">View
+                            Services</button>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <h3>50%</h3>
+                            <p>Reduced Wait Time</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>99.9%</h3>
+                            <p>System Uptime</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>3s</h3>
+                            <p>Slot-time Updates</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>24/7</h3>
+                            <p>System Availability</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="floating-card card-1">
+                        <div class="card-icon blue">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                        </div>
+                        <div class="card-content">
+                            <h4>Token Generated</h4>
+                            <p id="card1-token">P001 - Passport Service</p>
+                            <span class="status-badge waiting">Next in Queue</span>
+                        </div>
+                    </div>
+                    <div class="floating-card card-2">
+                        <div class="card-icon green">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                        </div>
+                        <div class="card-content">
+                            <h4>Real-time Updates</h4>
+                            <p id="card2-wait">Estimated wait: 8 minutes</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="card2-progress" style="width: 65%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="floating-card card-3">
+                        <div class="card-icon orange">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                            </svg>
+                        </div>
+                        <div class="card-content">
+                            <h4>Smart Scheduling</h4>
+                            <p>AI-powered predictions</p>
+                            <span class="status-badge success">Optimized</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Available Services -->
+    <section class="services-section" id="services">
+        <div class="container">
+            <div class="section-header">
+                <h2>Available Services</h2>
+                <p>Select from our range of government services and get in queue instantly</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card" data-service="passport" onclick="getServiceToken('passport')">
+                    <div class="service-icon blue">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                    </div>
+                    <h3>Passport</h3>
+                    <p>New passport, renewals, and updates</p>
+                    <div class="service-meta">
+                        <span class="meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="12" r="10" />
+                            </svg>
+                            <span id="passport-waiting">5 waiting</span>
+                        </span>
+                        <span class="meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                            <span>~8m wait</span>
+                        </span>
+                    </div>
+                    <button class="btn-service">Get Token →</button>
+                </div>
+
+                <div class="service-card" data-service="license" onclick="getServiceToken('license')">
+                    <div class="service-icon green">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                            <path d="M16 5V3a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+                        </svg>
+                    </div>
+                    <h3>License</h3>
+                    <p>Driving license, renewals, and tests</p>
+                    <div class="service-meta">
+                        <span class="meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="12" r="10" />
+                            </svg>
+                            <span id="license-waiting">3 waiting</span>
+                        </span>
+                        <span class="meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                            <span>~5m wait</span>
+                        </span>
+                    </div>
+                    <button class="btn-service">Get Token →</button>
+                </div>
+
+                <div class="service-card" data-service="certificate" onclick="getServiceToken('certificate')">
+                    <div class="service-icon orange">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                            <polyline points="17 8 12 13 7 8" />
+                        </svg>
+                    </div>
+                    <h3>Certificate</h3>
+                    <p>Birth, death, marriage certificates</p>
+                    <div class="service-meta">
+                        <span class="meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="12" r="10" />
+                            </svg>
+                            <span id="certificate-waiting">7 waiting</span>
+                        </span>
+                        <span class="meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                            <span>~12m wait</span>
+                        </span>
+                    </div>
+                    <button class="btn-service">Get Token →</button>
+                </div>
+                <div class="service-card" data-service="tax" onclick="getServiceToken('tax')">
+                    <div class="service-icon purple">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                    </div>
+                    <h3>Tax Service</h3>
+                    <p>Generate token for tax filing services</p>
+                    <div class="service-meta">
+                        <span class="meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="12" r="10" />
+                            </svg>
+                            <span id="tax-waiting">4 waiting</span>
+                        </span>
+                        <span class="meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                            <span>~6m wait</span>
+                        </span>
+                    </div>
+                    <button class="btn-service">Get Token →</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Powerful Features</h2>
+                <p>Everything you need for efficient queue management</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                    </div>
+                    <h3>Real-time Tracking</h3>
+                    <p>Get instant updates on your queue position</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                        </svg>
+                    </div>
+                    <h3>Wait Time Estimation</h3>
+                    <p>Know your expected wait time in advance</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                        </svg>
+                    </div>
+                    <h3>Analytics & Reports</h3>
+                    <p>Get insights on queue performance</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Skip the Queue?</h2>
+                <p>Get your token now and experience hassle-free government services</p>
+                <div class="cta-buttons">
+                    <button class="btn-large btn-white" onclick="goToToken()">Get Started Now →</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <div class="footer-logo">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <rect width="32" height="32" rx="8" fill="#3B82F6" />
+                            <rect x="8" y="8" width="6" height="6" rx="1" fill="white" />
+                            <rect x="18" y="8" width="6" height="6" rx="1" fill="white" />
+                            <rect x="8" y="18" width="6" height="6" rx="1" fill="white" />
+                            <rect x="18" y="18" width="6" height="6" rx="1" fill="white" />
+                        </svg>
+                        <span>QueuePro</span>
+                    </div>
+                    <p class="footer-description">© 2026 QueuePro. All rights reserved.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Product</h4>
+                        <a href="#features">Features</a>
+                        <a href="#services">Services</a>
+                        <a href="/login">Get Token</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Access</h4>
+                        <a href="/login">Get Token</a>
+                        <a href="/login">Login</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Support</h4>
+                        <a href="/about">About Us</a>
+                        <a href="/contact">Contact</a>
+                        <a href="/help">Help Center</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Scripts -->
+    <script src="/js/ui-utils.js"></script>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', function () {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        });
+
+        // Smooth scroll
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Navigation functions
+        function goToLogin() {
+            window.location.href = '/login';
+        }
+
+        function goToToken() {
+            // Redirect to login page and let the backend handle authentication flow
+            window.location.href = '/login';
+        }
+
+        // Get service token
+        function getServiceToken(service) {
+            // Redirect to login page and let the backend handle authentication flow
+            window.location.href = '/login';
+        }
+
+        // Update waiting numbers periodically
+        function updateWaitingNumbers() {
+            document.getElementById('passport-waiting').textContent = Math.floor(Math.random() * 10) + 1 + ' waiting';
+            document.getElementById('license-waiting').textContent = Math.floor(Math.random() * 8) + 1 + ' waiting';
+            document.getElementById('certificate-waiting').textContent = Math.floor(Math.random() * 12) + 1 + ' waiting';
+            document.getElementById('tax-waiting').textContent = Math.floor(Math.random() * 5) + 1 + ' waiting';
+
+            // Update progress bar
+            const progress = Math.floor(Math.random() * 40) + 30;
+            document.getElementById('card2-progress').style.width = progress + '%';
+            document.getElementById('card2-wait').textContent = 'Estimated wait: ' + progress + ' minutes';
+        }
+
+        // Update every 10 seconds
+        setInterval(updateWaitingNumbers, 10000);
+        updateWaitingNumbers(); // Initial call
+
+        // Active nav link on scroll
+        window.addEventListener('scroll', function () {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            let currentSection = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 200) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === currentSection) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Service card click handler
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.addEventListener('click', function () {
+                const service = this.getAttribute('data-service');
+                getServiceToken(service);
+            });
+        });
+    </script>
+</body>
+
+</html>

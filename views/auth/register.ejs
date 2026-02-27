@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - QueuePro</title>
+    <link rel="stylesheet" href="/css/auth-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="auth-page">
+    <!-- Navigation -->
+    <nav class="auth-navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">
+                <i class="fas fa-stream"></i>
+                <span>QueuePro</span>
+            </a>
+            <div class="nav-links">
+                <a href="/login" class="btn-link">Login</a>
+                <a href="/admin-login" class="btn-link admin-link">Admin Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Register Container -->
+    <div class="auth-container register-container">
+        <!-- Register Card -->
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h1>Create Account</h1>
+                <p>Join QueuePro today</p>
+            </div>
+
+            <form id="registerForm" class="auth-form">
+                <!-- Full Name -->
+                <div class="form-group">
+                    <label for="fullName">
+                        <i class="fas fa-id-card"></i>
+                        Full Name
+                    </label>
+                    <input 
+                        type="text" 
+                        id="fullName" 
+                        name="fullName" 
+                        placeholder="Enter your full name"
+                        required
+                    >
+                    <span class="error-message" id="fullNameError"></span>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope"></i>
+                        Email Address
+                    </label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="Enter your email"
+                        required
+                        autocomplete="email"
+                    >
+                    <span class="error-message" id="emailError"></span>
+                </div>
+
+                <!-- Username -->
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i>
+                        Username
+                    </label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        placeholder="Choose a username (min 3 chars)"
+                        required
+                        autocomplete="username"
+                    >
+                    <span class="error-message" id="usernameError"></span>
+                </div>
+
+                <!-- Role Selection -->
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-briefcase"></i>
+                        Select Your Role
+                    </label>
+                    <div class="role-selection">
+                        <label class="role-option">
+                            <input type="radio" name="role" value="citizen" required checked>
+                            <span class="role-label">
+                                <i class="fas fa-user-circle"></i>
+                                <strong>Citizen</strong>
+                                <p>Apply for documents & services</p>
+                            </span>
+                        </label>
+                        <label class="role-option">
+                            <input type="radio" name="role" value="officer" required>
+                            <span class="role-label">
+                                <i class="fas fa-user-tie"></i>
+                                <strong>Officer</strong>
+                                <p>Manage applications & queue</p>
+                            </span>
+                        </label>
+                    </div>
+                    <span class="error-message" id="roleError"></span>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i>
+                        Password
+                    </label>
+                    <div class="password-input">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            placeholder="Min 6 characters"
+                            required
+                            autocomplete="new-password"
+                        >
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <span class="error-message" id="passwordError"></span>
+                    <div class="password-strength" id="passwordStrength"></div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label for="confirmPassword">
+                        <i class="fas fa-lock"></i>
+                        Confirm Password
+                    </label>
+                    <div class="password-input">
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            name="confirmPassword" 
+                            placeholder="Confirm your password"
+                            required
+                            autocomplete="new-password"
+                        >
+                        <button type="button" class="toggle-password" id="toggleConfirmPassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <span class="error-message" id="confirmPasswordError"></span>
+                </div>
+
+                <!-- Terms & Conditions -->
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <span>I agree to the <a href="#" target="_blank">Terms & Conditions</a></span>
+                    </label>
+                    <span class="error-message" id="termsError"></span>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary btn-block" id="registerBtn">
+                    <i class="fas fa-user-plus"></i>
+                    Create Account
+                </button>
+
+                <!-- Login Link -->
+                <div class="form-footer">
+                    <p>Already have an account? <a href="/login">Login here</a></p>
+                </div>
+            </form>
+        </div>
+
+        <!-- Info Panel -->
+        <div class="auth-info register-info">
+            <h2>Why Join QueuePro?</h2>
+            <div class="info-list">
+                <div class="info-item">
+                    <i class="fas fa-check-circle"></i>
+                    <h4>Easy Queue Management</h4>
+                    <p>Never wait unnecessarily - manage your queue in real-time</p>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-lock"></i>
+                    <h4>Secure & Private</h4>
+                    <p>Your data is encrypted and protected at all times</p>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h4>Access Anywhere</h4>
+                    <p>Use on desktop, tablet, or mobile devices</p>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-headset"></i>
+                    <h4>24/7 Support</h4>
+                    <p>Our support team is always available to help</p>
+                </div>
+            </div>
+
+            <div class="info-note">
+                <i class="fas fa-lightbulb"></i>
+                <p><strong>Tip:</strong> Choose your role wisely as it determines your dashboard features</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Scripts -->
+    <script src="/js/auth-system.js"></script>
+    <script src="/js/ui-utils.js"></script>
+    <script src="/js/register-handler.js"></script>
+</body>
+</html>

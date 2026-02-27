@@ -1,0 +1,1759 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - QueuePro</title>
+    <link rel="stylesheet" href="/css/dashboard-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --indigo: #6366f1;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-900: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-700);
+        }
+
+        /* NAV */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .5rem 1rem;
+            border-radius: 9999px;
+            font-size: .875rem;
+            font-weight: 600;
+            background: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            color: var(--gray-700);
+            text-decoration: none;
+            padding: .5rem 1rem;
+            border-radius: .5rem;
+            transition: .2s;
+        }
+
+        .menu-item:hover {
+            background: var(--gray-100);
+            color: var(--primary);
+        }
+
+        .user-name {
+            font-weight: 600;
+        }
+
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: .5rem 1rem;
+            border-radius: .5rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            transition: .2s;
+        }
+
+        .btn-logout:hover {
+            background: #dc2626;
+        }
+
+        /* LAYOUT */
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .welcome-section {
+            margin-bottom: 2rem;
+        }
+
+        .welcome-section h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: .5rem;
+        }
+
+        .welcome-section p {
+            color: var(--gray-600);
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: .5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--gray-200);
+            padding-bottom: 0;
+        }
+
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .75rem 1.5rem;
+            border: none;
+            background: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: .875rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: .2s;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* STAT CARDS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: .75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+            transition: .3s;
+            border-left: 4px solid transparent;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .12);
+            transform: translateY(-2px);
+        }
+
+        .stat-card.blue {
+            border-left-color: var(--primary);
+        }
+
+        .stat-card.green {
+            border-left-color: var(--success);
+        }
+
+        .stat-card.yellow {
+            border-left-color: var(--warning);
+        }
+
+        .stat-card.red {
+            border-left-color: var(--danger);
+        }
+
+        .stat-card.purple {
+            border-left-color: var(--purple);
+        }
+
+        .stat-card.indigo {
+            border-left-color: var(--indigo);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            margin-bottom: .75rem;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: .5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .stat-icon.blue {
+            background: #eff6ff;
+            color: var(--primary);
+        }
+
+        .stat-icon.green {
+            background: #f0fdf4;
+            color: var(--success);
+        }
+
+        .stat-icon.yellow {
+            background: #fffbeb;
+            color: var(--warning);
+        }
+
+        .stat-icon.red {
+            background: #fef2f2;
+            color: var(--danger);
+        }
+
+        .stat-icon.purple {
+            background: #f5f3ff;
+            color: var(--purple);
+        }
+
+        .stat-icon.indigo {
+            background: #eef2ff;
+            color: var(--indigo);
+        }
+
+        .stat-label-top {
+            font-size: .75rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .stat-sub {
+            font-size: .75rem;
+            color: var(--gray-600);
+            margin-top: .25rem;
+        }
+
+        /* CARDS */
+        .card {
+            background: white;
+            border-radius: .75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .card-header p {
+            font-size: .8rem;
+            color: var(--gray-600);
+            margin-top: .15rem;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .75rem 1.5rem;
+            border: none;
+            border-radius: .5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .2s;
+            font-size: .875rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-sm {
+            padding: .375rem .875rem;
+            font-size: .75rem;
+        }
+
+        .btn:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* BAR CHART */
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: .75rem;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .bar-label {
+            font-size: .8rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            width: 90px;
+            text-transform: capitalize;
+            flex-shrink: 0;
+        }
+
+        .bar-track {
+            flex: 1;
+            background: var(--gray-100);
+            border-radius: 9999px;
+            height: 10px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 9999px;
+            transition: width .6s ease;
+        }
+
+        .bar-count {
+            font-size: .8rem;
+            font-weight: 700;
+            color: var(--gray-700);
+            width: 30px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* MINI CHART */
+        .sparkline {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 60px;
+            padding-top: .5rem;
+        }
+
+        .spark-bar {
+            flex: 1;
+            border-radius: 3px 3px 0 0;
+            background: var(--primary);
+            opacity: .7;
+            transition: .3s;
+            min-height: 4px;
+            position: relative;
+        }
+
+        .spark-bar:hover {
+            opacity: 1;
+        }
+
+        .spark-bar .tip {
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gray-900);
+            color: white;
+            font-size: .65rem;
+            padding: 2px 6px;
+            border-radius: 3px;
+            white-space: nowrap;
+            display: none;
+        }
+
+        .spark-bar:hover .tip {
+            display: block;
+        }
+
+        .spark-labels {
+            display: flex;
+            gap: 4px;
+            margin-top: .25rem;
+        }
+
+        .spark-label {
+            flex: 1;
+            font-size: .6rem;
+            color: var(--gray-600);
+            text-align: center;
+        }
+
+        /* USERS LIST */
+        .users-list {
+            display: flex;
+            flex-direction: column;
+            gap: .75rem;
+        }
+
+        .user-item {
+            border: 1px solid var(--gray-200);
+            border-radius: .5rem;
+            padding: 1.25rem;
+            background: var(--gray-50);
+            transition: .2s;
+        }
+
+        .user-item:hover {
+            border-color: var(--primary);
+            background: #eff6ff;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: .75rem;
+        }
+
+        .item-title {
+            font-weight: 700;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: .2rem .65rem;
+            border-radius: 9999px;
+            font-size: .7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-citizen {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-officer {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-admin {
+            background: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        .item-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: .75rem;
+        }
+
+        .detail-label {
+            font-size: .7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--gray-600);
+            margin-bottom: .15rem;
+        }
+
+        .detail-value {
+            font-size: .82rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .item-actions {
+            margin-top: .75rem;
+            padding-top: .75rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            gap: .5rem;
+        }
+
+        /* ACTIVITY LOG */
+        .log-filters {
+            display: flex;
+            gap: .75rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .log-filter-btn {
+            padding: .4rem 1rem;
+            border: 1.5px solid var(--gray-300);
+            border-radius: 9999px;
+            background: white;
+            font-size: .75rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            color: var(--gray-700);
+            transition: .2s;
+        }
+
+        .log-filter-btn:hover,
+        .log-filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .log-list {
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+            max-height: 480px;
+            overflow-y: auto;
+        }
+
+        .log-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: .875rem 1rem;
+            border-radius: .5rem;
+            background: var(--gray-50);
+            border-left: 3px solid var(--gray-300);
+            transition: .2s;
+        }
+
+        .log-item.success {
+            border-left-color: var(--success);
+        }
+
+        .log-item.failed {
+            border-left-color: var(--danger);
+        }
+
+        .log-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .8rem;
+            flex-shrink: 0;
+        }
+
+        .log-icon.LOGIN {
+            background: #eff6ff;
+            color: var(--primary);
+        }
+
+        .log-icon.REGISTER {
+            background: #f0fdf4;
+            color: var(--success);
+        }
+
+        .log-icon.CREATE_TOKEN {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+
+        .log-icon.CANCEL_TOKEN {
+            background: #fef2f2;
+            color: var(--danger);
+        }
+
+        .log-icon.COMPLETE_TOKEN {
+            background: #f0fdf4;
+            color: var(--success);
+        }
+
+        .log-icon.DEFAULT {
+            background: #f5f3ff;
+            color: var(--purple);
+        }
+
+        .log-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .log-action {
+            font-size: .82rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .log-detail {
+            font-size: .78rem;
+            color: var(--gray-600);
+            margin-top: .1rem;
+        }
+
+        .log-meta {
+            display: flex;
+            gap: 1rem;
+            margin-top: .25rem;
+        }
+
+        .log-user {
+            font-size: .72rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .log-time {
+            font-size: .72rem;
+            color: var(--gray-600);
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .log-status-badge {
+            font-size: .65rem;
+            font-weight: 700;
+            padding: .15rem .5rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+        }
+
+        .log-status-badge.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .log-status-badge.failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* HEALTH */
+        .health-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: .75rem;
+        }
+
+        .health-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: .875rem 1rem;
+            background: var(--gray-50);
+            border-radius: .5rem;
+        }
+
+        .health-status.good {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        /* EMPTY / LOADING */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem;
+            color: var(--gray-600);
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            opacity: .4;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: white;
+            border-radius: .5rem;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
+            display: none;
+            max-width: 320px;
+            z-index: 9999;
+        }
+
+        .toast.show {
+            display: block;
+            animation: slideIn .3s ease;
+        }
+
+        .toast.toast-success {
+            border-left: 4px solid var(--success);
+            color: #065f46;
+        }
+
+        .toast.toast-error {
+            border-left: 4px solid var(--danger);
+            color: #991b1b;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* MODALS */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .5);
+            z-index: 500;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, .25);
+            animation: modalIn .2s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                transform: scale(.95);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-600);
+            line-height: 1;
+            padding: .25rem .5rem;
+            border-radius: .25rem;
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
+            background: var(--gray-100);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: .875rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: .5rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: .75rem;
+            border: 1.5px solid var(--gray-300);
+            border-radius: .5rem;
+            font-family: 'Poppins', sans-serif;
+            font-size: .875rem;
+            transition: .2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .15);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        /* SETTINGS */
+        .settings-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-section h3 {
+            font-size: .9rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: .75rem;
+            padding-bottom: .5rem;
+            border-bottom: 2px solid var(--gray-100);
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: .875rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-info strong {
+            display: block;
+            font-size: .875rem;
+            color: var(--gray-900);
+            margin-bottom: .15rem;
+        }
+
+        .setting-info span {
+            font-size: .75rem;
+            color: var(--gray-600);
+        }
+
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 24px;
+            flex-shrink: 0;
+            margin-left: 1rem;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: var(--gray-300);
+            border-radius: 24px;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: .3s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+        }
+
+        .toggle input:checked+.toggle-slider {
+            background: var(--success);
+        }
+
+        .toggle input:checked+.toggle-slider:before {
+            transform: translateX(22px);
+        }
+
+        @media(max-width:768px) {
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                overflow-x: auto;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-brand"><i class="fas fa-stream"></i> QueuePro</a>
+            <div style="flex:1;display:flex;justify-content:center;">
+                <span class="role-badge"><i class="fas fa-shield-alt"></i> Administrator</span>
+            </div>
+            <div class="nav-right">
+                <a href="/admin-profile" class="menu-item"><i class="fas fa-user"></i> My Profile</a>
+                <span class="user-name" id="userName">
+                    <%= user ? (user.name || user.username || "Administrator" ) : "Administrator" %>
+                </span>
+                <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="welcome-section">
+            <h1>System Administration Dashboard</h1>
+            <p>Manage users, monitor queue analytics, and review system activity</p>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('overview')"><i class="fas fa-home"></i> Overview</button>
+            <button class="tab-btn" onclick="switchTab('analytics')"><i class="fas fa-chart-bar"></i> Queue
+                Analytics</button>
+            <button class="tab-btn" onclick="switchTab('logs')"><i class="fas fa-history"></i> Activity Logs</button>
+            <button class="tab-btn" onclick="switchTab('users')"><i class="fas fa-users"></i> All Users</button>
+        </div>
+
+        <!-- ========== TAB: OVERVIEW ========== -->
+        <div id="tab-overview" class="tab-pane active">
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <div class="stat-header">
+                        <div class="stat-icon blue"><i class="fas fa-users"></i></div><span class="stat-label-top">Total
+                            Users</span>
+                    </div>
+                    <div class="stat-value" id="totalUsers">—</div>
+                    <div class="stat-sub">All registered accounts</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-header">
+                        <div class="stat-icon green"><i class="fas fa-ticket-alt"></i></div><span
+                            class="stat-label-top">Total Tokens</span>
+                    </div>
+                    <div class="stat-value" id="totalTokens">—</div>
+                    <div class="stat-sub">All time</div>
+                </div>
+                <div class="stat-card yellow">
+                    <div class="stat-header">
+                        <div class="stat-icon yellow"><i class="fas fa-calendar-day"></i></div><span
+                            class="stat-label-top">Today's Tokens</span>
+                    </div>
+                    <div class="stat-value" id="todayTokens">—</div>
+                    <div class="stat-sub">Generated today</div>
+                </div>
+                <div class="stat-card indigo">
+                    <div class="stat-header">
+                        <div class="stat-icon indigo"><i class="fas fa-clock"></i></div><span class="stat-label-top">Avg
+                            Wait Time</span>
+                    </div>
+                    <div class="stat-value" id="avgWait">—</div>
+                    <div class="stat-sub">Minutes per token</div>
+                </div>
+            </div>
+
+            <div class="two-col">
+                <div class="card">
+                    <div class="card-header" style="flex-wrap:wrap;gap:.5rem;">
+                        <div>
+                            <h2>Quick Actions</h2>
+                            <p>Live data records from MongoDB</p>
+                        </div>
+                        <div style="display:flex;gap:.5rem;">
+                            <button class="btn btn-warning btn-sm" id="systemSettingsBtn"><i class="fas fa-cog"></i>
+                                Settings</button>
+                            <button class="btn btn-secondary btn-sm" id="backupBtn"><i class="fas fa-download"></i>
+                                Backup</button>
+                        </div>
+                    </div>
+                    <!-- Token Status Strip -->
+                    <div
+                        style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--gray-200);">
+                        <div style="padding:.875rem .5rem;text-align:center;border-right:1px solid var(--gray-200);">
+                            <div style="font-size:1.5rem;font-weight:700;color:var(--warning);" id="qa_pending">—</div>
+                            <div
+                                style="font-size:.68rem;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em;margin-top:.15rem;">
+                                Pending</div>
+                        </div>
+                        <div style="padding:.875rem .5rem;text-align:center;border-right:1px solid var(--gray-200);">
+                            <div style="font-size:1.5rem;font-weight:700;color:var(--primary);" id="qa_serving">—</div>
+                            <div
+                                style="font-size:.68rem;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em;margin-top:.15rem;">
+                                Serving</div>
+                        </div>
+                        <div style="padding:.875rem .5rem;text-align:center;border-right:1px solid var(--gray-200);">
+                            <div style="font-size:1.5rem;font-weight:700;color:var(--success);" id="qa_completed">—
+                            </div>
+                            <div
+                                style="font-size:.68rem;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em;margin-top:.15rem;">
+                                Completed</div>
+                        </div>
+                        <div style="padding:.875rem .5rem;text-align:center;">
+                            <div style="font-size:1.5rem;font-weight:700;color:var(--danger);" id="qa_cancelled">—</div>
+                            <div
+                                style="font-size:.68rem;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em;margin-top:.15rem;">
+                                Cancelled</div>
+                        </div>
+                    </div>
+                    <!-- Recent Tokens -->
+                    <div
+                        style="padding:.625rem 1.25rem;border-bottom:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-size:.78rem;font-weight:700;color:var(--gray-900);"><i
+                                class="fas fa-ticket-alt" style="color:var(--primary);margin-right:.4rem;"></i>Recent
+                            Tokens</span>
+                        <button class="btn btn-primary btn-sm" onclick="switchTab('analytics')"><i
+                                class="fas fa-chart-bar"></i> Analytics</button>
+                    </div>
+                    <div id="qa_recentTokens" style="max-height:230px;overflow-y:auto;">
+                        <div style="padding:1.5rem;text-align:center;color:var(--gray-600);font-size:.82rem;"><i
+                                class="fas fa-spinner fa-spin"></i> Loading...</div>
+                    </div>
+                    <!-- Users Footer -->
+                    <div
+                        style="border-top:1px solid var(--gray-200);padding:.75rem 1.25rem;display:flex;justify-content:space-between;align-items:center;background:var(--gray-50);flex-wrap:wrap;gap:.5rem;">
+                        <span style="font-size:.78rem;font-weight:600;color:var(--gray-700);"><i class="fas fa-users"
+                                style="color:var(--indigo);margin-right:.35rem;"></i><span id="qa_citizens"
+                                style="color:var(--primary);font-weight:700;">—</span> citizens &nbsp;·&nbsp; <span
+                                id="qa_officers" style="color:var(--warning);font-weight:700;">—</span> officers</span>
+                        <div style="display:flex;gap:.5rem;">
+                            <button class="btn btn-secondary btn-sm" onclick="switchTab('logs')"><i
+                                    class="fas fa-history"></i> Logs</button>
+                            <button class="btn btn-primary btn-sm" onclick="switchTab('users')"><i
+                                    class="fas fa-users"></i> All Users</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2>System Health</h2>
+                            <p>Live status</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="health-metrics">
+                            <div class="health-item"><span>Database:</span><span class="health-status good">✓
+                                    Healthy</span></div>
+                            <div class="health-item"><span>API Server:</span><span class="health-status good">✓
+                                    Healthy</span></div>
+                            <div class="health-item"><span>Queue Service:</span><span class="health-status good">✓
+                                    Operational</span></div>
+                            <div class="health-item"><span>Storage:</span><span class="health-status good">✓
+                                    Available</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== TAB: ANALYTICS ========== -->
+        <div id="tab-analytics" class="tab-pane">
+            <div class="stats-grid">
+                <div class="stat-card green">
+                    <div class="stat-header">
+                        <div class="stat-icon green"><i class="fas fa-check-circle"></i></div><span
+                            class="stat-label-top">Completed</span>
+                    </div>
+                    <div class="stat-value" id="a_completed">—</div>
+                    <div class="stat-sub">Tokens served</div>
+                </div>
+                <div class="stat-card yellow">
+                    <div class="stat-header">
+                        <div class="stat-icon yellow"><i class="fas fa-hourglass-half"></i></div><span
+                            class="stat-label-top">Pending</span>
+                    </div>
+                    <div class="stat-value" id="a_pending">—</div>
+                    <div class="stat-sub">In queue now</div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="stat-header">
+                        <div class="stat-icon blue"><i class="fas fa-concierge-bell"></i></div><span
+                            class="stat-label-top">Being Served</span>
+                    </div>
+                    <div class="stat-value" id="a_serving">—</div>
+                    <div class="stat-sub">Active right now</div>
+                </div>
+                <div class="stat-card red">
+                    <div class="stat-header">
+                        <div class="stat-icon red"><i class="fas fa-times-circle"></i></div><span
+                            class="stat-label-top">Cancelled</span>
+                    </div>
+                    <div class="stat-value" id="a_cancelled">—</div>
+                    <div class="stat-sub">By users</div>
+                </div>
+            </div>
+
+            <div class="two-col">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2>Tokens by Service Type</h2>
+                            <p>Which services are most used</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="bar-chart" id="serviceChart">
+                            <div class="empty-state"><i class="fas fa-spinner fa-spin"></i>
+                                <p>Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2>Tokens — Last 7 Days</h2>
+                            <p>Daily activity trend</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="sparkline" id="sparkline"></div>
+                        <div class="spark-labels" id="sparkLabels"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== TAB: ACTIVITY LOGS ========== -->
+        <div id="tab-logs" class="tab-pane">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2>Activity Logs</h2>
+                        <p>Full audit trail — every action recorded</p>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="loadLogs(currentFilter)"><i
+                            class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
+                <div class="card-content">
+                    <div class="log-filters">
+                        <button class="log-filter-btn active" onclick="filterLogs(null, this)">All</button>
+                        <button class="log-filter-btn" onclick="filterLogs('LOGIN', this)">Logins</button>
+                        <button class="log-filter-btn" onclick="filterLogs('REGISTER', this)">Registrations</button>
+                        <button class="log-filter-btn" onclick="filterLogs('CREATE_TOKEN', this)">Token Created</button>
+                        <button class="log-filter-btn" onclick="filterLogs('CANCEL_TOKEN', this)">Token
+                            Cancelled</button>
+                        <button class="log-filter-btn" onclick="filterLogs('COMPLETE_TOKEN', this)">Token
+                            Completed</button>
+                    </div>
+                    <div class="log-list" id="logList">
+                        <div class="empty-state"><i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading activity logs...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== TAB: USERS ========== -->
+        <div id="tab-users" class="tab-pane">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2>All Users</h2>
+                        <p>Loaded from MongoDB</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm" id="createUserBtn"><i class="fas fa-user-plus"></i> Create
+                        User</button>
+                </div>
+                <div class="card-content">
+                    <div id="usersList" class="users-list">
+                        <div class="empty-state"><i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading users...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <!-- CREATE USER MODAL -->
+    <div class="modal-overlay" id="createUserModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-plus" style="color:var(--primary);margin-right:.5rem;"></i>Create New User
+                </h2>
+                <button class="modal-close" onclick="closeModal('createUserModal')">&times;</button>
+            </div>
+            <div class="form-group"><label>Full Name</label><input type="text" id="cu_name"
+                    placeholder="e.g. John Smith"></div>
+            <div class="form-group"><label>Email Address</label><input type="email" id="cu_email"
+                    placeholder="e.g. john@example.com"></div>
+            <div class="form-group"><label>Username</label><input type="text" id="cu_username"
+                    placeholder="Min 3 characters"></div>
+            <div class="form-group"><label>Password</label><input type="password" id="cu_password"
+                    placeholder="Min 6 characters"></div>
+            <div class="form-group">
+                <label>Role</label>
+                <select id="cu_role">
+                    <option value="citizen">Citizen — applies for services & gets queue tokens</option>
+                    <option value="officer">Officer — manages queue, serves citizens</option>
+                    <option value="admin">Admin — full system access</option>
+                </select>
+            </div>
+            <p style="font-size:.78rem;color:var(--gray-600);"><i class="fas fa-info-circle"></i> Saved directly to
+                MongoDB. User can login immediately.</p>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('createUserModal')">Cancel</button>
+                <button class="btn btn-primary" id="cuSubmitBtn" onclick="submitCreateUser()"><i
+                        class="fas fa-user-plus"></i> Create User</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SYSTEM SETTINGS MODAL -->
+    <div class="modal-overlay" id="systemSettingsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog" style="color:var(--warning);margin-right:.5rem;"></i>System Settings</h2>
+                <button class="modal-close" onclick="closeModal('systemSettingsModal')">&times;</button>
+            </div>
+            <div class="settings-section">
+                <h3><i class="fas fa-ticket-alt" style="margin-right:.5rem;color:var(--primary);"></i>Queue</h3>
+                <div class="setting-item">
+                    <div class="setting-info"><strong>Allow Token Generation</strong><span>Citizens can create new queue
+                            tokens</span></div>
+                    <label class="toggle"><input type="checkbox" id="s_tokenGen"
+                            onchange="saveSetting('tokenGeneration',this.checked)"><span
+                            class="toggle-slider"></span></label>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info"><strong>Allow Token Cancellation</strong><span>Citizens can cancel their
+                            pending tokens</span></div>
+                    <label class="toggle"><input type="checkbox" id="s_tokenCancel"
+                            onchange="saveSetting('tokenCancellation',this.checked)"><span
+                            class="toggle-slider"></span></label>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info"><strong>Auto-refresh Dashboards</strong><span>Dashboards poll for new data
+                            every 10 seconds</span></div>
+                    <label class="toggle"><input type="checkbox" id="s_autoRefresh"
+                            onchange="saveSetting('autoRefresh',this.checked)"><span
+                            class="toggle-slider"></span></label>
+                </div>
+            </div>
+            <div class="settings-section">
+                <h3><i class="fas fa-user-plus" style="margin-right:.5rem;color:var(--primary);"></i>Registration</h3>
+                <div class="setting-item">
+                    <div class="setting-info"><strong>Allow New Registrations</strong><span>Anyone can register a new
+                            account</span></div>
+                    <label class="toggle"><input type="checkbox" id="s_registrations"
+                            onchange="saveSetting('registrations',this.checked)"><span
+                            class="toggle-slider"></span></label>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info"><strong>Allow Officer Self-Registration</strong><span>Officers can
+                            register; else admin creates them</span></div>
+                    <label class="toggle"><input type="checkbox" id="s_officerReg"
+                            onchange="saveSetting('officerRegistration',this.checked)"><span
+                            class="toggle-slider"></span></label>
+                </div>
+            </div>
+            <div class="settings-section">
+                <h3><i class="fas fa-bell" style="margin-right:.5rem;color:var(--primary);"></i>Notifications</h3>
+                <div class="setting-item">
+                    <div class="setting-info"><strong>Toast Notifications</strong><span>Show popup messages to users on
+                            actions</span></div>
+                    <label class="toggle"><input type="checkbox" id="s_notifications"
+                            onchange="saveSetting('notifications',this.checked)"><span
+                            class="toggle-slider"></span></label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('systemSettingsModal')">Close</button>
+                <button class="btn btn-success" onclick="saveAllSettings()"><i class="fas fa-save"></i> Save
+                    Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ─── INIT ───────────────────────────────────────────────────────────────
+        let currentFilter = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Auth is handled by server-side cookie; no localStorage JWT needed
+
+            document.getElementById('systemSettingsBtn').addEventListener('click', () => { loadSettingsToModal(); openModal('systemSettingsModal'); });
+            document.getElementById('backupBtn').addEventListener('click', performBackup);
+            document.getElementById('logoutBtn').addEventListener('click', function (e) {
+                e.preventDefault();
+                fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+                    .catch(() => { })
+                    .finally(() => { window.location.href = '/'; });
+            });
+            document.getElementById('createUserBtn').addEventListener('click', () => openModal('createUserModal'));
+
+            document.querySelectorAll('.modal-overlay').forEach(el => {
+                el.addEventListener('click', function (e) { if (e.target === this) closeModal(this.id); });
+            });
+
+            loadOverview();
+        });
+
+
+
+        // ─── TABS ───────────────────────────────────────────────────────────────
+        function switchTab(name) {
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + name).classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => { if (b.textContent.toLowerCase().includes(name === 'logs' ? 'activity' : name)) b.classList.add('active'); });
+
+            if (name === 'analytics') loadAnalytics();
+            else if (name === 'logs') loadLogs(currentFilter);
+            else if (name === 'users') loadUsers();
+            else if (name === 'overview') loadOverview();
+        }
+
+        // ─── OVERVIEW ───────────────────────────────────────────────────────────
+        function loadOverview() {
+            // Stats cards
+            fetch('/api/admin/analytics', { credentials: 'include' })
+                .then(r => r.json()).then(d => {
+                    if (!d.success) return;
+                    document.getElementById('totalTokens').textContent = d.data.totalTokens;
+                    document.getElementById('todayTokens').textContent = d.data.todayTokens;
+                    // Quick Actions token strip
+                    document.getElementById('qa_pending').textContent = (d.data.pending !== undefined) ? d.data.pending : '—';
+                    document.getElementById('qa_serving').textContent = (d.data.serving !== undefined) ? d.data.serving : '—';
+                    document.getElementById('qa_completed').textContent = (d.data.completed !== undefined) ? d.data.completed : '—';
+                    document.getElementById('qa_cancelled').textContent = (d.data.cancelled !== undefined) ? d.data.cancelled : '—';
+
+                    // Update Avg Wait Time card
+                    const avgWaitEl = document.getElementById('avgWait');
+                    if (avgWaitEl) {
+                        avgWaitEl.textContent = (d.data.avgWaitTime !== null && d.data.avgWaitTime !== undefined)
+                            ? d.data.avgWaitTime
+                            : '0';
+                    }
+                }).catch(() => { });
+
+            // Users strip
+            fetch('/api/admin/users', { credentials: 'include' })
+                .then(r => r.json()).then(d => {
+                    if (!d.success) return;
+                    document.getElementById('totalUsers').textContent = d.data.length;
+                    var citizens = d.data.filter(function (u) { return u.role === 'citizen'; }).length;
+                    var officers = d.data.filter(function (u) { return u.role === 'officer'; }).length;
+                    document.getElementById('qa_citizens').textContent = citizens;
+                    document.getElementById('qa_officers').textContent = officers;
+                }).catch(() => { });
+
+            // Recent tokens list
+            fetch('/api/queue/all-tokens', { credentials: 'include' })
+                .then(r => r.json()).then(d => {
+                    var container = document.getElementById('qa_recentTokens');
+                    if (!d.success || !d.data || !d.data.length) {
+                        container.innerHTML = '<div style="padding:1.5rem;text-align:center;color:var(--gray-600);font-size:.82rem;"><i class="fas fa-inbox"></i> No tokens yet</div>';
+                        return;
+                    }
+                    var recent = d.data.slice(0, 8);
+                    var statusColors = { pending: 'var(--warning)', serving: 'var(--primary)', completed: 'var(--success)', cancelled: 'var(--danger)' };
+                    var statusBg = { pending: '#fffbeb', serving: '#eff6ff', completed: '#f0fdf4', cancelled: '#fef2f2' };
+                    container.innerHTML = recent.map(function (t) {
+                        var id = t.tokenId || (t._id ? t._id.toString().slice(-6).toUpperCase() : '—');
+                        var sc = statusColors[t.status] || 'var(--gray-600)';
+                        var sb = statusBg[t.status] || '#f3f4f6';
+                        return '<div style="display:flex;align-items:center;gap:.75rem;padding:.625rem 1.25rem;border-bottom:1px solid var(--gray-100);">' +
+                            '<span style="font-size:.72rem;font-weight:700;background:' + sb + ';color:' + sc + ';padding:.2rem .55rem;border-radius:9999px;text-transform:uppercase;flex-shrink:0;">' + t.status + '</span>' +
+                            '<span style="font-size:.8rem;font-weight:700;color:var(--gray-900);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + id + '</span>' +
+                            '<span style="font-size:.75rem;color:var(--gray-600);flex-shrink:0;text-transform:capitalize;">' + (t.serviceType || '—') + '</span>' +
+                            '<span style="font-size:.7rem;color:var(--gray-600);flex-shrink:0;">' + timeAgo(t.createdAt) + '</span>' +
+                            '</div>';
+                    }).join('');
+                }).catch(function () {
+                    document.getElementById('qa_recentTokens').innerHTML = '<div style="padding:1.5rem;text-align:center;color:var(--gray-600);font-size:.82rem;"><i class="fas fa-exclamation-circle"></i> Could not load tokens</div>';
+                });
+        }
+
+        // ─── ANALYTICS ──────────────────────────────────────────────────────────
+        function loadAnalytics() {
+            fetch('/api/admin/analytics', { credentials: 'include' })
+                .then(r => r.json()).then(d => {
+                    if (!d.success) return;
+                    const { completed, pending, serving, cancelled, avgWaitTime, byService, dailyLast7 } = d.data;
+
+                    const avgWaitEl = document.getElementById('avgWait');
+                    if (avgWaitEl) {
+                        avgWaitEl.textContent = (avgWaitTime !== null && avgWaitTime !== undefined) ? avgWaitTime : '0';
+                    }
+
+                    document.getElementById('a_completed').textContent = completed;
+                    document.getElementById('a_pending').textContent = pending;
+                    document.getElementById('a_serving').textContent = serving;
+                    document.getElementById('a_cancelled').textContent = cancelled;
+
+                    // Service bar chart
+                    const colors = { passport: '#3b82f6', license: '#10b981', certificate: '#f59e0b', tax: '#8b5cf6', other: '#6b7280' };
+                    const maxCount = byService.length ? Math.max(...byService.map(s => s.count)) : 1;
+                    document.getElementById('serviceChart').innerHTML = byService.length ? byService.map(s => `
+                    <div class="bar-row">
+                        <span class="bar-label">${s._id}</span>
+                        <div class="bar-track"><div class="bar-fill" style="width:${Math.round(s.count / maxCount * 100)}%;background:${colors[s._id] || '#6b7280'};"></div></div>
+                        <span class="bar-count">${s.count}</span>
+                    </div>`).join('') : '<div class="empty-state"><i class="fas fa-chart-bar"></i><p>No token data yet</p></div>';
+
+                    // Sparkline for last 7 days
+                    const maxDay = dailyLast7.length ? Math.max(...dailyLast7.map(d => d.count), 1) : 1;
+                    // Fill in missing days
+                    const days = [];
+                    for (let i = 6; i >= 0; i--) {
+                        const d2 = new Date(); d2.setDate(d2.getDate() - i);
+                        const key = d2.toISOString().slice(0, 10);
+                        const found = dailyLast7.find(x => x._id === key);
+                        days.push({ date: key, count: found ? found.count : 0, label: d2.toLocaleDateString('en', { weekday: 'short' }) });
+                    }
+                    document.getElementById('sparkline').innerHTML = days.map(d => `
+                    <div class="spark-bar" style="height:${Math.max(8, Math.round(d.count / maxDay * 100))}%;">
+                        <span class="tip">${d.label}: ${d.count}</span>
+                    </div>`).join('');
+                    document.getElementById('sparkLabels').innerHTML = days.map(d => `<span class="spark-label">${d.label}</span>`).join('');
+
+                }).catch(() => showToast('Failed to load analytics', 'error'));
+        }
+
+        // ─── ACTIVITY LOGS ──────────────────────────────────────────────────────
+        const LOG_ICONS = { LOGIN: 'fa-sign-in-alt', REGISTER: 'fa-user-plus', CREATE_TOKEN: 'fa-ticket-alt', CANCEL_TOKEN: 'fa-times-circle', COMPLETE_TOKEN: 'fa-check-circle', ADMIN_LOGIN: 'fa-shield-alt' };
+        const LOG_COLORS = { LOGIN: 'LOGIN', REGISTER: 'REGISTER', CREATE_TOKEN: 'CREATE_TOKEN', CANCEL_TOKEN: 'CANCEL_TOKEN', COMPLETE_TOKEN: 'COMPLETE_TOKEN' };
+
+        function filterLogs(action, btn) {
+            currentFilter = action;
+            document.querySelectorAll('.log-filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            loadLogs(action);
+        }
+
+        function loadLogs(action) {
+            const url = '/api/admin/activity-logs' + (action ? '?action=' + action : '?limit=80');
+            document.getElementById('logList').innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div>';
+
+            fetch(url, { credentials: 'include' })
+                .then(r => r.json()).then(d => {
+                    if (!d.success || !d.data.length) {
+                        document.getElementById('logList').innerHTML = '<div class="empty-state"><i class="fas fa-history"></i><p>No activity logs found</p></div>';
+                        return;
+                    }
+                    document.getElementById('logList').innerHTML = d.data.map(log => {
+                        const iconClass = LOG_ICONS[log.action] || 'fa-bolt';
+                        const colorClass = LOG_COLORS[log.action] || 'DEFAULT';
+                        return `
+                    <div class="log-item ${log.status}">
+                        <div class="log-icon ${colorClass}"><i class="fas ${iconClass}"></i></div>
+                        <div class="log-body">
+                            <div style="display:flex;align-items:center;gap:.5rem;">
+                                <span class="log-action">${log.action.replace(/_/g, ' ')}</span>
+                                <span class="log-status-badge ${log.status}">${log.status}</span>
+                            </div>
+                            <div class="log-detail">${log.details || '—'}</div>
+                            <div class="log-meta">
+                                <span class="log-user"><i class="fas fa-user" style="font-size:.65rem;"></i> ${log.username}</span>
+                                <span style="font-size:.7rem;color:var(--gray-600);text-transform:uppercase;">${log.userRole}</span>
+                            </div>
+                        </div>
+                        <span class="log-time">${timeAgo(log.createdAt)}</span>
+                    </div>`;
+                    }).join('');
+                }).catch(() => showToast('Failed to load logs', 'error'));
+        }
+
+        // ─── USERS ──────────────────────────────────────────────────────────────
+        function loadUsers() {
+            fetch('/api/admin/users', { credentials: 'include' })
+                .then(r => r.json()).then(d => {
+                    if (!d.success) { document.getElementById('usersList').innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>Failed to load users</p></div>'; return; }
+                    const users = d.data;
+                    document.getElementById('usersList').innerHTML = users.length ? users.map(u => `
+                    <div class="user-item" id="user-${u._id}">
+                        <div class="item-header">
+                            <span class="item-title"><i class="fas fa-${u.role === 'citizen' ? 'user' : u.role === 'officer' ? 'user-tie' : 'shield-alt'}"></i>${u.name || u.username}</span>
+                            <span class="badge badge-${u.role}">${u.role.toUpperCase()}</span>
+                        </div>
+                        <div class="item-details">
+                            <div><div class="detail-label">Username</div><div class="detail-value">${u.username}</div></div>
+                            <div><div class="detail-label">Email</div><div class="detail-value">${u.email || 'N/A'}</div></div>
+                            <div><div class="detail-label">Joined</div><div class="detail-value">${formatDate(u.createdAt)}</div></div>
+                            <div><div class="detail-label">Last Login</div><div class="detail-value">${u.lastLogin ? timeAgo(u.lastLogin) : 'Never'}</div></div>
+                        </div>
+                        ${u.role !== 'admin' && u._id ? `<div class="item-actions"><button class="btn btn-danger btn-sm" onclick="deleteUser('${u._id}','${u.username}')"><i class="fas fa-trash"></i> Delete</button></div>` : ''}
+                    </div>`).join('') : '<div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div>';
+                }).catch(() => showToast('Failed to load users', 'error'));
+        }
+
+        // ─── CREATE USER ────────────────────────────────────────────────────────
+        function submitCreateUser() {
+            const fullName = document.getElementById('cu_name').value.trim();
+            const email = document.getElementById('cu_email').value.trim();
+            const username = document.getElementById('cu_username').value.trim();
+            const password = document.getElementById('cu_password').value;
+            const role = document.getElementById('cu_role').value;
+
+            if (!fullName || !email || !username || !password) { showToast('All fields are required', 'error'); return; }
+            if (username.length < 3) { showToast('Username min 3 chars', 'error'); return; }
+            if (password.length < 6) { showToast('Password min 6 chars', 'error'); return; }
+
+            const btn = document.getElementById('cuSubmitBtn');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+            fetch('/api/admin/create-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+                body: JSON.stringify({ fullName, email, username, password, role })
+            }).then(r => r.json()).then(result => {
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-user-plus"></i> Create User';
+                if (result.success) {
+                    showToast('User "' + username + '" created!', 'success');
+                    closeModal('createUserModal');
+                    ['cu_name', 'cu_email', 'cu_username', 'cu_password'].forEach(id => document.getElementById(id).value = '');
+                    if (document.getElementById('tab-users').classList.contains('active')) loadUsers();
+                } else {
+                    showToast(result.message || 'Failed to create user', 'error');
+                }
+            }).catch(err => { btn.disabled = false; btn.innerHTML = '<i class="fas fa-user-plus"></i> Create User'; showToast('Error: ' + err.message, 'error'); });
+        }
+
+        // ─── DELETE USER ────────────────────────────────────────────────────────
+        function deleteUser(userId, username) {
+            if (!confirm('Delete "' + username + '"? This cannot be undone.')) return;
+            fetch('/api/admin/users/' + userId, { method: 'DELETE', credentials: 'include' })
+                .then(r => r.json()).then(result => {
+                    if (result.success) {
+                        showToast(result.message, 'success');
+                        const el = document.getElementById('user-' + userId);
+                        if (el) { el.style.opacity = '0'; el.style.transition = '.3s'; setTimeout(() => { el.remove(); }, 300); }
+                    } else { showToast(result.message || 'Failed', 'error'); }
+                });
+        }
+
+        // ─── SETTINGS ───────────────────────────────────────────────────────────
+        const SETTING_MAP = { s_tokenGen: 'tokenGeneration', s_tokenCancel: 'tokenCancellation', s_autoRefresh: 'autoRefresh', s_registrations: 'registrations', s_officerReg: 'officerRegistration', s_notifications: 'notifications' };
+        const DEFAULTS = { tokenGeneration: true, tokenCancellation: true, autoRefresh: true, registrations: true, officerRegistration: true, notifications: true };
+
+        async function loadSettingsToModal() {
+            try {
+                const r = await fetch('/api/admin/settings', { credentials: 'include' });
+                const d = await r.json();
+                const settings = Object.assign({}, DEFAULTS, d.success ? d.data : {});
+                Object.entries(SETTING_MAP).forEach(([elId, key]) => { const el = document.getElementById(elId); if (el) el.checked = settings[key]; });
+            } catch (e) {
+                // If settings load fails, apply defaults
+                Object.entries(SETTING_MAP).forEach(([elId, key]) => { const el = document.getElementById(elId); if (el) el.checked = DEFAULTS[key]; });
+            }
+        }
+        async function saveSetting(key, value) {
+            await fetch('/api/admin/settings', {
+                method: 'PUT', credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ [key]: value })
+            });
+        }
+        async function saveAllSettings() {
+            const settings = {};
+            Object.entries(SETTING_MAP).forEach(([elId, key]) => { const el = document.getElementById(elId); if (el) settings[key] = el.checked; });
+            const r = await fetch('/api/admin/settings', {
+                method: 'PUT', credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(settings)
+            });
+            const d = await r.json();
+            showToast(d.success ? 'Settings saved!' : (d.message || 'Failed to save'), d.success ? 'success' : 'error');
+            if (d.success) closeModal('systemSettingsModal');
+        }
+
+        // ─── BACKUP ─────────────────────────────────────────────────────────────
+        function performBackup() {
+            showToast('Collecting backup data...', 'success');
+            fetch('/api/admin/users', { credentials: 'include' }).then(r => r.json()).then(d => {
+                const backup = { exportedAt: new Date().toISOString(), totalUsers: (d.data || []).length, users: d.data || [] };
+                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob); const a = document.createElement('a');
+                a.href = url; a.download = 'queuepro-backup-' + new Date().toISOString().slice(0, 10) + '.json'; a.click();
+                URL.revokeObjectURL(url); showToast('Backup downloaded!', 'success');
+            }).catch(() => showToast('Backup failed', 'error'));
+        }
+
+        // ─── HELPERS ────────────────────────────────────────────────────────────
+        function openModal(id) { document.getElementById(id).classList.add('open'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+        function showToast(msg, type) {
+            const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast show toast-' + type;
+            clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 3500);
+        }
+
+        function formatDate(d) {
+            if (!d) return 'N/A';
+            return new Date(d).toLocaleDateString();
+        }
+
+        function timeAgo(d) {
+            const diff = Date.now() - new Date(d);
+            const mins = Math.floor(diff / 60000);
+            if (mins < 1) return 'Just now';
+            if (mins < 60) return mins + 'm ago';
+            const hrs = Math.floor(mins / 60);
+            if (hrs < 24) return hrs + 'h ago';
+            const days = Math.floor(hrs / 24);
+            if (days < 7) return days + 'd ago';
+            return new Date(d).toLocaleDateString();
+        }
+    </script>
+</body>
+
+</html>

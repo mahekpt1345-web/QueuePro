@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - QueuePro</title>
+    <link rel="stylesheet" href="/css/auth-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="auth-page admin-login-page">
+    <!-- Navigation -->
+    <nav class="auth-navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">
+                <i class="fas fa-stream"></i>
+                <span>QueuePro</span>
+            </a>
+            <div class="nav-links">
+                <a href="/login" class="btn-link">User Login</a>
+                <a href="/register" class="btn-link">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Login Container -->
+    <div class="auth-container">
+        <!-- Admin Login Card -->
+        <div class="auth-card admin-card">
+            <div class="auth-header">
+                <div class="auth-icon admin-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h1>Admin Portal</h1>
+                <p>Restricted Access - Administrators Only</p>
+            </div>
+
+            <form id="adminLoginForm" class="auth-form">
+                <!-- Username -->
+                <div class="form-group">
+                    <label for="adminUsername">
+                        <i class="fas fa-user-shield"></i>
+                        Admin Username
+                    </label>
+                    <input 
+                        type="text" 
+                        id="adminUsername" 
+                        name="adminUsername" 
+                        placeholder="Enter admin username"
+                        required
+                        autocomplete="username"
+                    >
+                    <span class="error-message" id="usernameError"></span>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="adminPassword">
+                        <i class="fas fa-lock"></i>
+                        Admin Password
+                    </label>
+                    <div class="password-input">
+                        <input 
+                            type="password" 
+                            id="adminPassword" 
+                            name="adminPassword" 
+                            placeholder="Enter admin password"
+                            required
+                            autocomplete="current-password"
+                        >
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <span class="error-message" id="passwordError"></span>
+                </div>
+
+                <!-- Security Warning -->
+                <div class="security-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>This is a restricted admin area. Unauthorized access is prohibited.</p>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary btn-block btn-admin" id="adminLoginBtn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login as Admin
+                </button>
+
+                <!-- Back Link -->
+                <div class="form-footer">
+                    <p><a href="/login"><i class="fas fa-arrow-left"></i> Back to User Login</a></p>
+                </div>
+            </form>
+        </div>
+
+        <!-- Admin Info Panel -->
+        <div class="auth-info admin-info">
+            <h2>Admin Capabilities</h2>
+            <div class="info-list">
+                <div class="info-item">
+                    <i class="fas fa-users"></i>
+                    <h4>User Management</h4>
+                    <p>Create, edit, suspend, and delete user accounts</p>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <h4>Analytics & Reports</h4>
+                    <p>View detailed system analytics and generate reports</p>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-cog"></i>
+                    <h4>System Settings</h4>
+                    <p>Configure system parameters and preferences</p>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <h4>Security Controls</h4>
+                    <p>Monitor security logs and manage permissions</p>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-bell"></i>
+                    <h4>System Notifications</h4>
+                    <p>Send announcements and system-wide notifications</p>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-database"></i>
+                    <h4>Data Management</h4>
+                    <p>Manage database, backups, and data integrity</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Scripts -->
+    <script src="/js/auth-system.js"></script>
+    <script src="/js/ui-utils.js"></script>
+    <script src="/js/admin-login-handler.js"></script>
+</body>
+</html>
