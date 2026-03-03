@@ -13,6 +13,7 @@
 const User = require('../models/User');
 const Token = require('../models/Token');
 const ActivityLog = require('../models/ActivityLog');
+const SystemConfig = require('../models/SystemConfig');
 const { logActivity } = require('../middleware/auth');
 
 // ─────────────────────────────────────────────
@@ -270,6 +271,61 @@ exports.getAllTokens = async (req, res) => {
     } catch (err) {
         console.error('GET /api/queue/all-tokens error:', err);
         return res.status(500).json({ success: false, message: 'Failed to fetch tokens' });
+    }
+};
+
+// ─────────────────────────────────────────────
+// GET /api/admin/config
+// ─────────────────────────────────────────────
+exports.getSystemConfig = async (req, res) => {
+    try {
+        const configs = await SystemConfig.find();
+        const configMap = {};
+        configs.forEach(c => configMap[c.key] = c.value);
+
+        // Default values if not found
+        if (configMap.broadcast === undefined) configMap.broadcast = "";
+        if (configMap.serviceAvailability === undefined) {
+            configMap.serviceAvailability = {
+                aadhaar_update: true,
+                caste_certificate_verification: true,
+                income_certificate_verification: true,
+                birth_certificate_verification: true,
+                municipal_enquiry: true,
+                other: true
+            };
+        }
+
+        return res.json({ success: true, data: configMap });
+    } catch (err) {
+        console.error('GET /api/admin/config error:', err);
+        return res.status(500).json({ success: false, message: 'Failed to fetch config' });
+    }
+};
+
+// ─────────────────────────────────────────────
+// POST /api/admin/config
+// ─────────────────────────────────────────────
+exports.updateSystemConfig = async (req, res) => {
+    try {
+        const { key, value } = req.body;
+        if (!key) return res.status(400).json({ success: false, message: 'Key is required' });
+
+        await SystemConfig.findOneAndUpdate(
+            { key },
+            { value, updatedBy: req.user.username },
+            { upsert: true, new: true }
+        );
+
+        await logActivity('UPDATE_CONFIG', `System config updated: ${key}`, 'SYSTEM', req.user.userId, 'success', null, {
+            user: { _id: req.user.userId, username: req.user.username, role: 'admin' },
+            ip: req.ip, get: (h) => req.get(h)
+        });
+
+        return res.json({ success: true, message: `Config ${key} updated successfully` });
+    } catch (err) {
+        console.error('POST /api/admin/config error:', err);
+        return res.status(500).json({ success: false, message: 'Failed to update config' });
     }
 };
 

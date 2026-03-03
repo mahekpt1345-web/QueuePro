@@ -16,7 +16,7 @@ const { logActivity } = require('../middleware/auth');
 // ─────────────────────────────────────────────
 exports.createToken = async (req, res) => {
     try {
-        const { serviceType, description } = req.body;
+        const { serviceType, description, checklistConfirmed } = req.body;
         const userId = req.user.userId;
         const username = req.user.username;
         const userName = req.user.name;
@@ -29,6 +29,10 @@ exports.createToken = async (req, res) => {
             'other'
         ].includes(serviceType)) {
             return res.status(400).json({ success: false, message: 'Invalid service type' });
+        }
+
+        if (!checklistConfirmed) {
+            return res.status(400).json({ success: false, message: 'Document checklist must be confirmed' });
         }
 
         const timestamp = Date.now();
@@ -48,7 +52,8 @@ exports.createToken = async (req, res) => {
             description: description || '',
             status: 'pending',
             position: pendingCount + 1,
-            estimatedWaitTime
+            estimatedWaitTime,
+            checklistConfirmed: true
         });
 
         await newToken.save();

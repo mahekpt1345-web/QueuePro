@@ -102,6 +102,12 @@ const tokenSchema = new mongoose.Schema({
   cancelReason: {
     type: String,
     default: null
+  },
+
+  // Checklist confirmation
+  checklistConfirmed: {
+    type: Boolean,
+    default: false
   }
 });
 

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QueuePro - Smart Queue Management System</title>
+    <title>QueuePro - Queue Management System</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,6 +28,7 @@
             </div>
             <div class="nav-links" id="navLinks">
                 <a href="#home" class="nav-link active">Home</a>
+                <a href="/public-queue-status" class="nav-link">Queue Status</a>
                 <a href="#services" class="nav-link">Services</a>
                 <a href="#features" class="nav-link">Features</a>
                 <a href="/about" class="nav-link">About</a>
@@ -49,12 +50,7 @@
         <div class="container">
             <div class="hero-content">
                 <div class="hero-text">
-                    <div class="badge">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                            <path d="M8 2L9.5 5.5L13 6L10.5 8.5L11 12L8 10L5 12L5.5 8.5L3 6L6.5 5.5L8 2Z" />
-                        </svg>
-                        <span>Smart Queue Management System</span>
-                    </div>
+
                     <h1>Eliminate Wait Time<br><span class="gradient-text">Frustration Forever</span></h1>
                     <p class="hero-description">
                         QueuePro is a proposed academic government queue management prototype that demonstrates how
@@ -69,24 +65,6 @@
                         <button class="btn-large btn-primary" onclick="goToToken()">Get Your Token</button>
                         <button class="btn-large btn-outline" onclick="scrollToSection('services')">View
                             Services</button>
-                    </div>
-                    <div class="hero-stats">
-                        <div class="stat-item">
-                            <h3>50%</h3>
-                            <p>Reduced Wait Time</p>
-                        </div>
-                        <div class="stat-item">
-                            <h3>99.9%</h3>
-                            <p>System Uptime</p>
-                        </div>
-                        <div class="stat-item">
-                            <h3>3s</h3>
-                            <p>Slot-time Updates</p>
-                        </div>
-                        <div class="stat-item">
-                            <h3>24/7</h3>
-                            <p>System Availability</p>
-                        </div>
                     </div>
                 </div>
                 <div class="hero-visual">
@@ -263,6 +241,66 @@
                                 <polyline points="12 6 12 12 16 14" />
                             </svg>
                             <span>~6m wait</span>
+                        </span>
+                    </div>
+                    <button class="btn-service">Get Token →</button>
+                </div>
+
+                <div class="service-card" data-service="municipal_enquiry"
+                    onclick="getServiceToken('municipal_enquiry')">
+                    <div class="service-icon blue">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                            <polyline points="9 22 9 12 15 12 15 22" />
+                        </svg>
+                    </div>
+                    <h3>Municipal Enquiry</h3>
+                    <p>Property tax, water connection and NOC services</p>
+                    <div class="service-meta">
+                        <span class="meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="12" r="10" />
+                            </svg>
+                            <span id="municipal-waiting">2 waiting</span>
+                        </span>
+                        <span class="meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                            <span>~10m wait</span>
+                        </span>
+                    </div>
+                    <button class="btn-service">Get Token →</button>
+                </div>
+
+                <div class="service-card" data-service="other" onclick="getServiceToken('other')">
+                    <div class="service-icon purple">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                    </div>
+                    <h3>Other Services</h3>
+                    <p>Any other in-person government office service</p>
+                    <div class="service-meta">
+                        <span class="meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="12" r="10" />
+                            </svg>
+                            <span id="other-waiting">1 waiting</span>
+                        </span>
+                        <span class="meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                            <span>~5m wait</span>
                         </span>
                     </div>
                     <button class="btn-service">Get Token →</button>

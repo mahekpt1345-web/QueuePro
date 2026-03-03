@@ -1065,6 +1065,7 @@
             <button class="tab-btn active" onclick="switchTab('overview')"><i class="fas fa-home"></i> Overview</button>
             <button class="tab-btn" onclick="switchTab('analytics')"><i class="fas fa-chart-bar"></i> Queue
                 Analytics</button>
+            <button class="tab-btn" onclick="switchTab('system')"><i class="fas fa-cogs"></i> System Control</button>
             <button class="tab-btn" onclick="switchTab('logs')"><i class="fas fa-history"></i> Activity Logs</button>
             <button class="tab-btn" onclick="switchTab('users')"><i class="fas fa-users"></i> All Users</button>
         </div>
@@ -1315,6 +1316,60 @@
                         <div class="empty-state"><i class="fas fa-spinner fa-spin"></i>
                             <p>Loading users...</p>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== TAB: SYSTEM CONTROL ========== -->
+        <div id="tab-system" class="tab-pane">
+            <div class="two-col">
+                <!-- Broadcast Message -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-bullhorn"></i> Broadcast Message</h2>
+                        <p>Visible on all user dashboards</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label for="broadcastMessage">Announcement Text</label>
+                            <textarea id="broadcastMessage"
+                                style="width:100%; padding:1rem; border-radius:0.5rem; border:1.5px solid var(--gray-300); font-family:inherit; min-height:100px;"
+                                placeholder="Enter message to display..."></textarea>
+                        </div>
+                        <div style="display:flex; gap:1rem; margin-top:1rem;">
+                            <button class="btn btn-primary" onclick="saveBroadcast()">
+                                <i class="fas fa-save" style="margin-right:0.5rem;"></i> Update
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearBroadcast()">Clear</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Availability -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-toggle-on"></i> Service Availability</h2>
+                        <p>Enable or disable specific services</p>
+                    </div>
+                    <div class="card-content">
+                        <div id="serviceAvailabilityList" style="display:flex; flex-direction:column; gap:1rem;">
+                            <!-- Loaded via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Service Summary -->
+            <div class="card" style="margin-top:2rem;">
+                <div class="card-header">
+                    <h2><i class="fas fa-list-alt"></i> Daily Service Summary</h2>
+                    <p>Token count per service for today</p>
+                </div>
+                <div class="card-content">
+                    <div id="dailySummaryGrid"
+                        style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1.5rem;">
+                        <!-- Loaded via JS -->
                     </div>
                 </div>
             </div>
@@ -1787,6 +1842,128 @@
             if (days < 7) return days + 'd ago';
             return new Date(d).toLocaleDateString();
         }
+
+        /**
+         * System Config Logic
+         */
+        async function loadSystemConfig() {
+            try {
+                const res = await fetch('/api/admin/config', { credentials: 'include' });
+                const result = await res.json();
+
+                if (result.success) {
+                    const config = result.data;
+                    document.getElementById('broadcastMessage').value = config.broadcast || "";
+                    renderServiceAvailability(config.serviceAvailability);
+                    loadDailySummary();
+                }
+            } catch (err) {
+                console.error('Failed to load system config:', err);
+            }
+        }
+
+        async function saveBroadcast() {
+            const message = document.getElementById('broadcastMessage').value;
+            saveConfig('broadcast', message);
+        }
+
+        async function clearBroadcast() {
+            document.getElementById('broadcastMessage').value = "";
+            saveConfig('broadcast', "");
+        }
+
+        async function saveConfig(key, value) {
+            try {
+                const res = await fetch('/api/admin/config', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key, value })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    showToast('Configuration updated', 'success');
+                }
+            } catch (err) {
+                showToast('Failed to update config', 'error');
+            }
+        }
+
+        function renderServiceAvailability(availability) {
+            const container = document.getElementById('serviceAvailabilityList');
+            if (!container) return;
+
+            const services = {
+                aadhaar_update: 'Aadhaar Update',
+                caste_certificate_verification: 'Caste Certificate',
+                income_certificate_verification: 'Income Certificate',
+                birth_certificate_verification: 'Birth Certificate',
+                municipal_enquiry: 'Municipal Enquiry',
+                other: 'Other Services'
+            };
+
+            container.innerHTML = Object.entries(services).map(([key, label]) => `
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <strong>${label}</strong>
+                        <span>Currently ${availability[key] ? 'Active' : 'Disabled'}</span>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" ${availability[key] ? 'checked' : ''} onchange="toggleService('${key}', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            `).join('');
+        }
+
+        async function toggleService(serviceKey, isEnabled) {
+            const res = await fetch('/api/admin/config', { credentials: 'include' });
+            const result = await res.json();
+            if (result.success) {
+                const availability = result.data.serviceAvailability;
+                availability[serviceKey] = isEnabled;
+                saveConfig('serviceAvailability', availability);
+            }
+        }
+
+        async function loadDailySummary() {
+            const res = await fetch('/api/admin/analytics', { credentials: 'include' });
+            const result = await res.json();
+            if (result.success) {
+                const container = document.getElementById('dailySummaryGrid');
+                if (!container) return;
+
+                const byService = result.data.byService || [];
+
+                const services = {
+                    aadhaar_update: { label: 'Aadhaar', color: '#3b82f6' },
+                    caste_certificate_verification: { label: 'Caste', color: '#8b5cf6' },
+                    income_certificate_verification: { label: 'Income', color: '#10b981' },
+                    birth_certificate_verification: { label: 'Birth', color: '#f59e0b' },
+                    municipal_enquiry: { label: 'Municipal', color: '#ef4444' },
+                    other: { label: 'Other', color: '#6b7280' }
+                };
+
+                container.innerHTML = Object.entries(services).map(([key, info]) => {
+                    const match = byService.find(s => s._id === key);
+                    const count = match ? match.count : 0;
+                    return `
+                        <div class="stat-card" style="border-left: 4px solid ${info.color}">
+                            <div class="stat-label-top">${info.label}</div>
+                            <div class="stat-value" style="font-size: 1.5rem;">${count}</div>
+                            <div class="stat-sub">Tokens today</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // switchTab for system
+        const originalSwitchTab = window.switchTab;
+        window.switchTab = function (tabId) {
+            if (typeof originalSwitchTab === 'function') originalSwitchTab(tabId);
+            if (tabId === 'system') loadSystemConfig();
+        };
     </script>
 </body>
 

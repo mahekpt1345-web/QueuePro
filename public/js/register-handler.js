@@ -2,7 +2,7 @@
  * REGISTER FORM HANDLER
  */
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const registerForm = document.getElementById('registerForm');
     const registerBtn = document.getElementById('registerBtn');
     const togglePassword = document.getElementById('togglePassword');
@@ -94,6 +94,7 @@ async function handleRegister(e) {
 
     const fullName = document.getElementById('fullName').value.trim();
     const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone')?.value.trim();
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
@@ -103,6 +104,13 @@ async function handleRegister(e) {
     let isValid = true;
     if (!fullName) {
         UIUtils.showError('fullNameError', 'Full name is required');
+        isValid = false;
+    }
+    if (!phone) {
+        UIUtils.showError('phoneError', 'Phone number is required');
+        isValid = false;
+    } else if (!/^[0-9]{10}$/.test(phone)) {
+        UIUtils.showError('phoneError', 'Please enter a valid 10-digit mobile number');
         isValid = false;
     }
     if (!email) {
@@ -142,7 +150,7 @@ async function handleRegister(e) {
 
     UIUtils.disableButton('registerBtn', 'Creating Account...');
 
-    const result = await auth.register(username, email, password, confirmPassword, role, fullName);
+    const result = await auth.register(username, email, password, confirmPassword, role, fullName, phone);
 
     UIUtils.enableButton('registerBtn');
 

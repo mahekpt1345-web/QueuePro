@@ -11,25 +11,25 @@ const userSchema = new mongoose.Schema({
     trim: true,
     minlength: 3
   },
-  
+
   email: {
     type: String,
     required: true,
     unique: true,
     match: /^\S+@\S+\.\S+$/  // Email format validation
   },
-  
+
   password: {
     type: String,
     required: true,
     minlength: 6
   },
-  
+
   name: {
     type: String,
     required: true
   },
-  
+
   // Role (citizen, officer, admin)
   role: {
     type: String,
@@ -37,29 +37,31 @@ const userSchema = new mongoose.Schema({
     required: true,
     default: 'citizen'
   },
-  
-  // Phone (optional)
+
+  // Phone (Mobile Number)
   phone: {
     type: String,
-    default: null
+    required: true,
+    unique: true,
+    trim: true
   },
-  
+
   // Additional fields
   createdAt: {
     type: Date,
     default: Date.now
   },
-  
+
   lastLogin: {
     type: Date,
     default: null
   },
-  
+
   isActive: {
     type: Boolean,
     default: true
   },
-  
+
   // For officers
   assignedService: {
     type: String,
@@ -68,7 +70,7 @@ const userSchema = new mongoose.Schema({
 });
 
 // Hash password before saving
-userSchema.pre('save', async function() {
+userSchema.pre('save', async function () {
   if (!this.isModified('password')) {
     return;
   }
@@ -77,12 +79,12 @@ userSchema.pre('save', async function() {
 });
 
 // Method to compare password (for login)
-userSchema.methods.comparePassword = async function(enteredPassword) {
+userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
 // Method to remove password from response
-userSchema.methods.toJSON = function() {
+userSchema.methods.toJSON = function () {
   const user = this.toObject();
   delete user.password;  // Don't send password to frontend
   return user;

@@ -329,10 +329,10 @@
         }
 
         .token-number {
-            font-size: 3rem;
+            font-size: 2.5rem;
             font-weight: 700;
             color: var(--primary-color);
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
             font-family: 'Courier New', monospace;
         }
 
@@ -491,6 +491,107 @@
             }
         }
 
+        /* Service Tags & Indicators */
+        .service-tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: white;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .tag-aadhaar {
+            background-color: #3b82f6;
+        }
+
+        /* Blue */
+        .tag-caste {
+            background-color: #8b5cf6;
+        }
+
+        /* Purple */
+        .tag-income {
+            background-color: #10b981;
+        }
+
+        /* Green */
+        .tag-birth {
+            background-color: #f59e0b;
+        }
+
+        /* Orange */
+        .tag-municipal {
+            background-color: #ef4444;
+        }
+
+        /* Red */
+        .tag-other {
+            background-color: #6b7280;
+        }
+
+        /* Gray */
+
+        .pause-active {
+            background-color: #ef4444 !important;
+            animation: pulse-pause 2s infinite;
+        }
+
+        @keyframes pulse-pause {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.02);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Broadcast Banner */
+        .broadcast-banner {
+            background: linear-gradient(90deg, #3b82f6, #1e40af);
+            color: white;
+            padding: 0.75rem 2rem;
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .broadcast-banner i {
+            font-size: 1.25rem;
+            animation: pulse-broadcast 2s infinite;
+        }
+
+        @keyframes pulse-broadcast {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
         @media (max-width: 768px) {
             .nav-container {
                 flex-wrap: wrap;
@@ -515,6 +616,61 @@
             .btn {
                 width: 100%;
                 justify-content: center;
+            }
+        }
+
+        /* Service Tags */
+        .service-tag {
+            display: inline-block;
+            padding: 0.25rem 0.625rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .tag-aadhaar {
+            background-color: #3b82f6;
+        }
+
+        .tag-caste {
+            background-color: #8b5cf6;
+        }
+
+        .tag-income {
+            background-color: #10b981;
+        }
+
+        .tag-birth {
+            background-color: #f59e0b;
+        }
+
+        .tag-municipal {
+            background-color: #ef4444;
+        }
+
+        .tag-other {
+            background-color: #6b7280;
+        }
+
+        .pause-active {
+            background-color: var(--danger-color) !important;
+            animation: pulse-pause 2s infinite;
+        }
+
+        @keyframes pulse-pause {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+
+            100% {
+                opacity: 1;
             }
         }
     </style>
@@ -554,6 +710,12 @@
             </div>
         </div>
     </nav>
+
+    <!-- Broadcast Banner -->
+    <div id="broadcastBanner" class="broadcast-banner">
+        <i class="fas fa-bullhorn"></i>
+        <span id="broadcastText"></span>
+    </div>
 
     <!-- Main Content -->
     <div class="dashboard-container">
@@ -633,14 +795,29 @@
                 </div>
             </div>
 
-            <!-- Current Serving -->
             <div class="card">
                 <div class="card-header">
+                    <h2>Up Next</h2>
+                    <p>Next citizen in line</p>
+                </div>
+                <div class="card-content">
+                    <div id="upNextToken" class="current-token" style="padding: 1rem; min-height: 100px;">
+                        <p class="empty-state" style="padding: 1rem;">
+                            <i class="fas fa-user-clock" style="font-size: 1.5rem;"></i>
+                            <span style="font-size: 0.875rem;">Queue is empty</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Serving -->
+            <div class="card">
+                <div class="card-header" style="background-color: #eff6ff; border-bottom: 2px solid #3b82f6;">
                     <h2>Currently Serving</h2>
                     <p>Token being processed</p>
                 </div>
                 <div class="card-content">
-                    <div id="currentToken" class="current-token">
+                    <div id="currentToken" class="current-token" style="background-color: white;">
                         <p class="empty-state">
                             <i class="fas fa-inbox"></i>
                             No token currently being served
@@ -679,6 +856,7 @@
          */
 
         let currentServingToken = null;
+        let isPaused = false;
 
         document.addEventListener('DOMContentLoaded', function () {
             // Check authentication
@@ -777,6 +955,7 @@
                         .catch(err => console.error('[OFFICER] Stats error:', err));
 
                     loadQueueList(pendingTokens);
+                    loadUpNext(pendingTokens);
                 })
                 .catch(err => {
                     console.error('[OFFICER] Error loading pending tokens:', err);
@@ -829,7 +1008,7 @@
                 <div class="queue-item">
                     <div class="item-header">
                         <span class="item-title">#${index + 1} - ${token.tokenId || token.id}</span>
-                        <span class="item-status ${token.status}">${token.status.toUpperCase()}</span>
+                        <span class="service-tag ${getServiceClass(token.serviceType)}">${capitalizeService(token.serviceType)}</span>
                     </div>
                     <div class="item-details">
                         <div class="detail">
@@ -876,8 +1055,11 @@
             }
 
             container.innerHTML = `
-                <div class="token-display">
-                    <div class="token-number">${token.tokenId || token.id}</div>
+                <div class="token-display" style="border-width: 5px;">
+                    <div class="service-tag ${getServiceClass(token.serviceType)}" style="margin-bottom: 1rem; padding: 0.5rem 1rem; border-radius: 9999px;">
+                        ${capitalizeService(token.serviceType)}
+                    </div>
+                    <div class="token-number" style="font-size: 3rem;">${token.tokenId || token.id}</div>
                     <div class="token-details">
                         <div class="detail-row">
                             <span>Citizen:</span>
@@ -1023,7 +1205,64 @@
          * Pause queue
          */
         function pauseQueue() {
-            UIUtils.showToast('Queue paused - No new tokens will be processed', 'success');
+            const btn = document.getElementById('pauseBtn');
+            isPaused = !isPaused;
+
+            if (isPaused) {
+                btn.innerHTML = '<i class="fas fa-play"></i> Resume Queue';
+                btn.classList.add('pause-active');
+                document.getElementById('nextTokenBtn').disabled = true;
+                UIUtils.showToast('Queue Paused - No new tokens can be called', 'warning');
+            } else {
+                btn.innerHTML = '<i class="fas fa-pause"></i> Pause Queue';
+                btn.classList.remove('pause-active');
+                document.getElementById('nextTokenBtn').disabled = false;
+                UIUtils.showToast('Queue Resumed', 'success');
+            }
+        }
+
+        /**
+         * Load Up Next token
+         */
+        function loadUpNext(tokens) {
+            const container = document.getElementById('upNextToken');
+            const pending = tokens.filter(t => t.status === 'pending');
+
+            if (pending.length === 0) {
+                container.innerHTML = `
+                    <p class="empty-state" style="padding: 1rem;">
+                        <i class="fas fa-user-clock" style="font-size: 1.5rem;"></i>
+                        <span style="font-size: 0.875rem;">Queue is empty</span>
+                    </p>
+                `;
+                return;
+            }
+
+            const next = pending[0];
+            container.innerHTML = `
+                <div style="text-align: center;">
+                    <div class="service-tag ${getServiceClass(next.serviceType)}" style="font-size: 0.7rem;">${capitalizeService(next.serviceType)}</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color); font-family: 'Courier New', monospace; margin: 0.5rem 0;">
+                        ${next.tokenId}
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--gray-600);">Citizen: ${next.username}</div>
+                </div>
+            `;
+        }
+
+        /**
+         * Get service CSS class
+         */
+        function getServiceClass(service) {
+            const classes = {
+                aadhaar_update: 'tag-aadhaar',
+                caste_certificate_verification: 'tag-caste',
+                income_certificate_verification: 'tag-income',
+                birth_certificate_verification: 'tag-birth',
+                municipal_enquiry: 'tag-municipal',
+                other: 'tag-other'
+            };
+            return classes[service] || 'tag-other';
         }
 
         /**
@@ -1055,6 +1294,31 @@
             };
             return services[service] || service;
         }
+        /**
+         * System Configuration (Broadcast)
+         */
+        async function checkSystemConfig() {
+            try {
+                const res = await fetch('/api/admin/config', { credentials: 'include' });
+                const result = await res.json();
+                if (result.success) {
+                    const banner = document.getElementById('broadcastBanner');
+                    const text = document.getElementById('broadcastText');
+                    if (result.data.broadcast) {
+                        text.textContent = result.data.broadcast;
+                        banner.style.display = 'flex';
+                    } else {
+                        banner.style.display = 'none';
+                    }
+                }
+            } catch (err) {
+                console.error('[OFFICER] Failed to load system config');
+            }
+        }
+
+        // Initial check and periodic refresh
+        checkSystemConfig();
+        setInterval(checkSystemConfig, 30000); // Check every 30s
     </script>
 </body>
 
