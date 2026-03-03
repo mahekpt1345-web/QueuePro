@@ -21,7 +21,13 @@ exports.createToken = async (req, res) => {
         const username = req.user.username;
         const userName = req.user.name;
 
-        if (!serviceType || !['passport', 'license', 'certificate', 'tax', 'other'].includes(serviceType)) {
+        if (!serviceType || !['aadhaar_update',
+            'caste_certificate_verification',
+            'income_certificate_verification',
+            'birth_certificate_verification',
+            'municipal_enquiry',
+            'other'
+        ].includes(serviceType)) {
             return res.status(400).json({ success: false, message: 'Invalid service type' });
         }
 
@@ -29,6 +35,13 @@ exports.createToken = async (req, res) => {
         const tokenId = `TOKEN-${String(timestamp).slice(-5)}${Math.random().toString().slice(2, 5)}`;
         const pendingCount = await Token.countDocuments({ status: 'pending' });
         const estimatedWaitTime = pendingCount * 5;
+
+        let crowdLevel = "Low";
+        if (pendingCount > 10 && pendingCount <= 25) {
+            crowdLevel = "Moderate";
+        } else if (pendingCount > 25) {
+            crowdLevel = "High";
+        }
 
         const newToken = new Token({
             tokenId, userId, username, userName, serviceType,
@@ -40,12 +53,18 @@ exports.createToken = async (req, res) => {
 
         await newToken.save();
 
-        await logActivity('CREATE_TOKEN', `Token ${tokenId} created for ${serviceType}`, 'TOKEN', userId, 'success', null, {
+        await logActivity('CREATE_TOKEN', `Token ${tokenId} created for ${serviceType}. Crowd Level: ${crowdLevel}`, 'TOKEN', userId, 'success', null, {
             user: { _id: userId, username, role: req.user.role },
             ip: req.ip, get: (header) => req.get(header)
         });
 
-        res.status(201).json({ success: true, message: 'Token created successfully', data: newToken });
+        res.status(201).json({
+            success: true,
+            message: 'Token created successfully',
+            data: newToken,
+            token: newToken,
+            crowdLevel
+        });
     } catch (error) {
         console.error('Error creating token:', error);
         res.status(500).json({ success: false, message: 'Failed to create token', error: error.message });
@@ -168,6 +187,11 @@ exports.serveToken = async (req, res) => {
         token.startedAt = new Date();
         await token.save();
 
+        await logActivity('SERVE_TOKEN', `Started serving token ${token.tokenId}`, 'TOKEN', req.user.userId, 'success', null, {
+            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
+            ip: req.ip, get: (header) => req.get(header)
+        });
+
         res.json({ success: true, message: `Now serving token ${token.tokenId}`, data: token });
     } catch (error) {
         console.error('[OFFICER API] Error serving token:', error);
@@ -229,6 +253,11 @@ exports.skipToken = async (req, res) => {
         token.startedAt = null;
         await token.save();
 
+        await logActivity('SKIP_TOKEN', `Token ${token.tokenId} returned to pending queue`, 'TOKEN', req.user.userId, 'success', null, {
+            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
+            ip: req.ip, get: (header) => req.get(header)
+        });
+
         res.json({ success: true, message: `Token ${token.tokenId} returned to pending queue`, data: token });
     } catch (error) {
         console.error('[OFFICER API] Error skipping token:', error);
@@ -251,6 +280,11 @@ exports.startServing = async (req, res) => {
         token.startedAt = new Date();
         await token.save();
 
+        await logActivity('SERVE_TOKEN', `Started serving token ${token.tokenId} (Legacy)`, 'TOKEN', req.user.userId, 'success', null, {
+            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
+            ip: req.ip, get: (header) => req.get(header)
+        });
+
         res.json({ success: true, message: 'Token status updated to serving', data: token });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Failed to start serving token' });
@@ -270,6 +304,11 @@ exports.completeTokenLegacy = async (req, res) => {
         token.status = 'completed';
         token.completedAt = new Date();
         await token.save();
+
+        await logActivity('COMPLETE_TOKEN', `Token ${token.tokenId} marked as completed (Legacy)`, 'TOKEN', req.user.userId, 'success', null, {
+            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
+            ip: req.ip, get: (header) => req.get(header)
+        });
 
         res.json({ success: true, message: 'Token marked as completed', data: token });
     } catch (error) {
@@ -294,11 +333,19 @@ exports.getStatistics = async (req, res) => {
             Token.countDocuments({ status: 'completed', completedAt: { $gte: todayStart } })
         ]);
 
+        let crowdLevel = "Low";
+        if (pending > 10 && pending <= 25) {
+            crowdLevel = "Moderate";
+        } else if (pending > 25) {
+            crowdLevel = "High";
+        }
+
         res.json({
             success: true,
             message: 'Queue statistics retrieved',
             data: {
                 total, pending, serving, completed, cancelled, completedToday,
+                crowdLevel,
                 distribution: {
                     pending: total > 0 ? ((pending / total) * 100).toFixed(2) + '%' : '0%',
                     serving: total > 0 ? ((serving / total) * 100).toFixed(2) + '%' : '0%',

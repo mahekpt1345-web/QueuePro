@@ -31,8 +31,14 @@ const tokenSchema = new mongoose.Schema({
   // Service type
   serviceType: {
     type: String,
-    enum: ['passport', 'license', 'certificate', 'tax', 'other'],
-    required: true
+    enum: [
+      'aadhaar_update',
+      'caste_certificate_verification',
+      'income_certificate_verification',
+      'birth_certificate_verification',
+      'municipal_enquiry',
+      'other'
+    ]
   },
 
   // Description (optional)

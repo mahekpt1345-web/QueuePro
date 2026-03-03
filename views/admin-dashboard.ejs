@@ -1514,7 +1514,7 @@
                         return '<div style="display:flex;align-items:center;gap:.75rem;padding:.625rem 1.25rem;border-bottom:1px solid var(--gray-100);">' +
                             '<span style="font-size:.72rem;font-weight:700;background:' + sb + ';color:' + sc + ';padding:.2rem .55rem;border-radius:9999px;text-transform:uppercase;flex-shrink:0;">' + t.status + '</span>' +
                             '<span style="font-size:.8rem;font-weight:700;color:var(--gray-900);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + id + '</span>' +
-                            '<span style="font-size:.75rem;color:var(--gray-600);flex-shrink:0;text-transform:capitalize;">' + (t.serviceType || '—') + '</span>' +
+                            '<span style="font-size:.75rem;color:var(--gray-600);flex-shrink:0;text-transform:capitalize;">' + formatServiceLabel(t.serviceType) + '</span>' +
                             '<span style="font-size:.7rem;color:var(--gray-600);flex-shrink:0;">' + timeAgo(t.createdAt) + '</span>' +
                             '</div>';
                     }).join('');
@@ -1541,14 +1541,36 @@
                     document.getElementById('a_cancelled').textContent = cancelled;
 
                     // Service bar chart
-                    const colors = { passport: '#3b82f6', license: '#10b981', certificate: '#f59e0b', tax: '#8b5cf6', other: '#6b7280' };
-                    const maxCount = byService.length ? Math.max(...byService.map(s => s.count)) : 1;
-                    document.getElementById('serviceChart').innerHTML = byService.length ? byService.map(s => `
+                    const allServices = [
+                        'aadhaar_update',
+                        'caste_certificate_verification',
+                        'income_certificate_verification',
+                        'birth_certificate_verification',
+                        'municipal_enquiry',
+                        'other'
+                    ];
+
+                    const serviceData = allServices.map(serviceId => {
+                        const found = (byService || []).find(s => s._id === serviceId);
+                        return { _id: serviceId, count: found ? found.count : 0 };
+                    });
+
+                    const colors = {
+                        aadhaar_update: '#3b82f6',
+                        caste_certificate_verification: '#10b981',
+                        income_certificate_verification: '#f59e0b',
+                        birth_certificate_verification: '#8b5cf6',
+                        municipal_enquiry: '#6366f1',
+                        other: '#6b7280'
+                    };
+
+                    const maxCount = serviceData.length ? Math.max(...serviceData.map(s => s.count), 1) : 1;
+                    document.getElementById('serviceChart').innerHTML = serviceData.map(s => `
                     <div class="bar-row">
-                        <span class="bar-label">${s._id}</span>
+                        <span class="bar-label">${formatServiceLabel(s._id)}</span>
                         <div class="bar-track"><div class="bar-fill" style="width:${Math.round(s.count / maxCount * 100)}%;background:${colors[s._id] || '#6b7280'};"></div></div>
                         <span class="bar-count">${s.count}</span>
-                    </div>`).join('') : '<div class="empty-state"><i class="fas fa-chart-bar"></i><p>No token data yet</p></div>';
+                    </div>`).join('');
 
                     // Sparkline for last 7 days
                     const maxDay = dailyLast7.length ? Math.max(...dailyLast7.map(d => d.count), 1) : 1;
@@ -1581,7 +1603,7 @@
         }
 
         function loadLogs(action) {
-            const url = '/api/admin/activity-logs' + (action ? '?action=' + action : '?limit=80');
+            const url = '/api/admin/activity-logs' + (action ? '?action=' + action : '?limit=1000');
             document.getElementById('logList').innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div>';
 
             fetch(url, { credentials: 'include' })
@@ -1740,6 +1762,18 @@
         function formatDate(d) {
             if (!d) return 'N/A';
             return new Date(d).toLocaleDateString();
+        }
+
+        function formatServiceLabel(id) {
+            const labels = {
+                aadhaar_update: 'Aadhaar Update',
+                caste_certificate_verification: 'Caste Certificate',
+                income_certificate_verification: 'Income Certificate',
+                birth_certificate_verification: 'Birth Certificate',
+                municipal_enquiry: 'Municipal Enquiry',
+                other: 'Other Services'
+            };
+            return labels[id] || (id ? id.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : '—');
         }
 
         function timeAgo(d) {
