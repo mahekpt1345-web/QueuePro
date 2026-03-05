@@ -69,6 +69,14 @@ const userSchema = new mongoose.Schema({
   }
 });
 
+// Generate placeholder phone if missing (for legacy users or admin-created officers)
+userSchema.pre('validate', function (next) {
+  if (!this.phone) {
+    this.phone = this.role + '-' + (this.username || Date.now().toString());
+  }
+  next();
+});
+
 // Hash password before saving
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) {

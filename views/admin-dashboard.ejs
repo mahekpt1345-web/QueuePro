@@ -1034,6 +1034,19 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+
+        .broadcast-banner {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 1rem 2rem;
+            text-align: center;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 
@@ -1053,6 +1066,11 @@
             </div>
         </div>
     </nav>
+
+    <!-- Broadcast Banner -->
+    <div id="broadcastBanner" class="broadcast-banner" style="display:none;">
+        <i class="fas fa-bullhorn"></i> <span id="broadcastText"></span>
+    </div>
 
     <div class="dashboard-container">
         <div class="welcome-section">
@@ -1500,6 +1518,7 @@
             });
 
             loadOverview();
+            loadBroadcastBanner();
         });
 
 
@@ -1846,6 +1865,21 @@
         /**
          * System Config Logic
          */
+        async function loadBroadcastBanner() {
+            try {
+                const res = await fetch('/api/admin/config', { credentials: 'include' });
+                const result = await res.json();
+                if (result.success && result.data.broadcast) {
+                    document.getElementById('broadcastText').textContent = result.data.broadcast;
+                    document.getElementById('broadcastBanner').style.display = 'flex';
+                } else {
+                    document.getElementById('broadcastBanner').style.display = 'none';
+                }
+            } catch (err) {
+                console.error('Failed to load broadcast banner:', err);
+            }
+        }
+
         async function loadSystemConfig() {
             try {
                 const res = await fetch('/api/admin/config', { credentials: 'include' });
@@ -1864,12 +1898,14 @@
 
         async function saveBroadcast() {
             const message = document.getElementById('broadcastMessage').value;
-            saveConfig('broadcast', message);
+            await saveConfig('broadcast', message);
+            loadBroadcastBanner();
         }
 
         async function clearBroadcast() {
             document.getElementById('broadcastMessage').value = "";
-            saveConfig('broadcast', "");
+            await saveConfig('broadcast', "");
+            loadBroadcastBanner();
         }
 
         async function saveConfig(key, value) {

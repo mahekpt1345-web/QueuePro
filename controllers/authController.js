@@ -73,8 +73,7 @@ exports.apiLogin = async (req, res) => {
         const isPasswordValid = await user.comparePassword(password);
         if (!isPasswordValid) return res.status(401).json({ success: false, message: 'Invalid username or password' });
 
-        user.lastLogin = new Date();
-        await user.save();
+        await User.updateOne({ _id: user._id }, { $set: { lastLogin: new Date() } });
 
         const token = jwt.sign(
             { userId: user._id, username: user.username, role: user.role, name: user.name, email: user.email },
@@ -130,8 +129,7 @@ exports.apiAdminLogin = async (req, res) => {
             }
         }
 
-        admin.lastLogin = new Date();
-        await admin.save();
+        await User.updateOne({ _id: admin._id }, { $set: { lastLogin: new Date() } });
 
         const token = jwt.sign(
             { userId: admin._id, username: admin.username, role: 'admin', name: admin.name, email: admin.email },
@@ -150,7 +148,7 @@ exports.apiAdminLogin = async (req, res) => {
             user: { id: admin._id, username: admin.username, role: 'admin', name: admin.name, email: admin.email }
         });
     } catch (error) {
-        console.error('API admin login error:', error);
+        console.error('API admin login error:', error.message, error.errors);
         return res.status(500).json({ success: false, message: 'Admin login failed. Please try again.' });
     }
 };
@@ -300,8 +298,7 @@ exports.postLogin = async (req, res) => {
         if (!user || !(await user.comparePassword(password)))
             return res.render('auth/login', { title: 'Login - QueuePro', message: { type: 'error', text: 'Invalid credentials' } });
 
-        user.lastLogin = new Date();
-        await user.save();
+        await User.updateOne({ _id: user._id }, { $set: { lastLogin: new Date() } });
 
         const token = jwt.sign(
             { userId: user._id, username: user.username, role: user.role, name: user.name, email: user.email },
@@ -360,8 +357,7 @@ exports.postAdminLogin = async (req, res) => {
             }
         }
 
-        admin.lastLogin = new Date();
-        await admin.save();
+        await User.updateOne({ _id: admin._id }, { $set: { lastLogin: new Date() } });
 
         const token = jwt.sign(
             { userId: admin._id, username: admin.username, role: 'admin', name: admin.name, email: admin.email },
