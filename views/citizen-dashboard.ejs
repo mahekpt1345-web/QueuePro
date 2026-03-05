@@ -845,6 +845,7 @@
         <div id="toast" class="toast"></div>
 
         <!-- Scripts -->
+        <script src="/socket.io/socket.io.js"></script>
         <script src="/js/auth-system.js"></script>
         <script src="/js/ui-utils.js"></script>
         <script>
@@ -875,6 +876,9 @@
 
                 // Load initial data
                 loadCitizenData();
+
+                // Socket.io real-time notifications
+                initSocketNotifications();
 
                 // Refresh data every 10 seconds
                 setInterval(loadCitizenData, 10000);
@@ -952,7 +956,12 @@
                         UIUtils.enableButton('generateTokenBtn');
                         if (result.success) {
                             document.getElementById('tokenForm').reset();
+                            document.getElementById('checklistContainer').style.display = 'none';
                             UIUtils.showToast(`Token ${result.data.tokenId} generated successfully!`, 'success');
+                            // Subscribe this new token for socket notifications
+                            if (window._socket && result.data._id) {
+                                window._socket.emit('subscribe_token', result.data._id);
+                            }
                             setTimeout(() => loadCitizenData(), 500);
                         } else {
                             UIUtils.showToast(result.message || 'Failed to create token', 'error');
@@ -1092,10 +1101,10 @@
              */
             function capitalizeService(service) {
                 const services = {
-                    aadhaar_update: 'Aadhaar Update',
-                    caste_certificate_verification: 'Caste Certificate',
-                    income_certificate_verification: 'Income Certificate',
-                    birth_certificate_verification: 'Birth Certificate',
+                    aadhaar_update: 'Aadhaar Update / Correction',
+                    caste_certificate_verification: 'Caste Certificate Verification',
+                    income_certificate_verification: 'Income Certificate Verification',
+                    birth_certificate_verification: 'Birth Certificate Verification',
                     municipal_enquiry: 'Municipal Enquiry',
                     other: 'Other Services'
                 };
@@ -1250,6 +1259,81 @@
             checkSystemConfig();
             generateQR();
             setInterval(checkSystemConfig, 30000); // Check every 30s
+
+            /**
+             * Socket.io — Real-Time Queue Notifications
+             */
+            function initSocketNotifications() {
+                try {
+                    const socket = io();
+                    window._socket = socket;
+
+                    // Subscribe to general queue broadcasts
+                    socket.emit('subscribe_queue');
+
+                    socket.on('turn_notification', (data) => {
+                        showQueueNotification(data.message, data.type);
+                    });
+
+                    socket.on('token_called', (data) => {
+                        showQueueNotification(data.message, 'serving');
+                    });
+
+                    socket.on('queue_update', (data) => {
+                        // Silently refresh token data on queue changes
+                        loadCitizenData();
+                    });
+
+                    console.log('[Socket.io] Connected for real-time notifications');
+                } catch (e) {
+                    console.warn('[Socket.io] Not available:', e.message);
+                }
+            }
+
+            function showQueueNotification(message, type) {
+                // Show a dismissable notification banner
+                let notifEl = document.getElementById('queueNotifBanner');
+                if (!notifEl) {
+                    notifEl = document.createElement('div');
+                    notifEl.id = 'queueNotifBanner';
+                    notifEl.style.cssText = `
+                        position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+                        background: ${type === 'serving' ? '#059669' : type === 'next' ? '#dc2626' : '#2563eb'};
+                        color: white; padding: 1rem 2rem; border-radius: 1rem;
+                        box-shadow: 0 8px 24px rgba(0,0,0,0.3); z-index: 9999;
+                        font-weight: 600; font-size: 1rem; text-align: center;
+                        animation: slideDown 0.4s ease; max-width: 90vw;
+                        display: flex; align-items: center; gap: 1rem;
+                    `;
+                    document.body.appendChild(notifEl);
+                }
+                notifEl.innerHTML = `
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.remove()" style="background:rgba(255,255,255,0.3); border:none; color:white; padding:0.25rem 0.75rem; border-radius:0.5rem; cursor:pointer; font-weight:700;">✕</button>
+                `;
+                notifEl.style.display = 'flex';
+
+                // Auto-dismiss after 30 seconds
+                setTimeout(() => { if (notifEl) notifEl.remove(); }, 30000);
+
+                // Also update notification counter
+                const notifCount = document.getElementById('notifications');
+                if (notifCount) {
+                    notifCount.textContent = parseInt(notifCount.textContent || 0) + 1;
+                }
+
+                // Play a soft alert sound (optional)
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain); gain.connect(ctx.destination);
+                    osc.frequency.value = type === 'next' ? 880 : 660;
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+                    osc.start(); osc.stop(ctx.currentTime + 0.5);
+                } catch (e) { /* Sound not supported */ }
+            }
         </script>
 </body>
 

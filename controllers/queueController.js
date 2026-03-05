@@ -10,6 +10,53 @@
 const Token = require('../models/Token');
 const ActivityLog = require('../models/ActivityLog');
 const { logActivity } = require('../middleware/auth');
+const { SERVICE_TYPES, SERVICE_TIME, calculateEstimatedWaitTime } = require('../utils/serviceConfig');
+
+// ─────────────────────────────────────────────
+// Helper: emit queue update events via Socket.io
+// ─────────────────────────────────────────────
+async function emitQueueUpdate(req, targetUserId = null) {
+    try {
+        const io = req.app.get('io');
+        if (!io) return;
+
+        // Get current pending tokens for position notifications
+        const pendingTokens = await Token.find({ status: 'pending' })
+            .sort({ position: 1 })
+            .select('_id tokenId userId position serviceType')
+            .lean();
+
+        // Broadcast general queue update to all subscribers
+        io.to('queue_broadcast').emit('queue_update', {
+            pendingCount: pendingTokens.length,
+            timestamp: new Date().toISOString()
+        });
+
+        // Send position-specific notifications to each citizen
+        pendingTokens.forEach((token, idx) => {
+            const position = idx + 1;
+            const room = `token_${token._id}`;
+
+            if (position === 1) {
+                io.to(room).emit('turn_notification', {
+                    type: 'next',
+                    position,
+                    message: '🔔 You are next. Please proceed to the counter.',
+                    tokenId: token.tokenId
+                });
+            } else if (position <= 3) {
+                io.to(room).emit('turn_notification', {
+                    type: 'approaching',
+                    position,
+                    message: '🔔 Your turn will arrive in approximately 5–7 minutes. Please move towards the waiting area.',
+                    tokenId: token.tokenId
+                });
+            }
+        });
+    } catch (err) {
+        console.error('[SOCKET] Error emitting queue update:', err.message);
+    }
+}
 
 // ─────────────────────────────────────────────
 // POST /api/queue/create-token  (citizen)
@@ -21,13 +68,7 @@ exports.createToken = async (req, res) => {
         const username = req.user.username;
         const userName = req.user.name;
 
-        if (!serviceType || !['aadhaar_update',
-            'caste_certificate_verification',
-            'income_certificate_verification',
-            'birth_certificate_verification',
-            'municipal_enquiry',
-            'other'
-        ].includes(serviceType)) {
+        if (!serviceType || !SERVICE_TYPES.includes(serviceType)) {
             return res.status(400).json({ success: false, message: 'Invalid service type' });
         }
 
@@ -37,8 +78,16 @@ exports.createToken = async (req, res) => {
 
         const timestamp = Date.now();
         const tokenId = `TOKEN-${String(timestamp).slice(-5)}${Math.random().toString().slice(2, 5)}`;
-        const pendingCount = await Token.countDocuments({ status: 'pending' });
-        const estimatedWaitTime = pendingCount * 5;
+
+        // Get all pending tokens to calculate realistic wait time
+        const pendingTokens = await Token.find({ status: 'pending' })
+            .select('serviceType')
+            .lean();
+
+        const pendingCount = pendingTokens.length;
+
+        // Realistic wait time: sum of average times of all pending tokens
+        const estimatedWaitTime = calculateEstimatedWaitTime(pendingTokens, serviceType);
 
         let crowdLevel = "Low";
         if (pendingCount > 10 && pendingCount <= 25) {
@@ -62,6 +111,9 @@ exports.createToken = async (req, res) => {
             user: { _id: userId, username, role: req.user.role },
             ip: req.ip, get: (header) => req.get(header)
         });
+
+        // Emit queue updates to all subscribers
+        await emitQueueUpdate(req);
 
         res.status(201).json({
             success: true,
@@ -114,6 +166,9 @@ exports.cancelToken = async (req, res) => {
             user: { _id: userId, username: req.user.username, role: req.user.role },
             ip: req.ip, get: (header) => req.get(header)
         });
+
+        // Emit queue updates after cancellation
+        await emitQueueUpdate(req);
 
         res.json({ success: true, message: 'Token cancelled successfully', data: token });
     } catch (error) {
@@ -197,6 +252,20 @@ exports.serveToken = async (req, res) => {
             ip: req.ip, get: (header) => req.get(header)
         });
 
+        // Notify the citizen being served
+        const io = req.app.get('io');
+        if (io) {
+            io.to(`token_${token._id}`).emit('token_called', {
+                type: 'serving',
+                message: '🔔 You are now being served. Please proceed to the counter.',
+                tokenId: token.tokenId,
+                handledBy: officerUsername
+            });
+        }
+
+        // Emit queue re-positioning for all others
+        await emitQueueUpdate(req);
+
         res.json({ success: true, message: `Now serving token ${token.tokenId}`, data: token });
     } catch (error) {
         console.error('[OFFICER API] Error serving token:', error);
@@ -223,13 +292,15 @@ exports.completeToken = async (req, res) => {
 
         token.status = 'completed';
         token.completedAt = completedAt;
-        // actualWaitTime is already calculated in the model's pre-save during serveToken
         await token.save();
 
         await logActivity('COMPLETE_TOKEN', `Token ${token.tokenId} completed. Wait: ${token.actualWaitTime}min`, 'TOKEN', req.user.userId, 'success', null, {
             user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
             ip: req.ip, get: (header) => req.get(header)
         });
+
+        // Emit queue update
+        await emitQueueUpdate(req);
 
         res.json({ success: true, message: `Token ${token.tokenId} completed`, data: token });
     } catch (error) {
@@ -263,6 +334,8 @@ exports.skipToken = async (req, res) => {
             ip: req.ip, get: (header) => req.get(header)
         });
 
+        await emitQueueUpdate(req);
+
         res.json({ success: true, message: `Token ${token.tokenId} returned to pending queue`, data: token });
     } catch (error) {
         console.error('[OFFICER API] Error skipping token:', error);
@@ -290,6 +363,8 @@ exports.startServing = async (req, res) => {
             ip: req.ip, get: (header) => req.get(header)
         });
 
+        await emitQueueUpdate(req);
+
         res.json({ success: true, message: 'Token status updated to serving', data: token });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Failed to start serving token' });
@@ -314,6 +389,8 @@ exports.completeTokenLegacy = async (req, res) => {
             user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
             ip: req.ip, get: (header) => req.get(header)
         });
+
+        await emitQueueUpdate(req);
 
         res.json({ success: true, message: 'Token marked as completed', data: token });
     } catch (error) {

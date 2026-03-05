@@ -669,7 +669,14 @@
         }
 
         function capitalizeService(service) {
-            const services = { passport: 'Passport Application', license: 'License Renewal', certificate: 'Birth Certificate', tax: 'Tax Services', other: 'Other Services' };
+            const services = {
+                aadhaar_update: 'Aadhaar Update / Correction',
+                caste_certificate_verification: 'Caste Certificate Verification',
+                income_certificate_verification: 'Income Certificate Verification',
+                birth_certificate_verification: 'Birth Certificate Verification',
+                municipal_enquiry: 'Municipal Enquiry',
+                other: 'Other Services'
+            };
             return services[service] || service;
         }
 

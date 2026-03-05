@@ -1,13 +1,23 @@
 require('dotenv').config();
 const express = require('express');
+const http = require('http');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
+const { Server } = require('socket.io');
 
 const connectDB = require('./config/database');
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: { origin: '*', methods: ['GET', 'POST'] }
+});
+
 const JWT_SECRET = process.env.JWT_SECRET || 'queuepro_secret_2024';
+
+// Export io so controllers can emit events
+app.set('io', io);
 
 // ========================================
 // DATABASE CONNECTION
@@ -44,6 +54,25 @@ app.use((req, res, next) => {
 });
 
 // ========================================
+// SOCKET.IO — REAL-TIME QUEUE EVENTS
+// ========================================
+io.on('connection', (socket) => {
+    // Citizen subscribes to their token updates
+    socket.on('subscribe_token', (tokenId) => {
+        socket.join(`token_${tokenId}`);
+    });
+
+    // Citizen subscribes to general queue updates
+    socket.on('subscribe_queue', () => {
+        socket.join('queue_broadcast');
+    });
+
+    socket.on('disconnect', () => {
+        // cleanup handled automatically by socket.io
+    });
+});
+
+// ========================================
 // ROUTES
 // ========================================
 app.use('/', require('./routes/auth'));       // Auth: /api/auth/*, /register, /login, /admin-login, /logout
@@ -66,9 +95,10 @@ app.use((req, res) => {
 // START SERVER
 // ========================================
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`\n QueuePro Server Running`);
     console.log(`   URL: http://localhost:${PORT}`);
     console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`   Database: MongoDB\n`);
+    console.log(`   Database: MongoDB`);
+    console.log(`   Socket.IO: Enabled\n`);
 });
