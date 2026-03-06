@@ -36,7 +36,11 @@ exports.health = (req, res) => {
 // DASHBOARD PAGES (protected)
 // ─────────────────────────────────────────────
 exports.citizenDashboard = (req, res) => {
-    res.render('citizen-dashboard', { title: 'Citizen Dashboard - QueuePro', user: req.user || null });
+    res.render('citizen-dashboard', {
+        title: 'Citizen Dashboard - QueuePro',
+        user: req.user || null,
+        officialUrl: process.env.OFFICIAL_URL || `${req.protocol}://${req.get('host')}`
+    });
 };
 
 exports.citizenProfile = (req, res) => {

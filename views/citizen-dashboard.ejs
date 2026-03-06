@@ -626,6 +626,38 @@
                 font-size: 1.5rem;
             }
         }
+
+        /* Task 1 & 2: Notification pulse animation for token cards */
+        @keyframes notifPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 12px rgba(59, 130, 246, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
+        }
+
+        .notification-pulse {
+            animation: notifPulse 1s ease 3;
+            border-color: var(--primary-color) !important;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 
@@ -893,6 +925,8 @@
                     .then(data => {
                         if (data.success && data.data) {
                             displayTokens(data.data);
+                            // Task 1: Subscribe active tokens to socket rooms
+                            subscribeActiveTokens(data.data);
                         } else {
                             displayTokens([]);
                         }
@@ -1001,8 +1035,23 @@
                     return;
                 }
 
-                container.innerHTML = activeTokens.map(token => `
-                <div class="token-item">
+                container.innerHTML = activeTokens.map(token => {
+                    // Task 2: Progress visualization
+                    const isPending = token.status === 'pending';
+                    const isServing = token.status === 'serving';
+                    const pos = token.position || null;
+                    const totalInQueue = window._queueTotalPending || pos || 1;
+                    const progressPct = isPending && pos
+                        ? Math.max(5, Math.round(((totalInQueue - pos + 1) / totalInQueue) * 100))
+                        : isServing ? 100 : 50;
+                    const waitMins = isPending && pos ? Math.max(1, (pos - 1) * 7) : 0;
+                    const positionLabel = isPending
+                        ? (pos === 1 ? '🔔 You are next!' : pos <= 3 ? `⚡ Almost there — #${pos}` : `#${pos} in queue`)
+                        : isServing ? '✅ Currently being served' : '';
+                    const barColor = isServing ? '#10b981' : pos === 1 ? '#ef4444' : pos <= 3 ? '#f59e0b' : '#3b82f6';
+
+                    return `
+                <div class="token-item" id="token-card-${token._id}">
                     <div class="item-header">
                         <span class="item-title">${token.tokenId || token.id}</span>
                         <span class="item-status ${token.status}">${token.status.toUpperCase()}</span>
@@ -1014,22 +1063,39 @@
                         </div>
                         <div class="detail">
                             <span class="detail-label">Position</span>
-                            <span class="detail-value">#${token.position || 'N/A'}</span>
+                            <span class="detail-value" id="pos-${token._id}">${positionLabel || ('#' + (pos || 'N/A'))}</span>
                         </div>
+                        ${isPending && waitMins > 0 ? `
+                        <div class="detail">
+                            <span class="detail-label">Est. Wait</span>
+                            <span class="detail-value" id="wait-${token._id}" style="color:#f59e0b; font-weight:600;">~${waitMins} min</span>
+                        </div>` : ''}
                         <div class="detail">
                             <span class="detail-label">Created</span>
                             <span class="detail-value">${formatDate(token.createdAt)}</span>
                         </div>
                     </div>
-                    ${token.status === 'pending' ? `
+                    ${(isPending || isServing) ? `
+                    <div style="margin-top:1rem;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                            <span style="font-size:0.78rem; color:#6b7280; font-weight:500;">Queue Progress</span>
+                            <span style="font-size:0.78rem; color:${barColor}; font-weight:600;" id="pct-${token._id}">${progressPct}%</span>
+                        </div>
+                        <div style="background:#e5e7eb; border-radius:9999px; height:10px; overflow:hidden;">
+                            <div id="bar-${token._id}" style="height:100%; width:${progressPct}%; background:${barColor}; border-radius:9999px; transition:width 0.6s ease;"></div>
+                        </div>
+                        ${isPending && pos === 1 ? `<p style="margin-top:0.5rem; font-size:0.8rem; color:#ef4444; font-weight:600;"><i class="fas fa-bell"></i> Please proceed to the counter now.</p>` : ''}
+                        ${isPending && pos > 1 && pos <= 3 ? `<p style="margin-top:0.5rem; font-size:0.8rem; color:#f59e0b; font-weight:600;"><i class="fas fa-walking"></i> Please move towards the waiting area.</p>` : ''}
+                    </div>` : ''}
+                    ${isPending ? `
                         <div class="item-actions">
                             <button class="btn-cancel-token" onclick="cancelToken('${token._id}')">
                                 <i class="fas fa-times"></i> Cancel Token
                             </button>
                         </div>
                     ` : ''}
-                </div>
-            `).join('');
+                </div>`;
+                }).join('');
             }
 
             /**
@@ -1241,7 +1307,7 @@
             }
 
             function generateQR() {
-                const baseUrl = window.location.origin;
+                const baseUrl = '<%= officialUrl %>';
                 const statusUrl = baseUrl + '/public-queue-status';
 
                 const statusQrImg = document.getElementById('statusQR');
@@ -1271,8 +1337,17 @@
                     // Subscribe to general queue broadcasts
                     socket.emit('subscribe_queue');
 
+                    // Task 1: Subscribe each active token to its individual room
+                    // This is called after tokens are loaded (see subscribeActiveTokens below)
+
+                    // Task 1: Handle position-specific turn notifications from backend
                     socket.on('turn_notification', (data) => {
                         showQueueNotification(data.message, data.type);
+                        // Also update the token card if visible
+                        if (data.tokenId) {
+                            const card = document.querySelector(`[data-token-id="${data.tokenId}"]`);
+                            if (card) card.classList.add('notification-pulse');
+                        }
                     });
 
                     socket.on('token_called', (data) => {
@@ -1280,6 +1355,10 @@
                     });
 
                     socket.on('queue_update', (data) => {
+                        // Track total pending for progress bar calculation
+                        if (data.pendingCount !== undefined) {
+                            window._queueTotalPending = data.pendingCount;
+                        }
                         // Silently refresh token data on queue changes
                         loadCitizenData();
                     });
@@ -1288,6 +1367,16 @@
                 } catch (e) {
                     console.warn('[Socket.io] Not available:', e.message);
                 }
+            }
+
+            // Task 1: Subscribe all active tokens to their socket rooms
+            function subscribeActiveTokens(tokens) {
+                if (!window._socket || !tokens) return;
+                tokens.forEach(token => {
+                    if ((token.status === 'pending' || token.status === 'serving') && token._id) {
+                        window._socket.emit('subscribe_token', token._id);
+                    }
+                });
             }
 
             function showQueueNotification(message, type) {
@@ -1335,6 +1424,7 @@
                 } catch (e) { /* Sound not supported */ }
             }
         </script>
+        <%- include('partials/scroll-to-top') %>
 </body>
 
 </html>

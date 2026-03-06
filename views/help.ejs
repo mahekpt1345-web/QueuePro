@@ -4,256 +4,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Help & Guidance - QueuePro</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #3b82f6;
-            --secondary-color: #1e3a8a;
-            --bg-light: #f8fafc;
+            --primary: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --primary-light: #eff6ff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
             --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --white: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
-        .help-container {
-            max-width: 1100px;
-            margin: 4rem auto;
-            padding: 0 2rem;
+        body {
             font-family: 'Poppins', sans-serif;
+            background-color: var(--gray-50);
+            color: var(--gray-700);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
         }
 
-        .help-header {
+        .help-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 80px 0;
             text-align: center;
-            margin-bottom: 5rem;
         }
 
-        .help-header h1 {
-            font-size: 2.75rem;
-            font-weight: 700;
-            color: var(--secondary-color);
-            margin-bottom: 1rem;
-        }
-
-        .help-header p {
-            font-size: 1.15rem;
-            color: var(--gray-600);
-            max-width: 600px;
+        .container {
+            max-width: 1000px;
             margin: 0 auto;
+            padding: 40px 20px;
         }
 
-        /* 4-Step Guidance */
-        .guide-steps {
+        .content-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 3rem;
+            box-shadow: var(--shadow);
+            margin-top: -60px;
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 1.75rem;
+            margin: 2.5rem 0 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
+        .step-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 2.5rem;
-            margin-bottom: 5rem;
-            position: relative;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
         }
 
         .step-card {
-            background: white;
-            padding: 2.5rem 2rem;
-            border-radius: 1.25rem;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
+            padding: 1.5rem;
+            background: var(--gray-50);
+            border-radius: 0.75rem;
             text-align: center;
             position: relative;
-            transition: all 0.3s ease;
-            border: 1px solid #f1f5f9;
-        }
-
-        .step-card:hover {
-            transform: translateY(-12px);
-            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.1);
-            border-color: #dbeafe;
         }
 
         .step-number {
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--primary-color);
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
             color: white;
-            width: 45px;
-            height: 45px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 1.25rem;
-            box-shadow: 0 8px 15px rgba(59, 130, 246, 0.3);
-        }
-
-        .step-icon {
-            font-size: 3rem;
-            color: var(--primary-color);
-            margin-bottom: 1.75rem;
-            margin-top: 0.5rem;
-            display: inline-block;
-        }
-
-        .step-card h3 {
-            font-weight: 700;
-            color: var(--secondary-color);
-            margin-bottom: 1rem;
-            font-size: 1.25rem;
-        }
-
-        .step-card p {
-            font-size: 0.95rem;
-            color: var(--gray-600);
-            line-height: 1.6;
-        }
-
-        /* FAQ Section */
-        .faq-section {
-            background: var(--bg-light);
-            padding: 4rem;
-            border-radius: 2rem;
-            margin-bottom: 4rem;
-        }
-
-        .faq-section h2 {
-            text-align: center;
-            font-size: 2rem;
-            color: var(--secondary-color);
-            margin-bottom: 3rem;
-        }
-
-        .faq-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 2rem;
+            margin: 0 auto 1rem;
         }
 
         .faq-item {
-            background: white;
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-            border-left: 5px solid var(--primary-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--gray-100);
         }
 
-        .faq-item h4 {
-            font-weight: 700;
-            color: var(--secondary-color);
-            margin-bottom: 0.75rem;
+        .faq-question {
+            font-weight: 600;
+            color: var(--gray-800);
             font-size: 1.1rem;
+            margin-bottom: 0.5rem;
         }
 
-        .faq-item p {
-            font-size: 0.9rem;
+        .faq-answer {
             color: var(--gray-600);
             line-height: 1.6;
         }
 
-        .cta-section {
-            text-align: center;
-            margin-top: 4rem;
+        .search-container {
+            max-width: 600px;
+            margin: 2rem auto 0;
+            position: relative;
         }
 
-        .cta-section .btn {
-            padding: 1rem 2.5rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 0.75rem;
-            transition: all 0.3s ease;
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            padding-left: 3rem;
+            border-radius: 2rem;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-family: inherit;
+            font-size: 1rem;
         }
 
-        @media (max-width: 768px) {
-            .help-header h1 {
-                font-size: 2rem;
-            }
-
-            .faq-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .faq-section {
-                padding: 2rem;
-            }
+        .search-icon {
+            position: absolute;
+            left: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
         }
     </style>
 </head>
 
 <body>
-    <%- include('partials/navbar') %>
+    <div class="help-hero">
+        <h1 style="font-size: 3rem; font-weight: 800; margin: 0;">How can we help?</h1>
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="Search FAQ, guides, and more...">
+        </div>
+        <div style="margin-top: 2rem;">
+            <a href="/"
+                style="text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem; background:rgba(255,255,255,0.2); color:white; padding:0.6rem 1.2rem; border-radius:30px; border:1.5px solid rgba(255,255,255,0.4); font-size:0.9rem; font-weight:600; cursor:pointer; transition:0.3s; backdrop-filter:blur(5px);"><i
+                    class="fas fa-home"></i> Back to Home</a>
+        </div>
+    </div>
 
-        <div class="help-container">
-            <div class="help-header">
-                <h1>How It Works</h1>
-                <p>Your simple 4-step guide to a faster, more efficient government office visit using QueuePro.</p>
-            </div>
-
-            <div class="guide-steps">
+    <div class="container">
+        <div class="content-card">
+            <h2 class="section-title"><i class="fas fa-rocket"></i> Getting Started</h2>
+            <div class="step-grid">
                 <div class="step-card">
                     <div class="step-number">1</div>
-                    <i class="fas fa-user-plus step-icon"></i>
-                    <h3>Register Account</h3>
-                    <p>Create your secure account using your <strong>Mobile Number</strong> or
-                        <strong>Username</strong>. This keeps your details ready for all future visits.</p>
+                    <h3 style="font-size:1.1rem; margin-bottom:0.5rem;">Register</h3>
+                    <p style="font-size:0.9rem; color:var(--gray-600);">Create an account as a citizen to access
+                        services.</p>
                 </div>
                 <div class="step-card">
                     <div class="step-number">2</div>
-                    <i class="fas fa-list-check step-icon"></i>
-                    <h3>Check Documents</h3>
-                    <p>Select your service and review the <strong>Document Checklist</strong>. Ensure you have all
-                        required originals to avoid rejection at the counter.</p>
+                    <h3 style="font-size:1.1rem; margin-bottom:0.5rem;">Select Service</h3>
+                    <p style="font-size:0.9rem; color:var(--gray-600);">Choose the government document or inquiry you
+                        need.</p>
                 </div>
                 <div class="step-card">
                     <div class="step-number">3</div>
-                    <i class="fas fa-ticket step-icon"></i>
-                    <h3>Get Your Token</h3>
-                    <p>Request a digital token. You'll instantly see your <strong>Token ID</strong>, queue position, and
-                        <strong>Estimated Appointment Window</strong>.</p>
+                    <h3 style="font-size:1.1rem; margin-bottom:0.5rem;">Get Token</h3>
+                    <p style="font-size:0.9rem; color:var(--gray-600);">Generate a digital token and track your
+                        position.</p>
                 </div>
                 <div class="step-card">
                     <div class="step-number">4</div>
-                    <i class="fas fa-building-circle-check step-icon"></i>
-                    <h3>Relax & Visit</h3>
-                    <p>Monitor your status from home. Arrive at the office <strong>10 minutes before</strong> your time
-                        window and present your digital token ID.</p>
+                    <h3 style="font-size:1.1rem; margin-bottom:0.5rem;">Get Served</h3>
+                    <p style="font-size:0.9rem; color:var(--gray-600);">Receive notification and proceed to the counter.
+                    </p>
                 </div>
             </div>
 
-            <div class="faq-section">
-                <h2>Common Questions</h2>
-                <div class="faq-grid">
-                    <div class="faq-item">
-                        <h4>What if I'm late for my window?</h4>
-                        <p>If you aren't present when your token is called, the officer will mark you as "missed". Your
-                            token will be moved to a buffer zone for 15 minutes before expiring.</p>
-                    </div>
-                    <div class="faq-item">
-                        <h4>Can I cancel my appointment?</h4>
-                        <p>Yes, you can cancel your token anytime from your dashboard. This helps other citizens get
-                            their service faster.</p>
-                    </div>
-                    <div class="faq-item">
-                        <h4>Do I need to print the token?</h4>
-                        <p>No printing is required. Simply show the digital token screen on your phone or provide your
-                            Token ID to the officer.</p>
-                    </div>
-                    <div class="faq-item">
-                        <h4>What are the office hours?</h4>
-                        <p>The queue system follows standard government office hours (9:00 AM to 5:00 PM). Tokens cannot
-                            be generated outside these hours.</p>
-                    </div>
-                </div>
+            <h2 class="section-title"><i class="fas fa-question-circle"></i> Frequently Asked Questions</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">Do I need to stay at the office after getting a token?</div>
+                <div class="faq-answer">No! You can track your position in real-time on your dashboard. We recommend
+                    arriving at the counter when you are in the top 3 of the queue.</div>
             </div>
 
-            <div class="cta-section">
-                <a href="/citizen-dashboard" class="btn btn-primary"
-                    style="background:var(--primary-color); color:white; padding: 1rem 2rem; border-radius: 8px; text-decoration:none;">
-                    <i class="fas fa-arrow-left" style="margin-right:0.5rem;"></i> Back to Dashboard
-                </a>
+            <div class="faq-item">
+                <div class="faq-question">How do I know when it's my turn?</div>
+                <div class="faq-answer">QueuePro will send you a notification on your dashboard. You will also see your
+                    status change to "Currently Being Served".</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Can I cancel my token if I can't make it?</div>
+                <div class="faq-answer">Yes, you can cancel your active token at any time from your citizen dashboard by
+                    clicking the "Cancel Token" button.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What if I miss my turn?</div>
+                <div class="faq-answer">If you are not present when called, the officer may "skip" your token. You will
+                    need to generate a new token if that happens.</div>
+            </div>
+
+            <div
+                style="margin-top: 3rem; padding: 2rem; background: var(--primary-light); border-radius: 0.75rem; text-align: center;">
+                <h3 style="color: var(--primary); margin-bottom: 0.5rem;">Still have questions?</h3>
+                <p style="margin-bottom: 1.5rem;">Our support team is ready to help you.</p>
+                <a href="/contact"
+                    style="text-decoration:none; padding:0.75rem 1.5rem; background:var(--primary); color:white; border-radius:0.5rem; font-weight:600;">Contact
+                    Support</a>
             </div>
         </div>
+    </div>
 
-        <%- include('partials/footer') %>
+    <footer style="text-align: center; padding: 40px 20px; color: var(--gray-600); font-size: 0.9rem;">
+        &copy; 2024 QueuePro - Smart Queue Management System. All rights reserved.
+    </footer>
+
+    <%- include('partials/scroll-to-top') %>
 </body>
 
 </html>

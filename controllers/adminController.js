@@ -13,6 +13,8 @@
 const User = require('../models/User');
 const Token = require('../models/Token');
 const ActivityLog = require('../models/ActivityLog');
+let QRCode;
+try { QRCode = require('qrcode'); } catch (e) { QRCode = null; }
 const SystemConfig = require('../models/SystemConfig');
 const { logActivity } = require('../middleware/auth');
 
@@ -332,8 +334,23 @@ exports.updateSystemConfig = async (req, res) => {
 // ─────────────────────────────────────────────
 // GET /admin-dashboard  (EJS page render)
 // ─────────────────────────────────────────────
-exports.showDashboard = (req, res) => {
-    res.render('admin-dashboard', { title: 'Admin Dashboard - QueuePro', user: req.user || null });
+exports.showDashboard = async (req, res) => {
+    let qrCodeDataUrl = null;
+    try {
+        if (QRCode) {
+            const baseUrl = process.env.OFFICIAL_URL || `${req.protocol}://${req.get('host')}`;
+            const publicQueueUrl = `${baseUrl}/public-queue-status`;
+
+            qrCodeDataUrl = await QRCode.toDataURL(publicQueueUrl, {
+                width: 200,
+                margin: 2,
+                color: { dark: '#1e3a5f', light: '#ffffff' }
+            });
+        }
+    } catch (e) {
+        console.error('[QR] Failed to generate QR code:', e.message);
+    }
+    res.render('admin-dashboard', { title: 'Admin Dashboard - QueuePro', user: req.user || null, qrCodeDataUrl });
 };
 
 // ─────────────────────────────────────────────
