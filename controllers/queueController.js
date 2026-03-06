@@ -252,6 +252,7 @@ exports.serveToken = async (req, res) => {
             ip: req.ip, get: (header) => req.get(header)
         });
 
+<<<<<<< HEAD
         // Notify the citizen being served
         const io = req.app.get('io');
         if (io) {
@@ -266,6 +267,8 @@ exports.serveToken = async (req, res) => {
         // Emit queue re-positioning for all others
         await emitQueueUpdate(req);
 
+=======
+>>>>>>> Queuepro
         res.json({ success: true, message: `Now serving token ${token.tokenId}`, data: token });
     } catch (error) {
         console.error('[OFFICER API] Error serving token:', error);
@@ -334,8 +337,11 @@ exports.skipToken = async (req, res) => {
             ip: req.ip, get: (header) => req.get(header)
         });
 
+<<<<<<< HEAD
         await emitQueueUpdate(req);
 
+=======
+>>>>>>> Queuepro
         res.json({ success: true, message: `Token ${token.tokenId} returned to pending queue`, data: token });
     } catch (error) {
         console.error('[OFFICER API] Error skipping token:', error);
@@ -363,8 +369,11 @@ exports.startServing = async (req, res) => {
             ip: req.ip, get: (header) => req.get(header)
         });
 
+<<<<<<< HEAD
         await emitQueueUpdate(req);
 
+=======
+>>>>>>> Queuepro
         res.json({ success: true, message: 'Token status updated to serving', data: token });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Failed to start serving token' });
@@ -390,8 +399,11 @@ exports.completeTokenLegacy = async (req, res) => {
             ip: req.ip, get: (header) => req.get(header)
         });
 
+<<<<<<< HEAD
         await emitQueueUpdate(req);
 
+=======
+>>>>>>> Queuepro
         res.json({ success: true, message: 'Token marked as completed', data: token });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Failed to complete token' });
