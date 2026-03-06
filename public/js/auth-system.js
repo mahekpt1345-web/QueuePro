@@ -33,11 +33,11 @@ class AuthSystem {
     }
 
     // Register new user (async, calls API)
-    async register(username, email, password, confirmPassword, role, fullName) {
+    async register(username, email, password, confirmPassword, role, fullName, phone) {
         if (username && username.toLowerCase() === 'admin') {
             return { success: false, message: 'This username is reserved.', type: 'error' };
         }
-        const validation = this.validateRegistration(username, email, password, confirmPassword, role);
+        const validation = this.validateRegistration(username, email, password, confirmPassword, role, phone);
         if (!validation.success) return validation;
 
         const name = fullName != null && fullName !== '' ? fullName : username;
@@ -49,6 +49,7 @@ class AuthSystem {
                     username,
                     email,
                     fullName: name,
+                    phone,
                     password,
                     confirmPassword,
                     role: role || 'citizen'
@@ -163,12 +164,18 @@ class AuthSystem {
         return { success: true, message: 'Logged out successfully!', type: 'success' };
     }
 
-    validateRegistration(username, email, password, confirmPassword, role) {
+    validateRegistration(username, email, password, confirmPassword, role, phone) {
         if (!username || String(username).trim() === '') {
             return { success: false, message: 'Username is required.', type: 'error' };
         }
         if (String(username).length < 3) {
             return { success: false, message: 'Username must be at least 3 characters.', type: 'error' };
+        }
+        if (!phone || String(phone).trim() === '') {
+            return { success: false, message: 'Phone number is required.', type: 'error' };
+        }
+        if (!/^[0-9]{10}$/.test(phone)) {
+            return { success: false, message: 'Please enter a valid 10-digit phone number.', type: 'error' };
         }
         if (!email || !this.isValidEmail(email)) {
             return { success: false, message: 'Valid email is required.', type: 'error' };

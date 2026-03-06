@@ -16,28 +16,30 @@ const adminController = require('../controllers/adminController');
 const isAdmin = [verifyToken, checkRole(['admin'])];
 
 // ── User Management ──────────────────────────
-router.get(   '/api/users',                    ...isAdmin, adminController.getUsers);
-router.get(   '/api/admin/users',              ...isAdmin, adminController.adminGetUsers);
-router.delete('/api/admin/users/:userId',      ...isAdmin, adminController.deleteUser);
-router.post(  '/api/admin/create-user',        ...isAdmin, adminController.createUser);
+router.get('/api/users', ...isAdmin, adminController.getUsers);
+router.get('/api/admin/users', ...isAdmin, adminController.adminGetUsers);
+router.delete('/api/admin/users/:userId', ...isAdmin, adminController.deleteUser);
+router.post('/api/admin/create-user', ...isAdmin, adminController.createUser);
 
 // ── Analytics & Logs ─────────────────────────
-router.get('/api/admin/analytics',             ...isAdmin, adminController.getAnalytics);
-router.get('/api/admin/activity-logs',         ...isAdmin, adminController.getActivityLogs);
+router.get('/api/admin/analytics', ...isAdmin, adminController.getAnalytics);
+router.get('/api/admin/activity-logs', ...isAdmin, adminController.getActivityLogs);
 
 // ── Settings ─────────────────────────────────
-router.get('/api/admin/settings',              ...isAdmin, adminController.getSettings);
-router.put('/api/admin/settings',              ...isAdmin, adminController.updateSettings);
+router.get('/api/admin/settings', ...isAdmin, adminController.getSettings);
+router.put('/api/admin/settings', ...isAdmin, adminController.updateSettings);
+router.get('/api/admin/config', verifyToken, adminController.getSystemConfig);
+router.post('/api/admin/config', ...isAdmin, adminController.updateSystemConfig);
 
 // ── Profile data ─────────────────────────────
-router.get('/api/admin/profile-stats',         ...isAdmin, adminController.getProfileStats);
-router.get('/api/admin/profile-activity',      ...isAdmin, adminController.getProfileActivity);
+router.get('/api/admin/profile-stats', ...isAdmin, adminController.getProfileStats);
+router.get('/api/admin/profile-activity', ...isAdmin, adminController.getProfileActivity);
 
 // ── All tokens (admin view) ───────────────────
-router.get('/api/queue/all-tokens',            ...isAdmin, adminController.getAllTokens);
+router.get('/api/queue/all-tokens', ...isAdmin, adminController.getAllTokens);
 
 // ── EJS Page Renders (protected) ─────────────
 router.get('/admin-dashboard', ensureAuthenticated, ensureRole(['admin']), adminController.showDashboard);
-router.get('/admin-profile',   ensureAuthenticated, ensureRole(['admin']), adminController.showProfile);
+router.get('/admin-profile', ensureAuthenticated, ensureRole(['admin']), adminController.showProfile);
 
 module.exports = router;

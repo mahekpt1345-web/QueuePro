@@ -20,22 +20,25 @@ const JWT_SECRET = process.env.JWT_SECRET || 'queuepro_secret_2024';
 // ─────────────────────────────────────────────
 exports.apiRegister = async (req, res) => {
     try {
-        const { username, email, fullName, password, confirmPassword, role } = req.body;
-        if (!username || !email || !fullName || !password || !role)
+        const { username, email, phone, fullName, password, confirmPassword, role } = req.body;
+        if (!username || !email || !phone || !fullName || !password || !role)
             return res.status(400).json({ success: false, message: 'All fields are required' });
         if (password !== confirmPassword)
             return res.status(400).json({ success: false, message: 'Passwords do not match' });
         if (password.length < 6)
             return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
 
-        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+        const existingUser = await User.findOne({ $or: [{ username }, { email }, { phone }] });
         if (existingUser) {
-            const msg = existingUser.username === username ? 'Username already taken' : 'Email already registered';
+            let msg = 'User already exists';
+            if (existingUser.username === username) msg = 'Username already taken';
+            else if (existingUser.email === email) msg = 'Email already registered';
+            else if (existingUser.phone === phone) msg = 'Phone number already registered';
             return res.status(400).json({ success: false, message: msg });
         }
 
         const newUser = new User({
-            username, email, name: fullName, password,
+            username, email, phone, name: fullName, password,
             role: role === 'citizen' || role === 'officer' ? role : 'citizen'
         });
         await newUser.save();
@@ -59,16 +62,18 @@ exports.apiLogin = async (req, res) => {
     try {
         const { username, password } = req.body;
         if (!username || !password)
-            return res.status(400).json({ success: false, message: 'Username and password are required' });
+            return res.status(400).json({ success: false, message: 'Username/Phone and password are required' });
 
-        const user = await User.findOne({ username });
-        if (!user) return res.status(401).json({ success: false, message: 'Invalid username or password' });
+        // Allow login by username or phone
+        const user = await User.findOne({
+            $or: [{ username: username }, { phone: username }]
+        });
+        if (!user) return res.status(401).json({ success: false, message: 'Invalid credentials' });
 
         const isPasswordValid = await user.comparePassword(password);
         if (!isPasswordValid) return res.status(401).json({ success: false, message: 'Invalid username or password' });
 
-        user.lastLogin = new Date();
-        await user.save();
+        await User.updateOne({ _id: user._id }, { $set: { lastLogin: new Date() } });
 
         const token = jwt.sign(
             { userId: user._id, username: user.username, role: user.role, name: user.name, email: user.email },
@@ -124,8 +129,7 @@ exports.apiAdminLogin = async (req, res) => {
             }
         }
 
-        admin.lastLogin = new Date();
-        await admin.save();
+        await User.updateOne({ _id: admin._id }, { $set: { lastLogin: new Date() } });
 
         const token = jwt.sign(
             { userId: admin._id, username: admin.username, role: 'admin', name: admin.name, email: admin.email },
@@ -144,7 +148,7 @@ exports.apiAdminLogin = async (req, res) => {
             user: { id: admin._id, username: admin.username, role: 'admin', name: admin.name, email: admin.email }
         });
     } catch (error) {
-        console.error('API admin login error:', error);
+        console.error('API admin login error:', error.message, error.errors);
         return res.status(500).json({ success: false, message: 'Admin login failed. Please try again.' });
     }
 };
@@ -227,23 +231,27 @@ exports.showRegister = (req, res) => {
 // ─────────────────────────────────────────────
 exports.postRegister = async (req, res) => {
     try {
-        const { username, email, fullName, password, confirmPassword, role } = req.body;
-        if (!username || !email || !fullName || !password || !role)
+        const { username, email, phone, fullName, password, confirmPassword, role } = req.body;
+        if (!username || !email || !phone || !fullName || !password || !role)
             return res.render('auth/register', { title: 'Register - QueuePro', message: { type: 'error', text: 'All fields are required' } });
         if (password !== confirmPassword)
             return res.render('auth/register', { title: 'Register - QueuePro', message: { type: 'error', text: 'Passwords do not match' } });
         if (password.length < 6)
             return res.render('auth/register', { title: 'Register - QueuePro', message: { type: 'error', text: 'Password must be at least 6 characters' } });
 
-        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+        const existingUser = await User.findOne({ $or: [{ username }, { email }, { phone }] });
         if (existingUser) {
+            let msg = 'User already exists';
+            if (existingUser.username === username) msg = 'Username already taken';
+            else if (existingUser.email === email) msg = 'Email already registered';
+            else if (existingUser.phone === phone) msg = 'Phone number already registered';
             return res.render('auth/register', {
                 title: 'Register - QueuePro',
-                message: { type: 'error', text: existingUser.username === username ? 'Username already taken' : 'Email already registered' }
+                message: { type: 'error', text: msg }
             });
         }
 
-        const newUser = new User({ username, email, name: fullName, password, role: role || 'citizen' });
+        const newUser = new User({ username, email, phone, name: fullName, password, role: role || 'citizen' });
         await newUser.save();
 
         await logActivity('REGISTER', `New ${role} account created`, 'USER', newUser._id, 'success', null, {
@@ -282,14 +290,15 @@ exports.postLogin = async (req, res) => {
     try {
         const { username, password } = req.body;
         if (!username || !password)
-            return res.render('auth/login', { title: 'Login - QueuePro', message: { type: 'error', text: 'Username and password are required' } });
+            return res.render('auth/login', { title: 'Login - QueuePro', message: { type: 'error', text: 'Username/Phone and password are required' } });
 
-        const user = await User.findOne({ username });
+        const user = await User.findOne({
+            $or: [{ username: username }, { phone: username }]
+        });
         if (!user || !(await user.comparePassword(password)))
-            return res.render('auth/login', { title: 'Login - QueuePro', message: { type: 'error', text: 'Invalid username or password' } });
+            return res.render('auth/login', { title: 'Login - QueuePro', message: { type: 'error', text: 'Invalid credentials' } });
 
-        user.lastLogin = new Date();
-        await user.save();
+        await User.updateOne({ _id: user._id }, { $set: { lastLogin: new Date() } });
 
         const token = jwt.sign(
             { userId: user._id, username: user.username, role: user.role, name: user.name, email: user.email },
@@ -348,8 +357,7 @@ exports.postAdminLogin = async (req, res) => {
             }
         }
 
-        admin.lastLogin = new Date();
-        await admin.save();
+        await User.updateOne({ _id: admin._id }, { $set: { lastLogin: new Date() } });
 
         const token = jwt.sign(
             { userId: admin._id, username: admin.username, role: 'admin', name: admin.name, email: admin.email },

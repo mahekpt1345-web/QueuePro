@@ -36,7 +36,11 @@ exports.health = (req, res) => {
 // DASHBOARD PAGES (protected)
 // ─────────────────────────────────────────────
 exports.citizenDashboard = (req, res) => {
-    res.render('citizen-dashboard', { title: 'Citizen Dashboard - QueuePro', user: req.user || null });
+    res.render('citizen-dashboard', {
+        title: 'Citizen Dashboard - QueuePro',
+        user: req.user || null,
+        officialUrl: process.env.OFFICIAL_URL || `${req.protocol}://${req.get('host')}`
+    });
 };
 
 exports.citizenProfile = (req, res) => {
@@ -90,3 +94,55 @@ exports.postContact = (req, res) => {
 exports.help = (req, res) => {
     res.render('help', { title: 'Help Center - QueuePro' });
 };
+
+// ─────────────────────────────────────────────
+// PUBLIC QUEUE STATUS (No Auth)
+// ─────────────────────────────────────────────
+exports.publicQueueStatus = async (req, res) => {
+    try {
+        const Token = require('../models/Token');
+
+        const services = [
+            { id: 'aadhaar_update', name: 'Aadhaar Update' },
+            { id: 'caste_certificate_verification', name: 'Caste Certificate' },
+            { id: 'income_certificate_verification', name: 'Income Certificate' },
+            { id: 'birth_certificate_verification', name: 'Birth Certificate' },
+            { id: 'municipal_enquiry', name: 'Municipal Enquiry' },
+            { id: 'other', name: 'Other Services' }
+        ];
+
+        const stats = await Promise.all(services.map(async (service) => {
+            const count = await Token.countDocuments({
+                serviceType: service.id,
+                status: { $in: ['pending', 'serving'] }
+            });
+
+            let level = 'Low';
+            let color = '#10b981'; // green
+            if (count > 25) {
+                level = 'High';
+                color = '#ef4444'; // red
+            } else if (count > 10) {
+                level = 'Moderate';
+                color = '#f59e0b'; // orange
+            }
+
+            return {
+                ...service,
+                count,
+                level,
+                color
+            };
+        }));
+
+        res.render('public-queue-status', {
+            title: 'Public Queue Status - QueuePro',
+            stats,
+            timestamp: new Date().toLocaleTimeString()
+        });
+    } catch (error) {
+        console.error('Error fetching public queue status:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+

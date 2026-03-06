@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - QueuePro</title>
     <link rel="stylesheet" href="/css/auth-styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body class="auth-page">
     <!-- Navigation -->
     <nav class="auth-navbar">
@@ -40,16 +43,10 @@
                 <div class="form-group">
                     <label for="username">
                         <i class="fas fa-user"></i>
-                        Username
+                        Username or Mobile Number
                     </label>
-                    <input 
-                        type="text" 
-                        id="username" 
-                        name="username" 
-                        placeholder="Enter your username"
-                        required
-                        autocomplete="username"
-                    >
+                    <input type="text" id="username" name="username"
+                        placeholder="Enter username or 10-digit mobile number" required autocomplete="username">
                     <span class="error-message" id="usernameError"></span>
                 </div>
 
@@ -60,14 +57,8 @@
                         Password
                     </label>
                     <div class="password-input">
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password" 
-                            placeholder="Enter your password"
-                            required
-                            autocomplete="current-password"
-                        >
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required
+                            autocomplete="current-password">
                         <button type="button" class="toggle-password" id="togglePassword">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -100,7 +91,7 @@
             <div class="hero-content">
 
                 <div class="hero-brand">
-                     QueuePro
+                    QueuePro
                 </div>
 
                 <h1>Welcome Back.</h1>
@@ -128,5 +119,7 @@
     <script src="/js/auth-system.js"></script>
     <script src="/js/ui-utils.js"></script>
     <script src="/js/login-handler.js"></script>
+    <%- include('../partials/scroll-to-top') %>
 </body>
+
 </html>

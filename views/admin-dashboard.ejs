@@ -1034,6 +1034,19 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+
+        .broadcast-banner {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 1rem 2rem;
+            text-align: center;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 
@@ -1054,6 +1067,11 @@
         </div>
     </nav>
 
+    <!-- Broadcast Banner -->
+    <div id="broadcastBanner" class="broadcast-banner" style="display:none;">
+        <i class="fas fa-bullhorn"></i> <span id="broadcastText"></span>
+    </div>
+
     <div class="dashboard-container">
         <div class="welcome-section">
             <h1>System Administration Dashboard</h1>
@@ -1065,6 +1083,7 @@
             <button class="tab-btn active" onclick="switchTab('overview')"><i class="fas fa-home"></i> Overview</button>
             <button class="tab-btn" onclick="switchTab('analytics')"><i class="fas fa-chart-bar"></i> Queue
                 Analytics</button>
+            <button class="tab-btn" onclick="switchTab('system')"><i class="fas fa-cogs"></i> System Control</button>
             <button class="tab-btn" onclick="switchTab('logs')"><i class="fas fa-history"></i> Activity Logs</button>
             <button class="tab-btn" onclick="switchTab('users')"><i class="fas fa-users"></i> All Users</button>
         </div>
@@ -1319,6 +1338,154 @@
                 </div>
             </div>
         </div>
+
+        <!-- ========== TAB: SYSTEM CONTROL ========== -->
+        <div id="tab-system" class="tab-pane">
+            <div class="two-col">
+                <!-- Broadcast Message -->
+                <div class="card" style="border-top: 4px solid var(--primary);">
+                    <div class="card-header" style="background: rgba(59, 130, 246, 0.05);">
+                        <div>
+                            <h2 style="display:flex; align-items:center; gap:0.75rem;">
+                                <div
+                                    style="width:36px; height:36px; background:var(--primary); color:white; border-radius:0.5rem; display:flex; align-items:center; justify-content:center;">
+                                    <i class="fas fa-bullhorn"></i>
+                                </div>
+                                Broadcast Message
+                            </h2>
+                            <p>Announcements visible to all citizens & officers</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label for="broadcastMessage"
+                                style="color:var(--gray-600); font-weight:600; margin-bottom:0.75rem; display:block;">
+                                Announcement Text
+                            </label>
+                            <div style="position:relative;">
+                                <textarea id="broadcastMessage"
+                                    style="width:100%; padding:1.25rem; border-radius:0.75rem; border:2px solid var(--gray-200); font-family:inherit; min-height:140px; font-size:1rem; transition:0.3s; border-left: 5px solid var(--primary);"
+                                    placeholder="Type important updates or notices here..."></textarea>
+                                <div
+                                    style="position:absolute; bottom:12px; right:12px; color:var(--gray-400); font-size:0.75rem;">
+                                    <i class="fas fa-keyboard"></i> Use standard text
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:1rem; margin-top:1.5rem; align-items:center;">
+                            <button class="btn btn-primary" onclick="saveBroadcast()"
+                                style="padding:0.75rem 2rem; box-shadow:0 4px 12px rgba(59,130,246,0.3);">
+                                <i class="fas fa-paper-plane" style="margin-right:0.5rem;"></i> Publish Announcement
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearBroadcast()"
+                                style="color:var(--danger); border-color:var(--danger);">
+                                <i class="fas fa-trash-alt" style="margin-right:0.5rem;"></i> Clear
+                            </button>
+                        </div>
+                        <div
+                            style="margin-top:1.5rem; padding:1rem; background:#f0f7ff; border-radius:0.5rem; border:1px dashed #3b82f6;">
+                            <p style="font-size:0.8rem; color:#1e40af; display:flex; align-items:center; gap:0.5rem;">
+                                <i class="fas fa-lightbulb"></i>
+                                <strong>Tip:</strong> Keep messages concise for better readability on mobile devices.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Availability -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-toggle-on"></i> Service Availability</h2>
+                        <p>Enable or disable specific services</p>
+                    </div>
+                    <div class="card-content">
+                        <div id="serviceAvailabilityList" style="display:flex; flex-direction:column; gap:1rem;">
+                            <!-- Loaded via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QR Code for Public Queue Status — Task 3 -->
+            <div class="card" style="margin-top:2rem;">
+                <div class="card-header">
+                    <h2><i class="fas fa-qrcode"></i> Public Queue Status QR Code</h2>
+                    <p>Display or print this QR code at the office entrance for citizens to scan</p>
+                </div>
+                <div class="card-content">
+                    <div style="display:flex; flex-wrap:wrap; align-items:center; gap:2rem;">
+                        <div style="text-align:center;">
+                            <% if (qrCodeDataUrl) { %>
+                                <img src="<%= qrCodeDataUrl %>" alt="Public Queue Status QR Code"
+                                    style="width:200px; height:200px; border:12px solid #f8fafc; border-radius:1rem; box-shadow:0 4px 16px rgba(0,0,0,0.1);">
+                                <p style="margin-top:0.75rem; font-size:0.8rem; color:var(--gray-600);">Scan to view
+                                    live queue status</p>
+                                <% } else { %>
+                                    <div
+                                        style="width:200px; height:200px; background:#f3f4f6; border-radius:1rem; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:0.5rem;">
+                                        <i class="fas fa-qrcode" style="font-size:3rem; color:#9ca3af;"></i>
+                                        <p style="font-size:0.75rem; color:#9ca3af; text-align:center; padding:0 1rem;">
+                                            Run <code>npm install</code> then restart server to activate</p>
+                                    </div>
+                                    <% } %>
+                        </div>
+                        <div style="flex:1; min-width:220px;">
+                            <h3 style="font-size:1.1rem; font-weight:600; color:var(--gray-900); margin-bottom:1rem;">
+                                <i class="fas fa-info-circle" style="color:var(--primary); margin-right:0.5rem;"></i>
+                                How to use
+                            </h3>
+                            <div style="display:flex; flex-direction:column; gap:0.75rem; margin-bottom:1.5rem;">
+                                <div style="display:flex; align-items:flex-start; gap:0.75rem;">
+                                    <span
+                                        style="background:#dbeafe; color:var(--primary); border-radius:50%; width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; flex-shrink:0;">1</span>
+                                    <span style="color:var(--gray-600); font-size:0.875rem;">Print or display this QR
+                                        code at the office entrance or waiting area</span>
+                                </div>
+                                <div style="display:flex; align-items:flex-start; gap:0.75rem;">
+                                    <span
+                                        style="background:#dbeafe; color:var(--primary); border-radius:50%; width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; flex-shrink:0;">2</span>
+                                    <span style="color:var(--gray-600); font-size:0.875rem;">Citizens scan with their
+                                        phone camera to check live queue status without logging in</span>
+                                </div>
+                                <div style="display:flex; align-items:flex-start; gap:0.75rem;">
+                                    <span
+                                        style="background:#dbeafe; color:var(--primary); border-radius:50%; width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; flex-shrink:0;">3</span>
+                                    <span style="color:var(--gray-600); font-size:0.875rem;">They see the current token
+                                        being served and estimated wait times in real time</span>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+                                <a href="/public-queue-status" target="_blank" class="btn btn-primary"
+                                    style="text-decoration:none;">
+                                    <i class="fas fa-external-link-alt" style="margin-right:0.5rem;"></i> View Public
+                                    Status
+                                </a>
+                                <% if (qrCodeDataUrl) { %>
+                                    <a href="<%= qrCodeDataUrl %>" download="queue-status-qr.png"
+                                        class="btn btn-secondary" style="text-decoration:none;">
+                                        <i class="fas fa-download" style="margin-right:0.5rem;"></i> Download QR
+                                    </a>
+                                    <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Service Summary -->
+            <div class="card" style="margin-top:2rem;">
+                <div class="card-header">
+                    <h2><i class="fas fa-list-alt"></i> Daily Service Summary</h2>
+                    <p>Token count per service for today</p>
+                </div>
+                <div class="card-content">
+                    <div id="dailySummaryGrid"
+                        style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1.5rem;">
+                        <!-- Loaded via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="toast" class="toast"></div>
@@ -1445,6 +1612,7 @@
             });
 
             loadOverview();
+            loadBroadcastBanner();
         });
 
 
@@ -1514,7 +1682,7 @@
                         return '<div style="display:flex;align-items:center;gap:.75rem;padding:.625rem 1.25rem;border-bottom:1px solid var(--gray-100);">' +
                             '<span style="font-size:.72rem;font-weight:700;background:' + sb + ';color:' + sc + ';padding:.2rem .55rem;border-radius:9999px;text-transform:uppercase;flex-shrink:0;">' + t.status + '</span>' +
                             '<span style="font-size:.8rem;font-weight:700;color:var(--gray-900);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + id + '</span>' +
-                            '<span style="font-size:.75rem;color:var(--gray-600);flex-shrink:0;text-transform:capitalize;">' + (t.serviceType || '—') + '</span>' +
+                            '<span style="font-size:.75rem;color:var(--gray-600);flex-shrink:0;text-transform:capitalize;">' + formatServiceLabel(t.serviceType) + '</span>' +
                             '<span style="font-size:.7rem;color:var(--gray-600);flex-shrink:0;">' + timeAgo(t.createdAt) + '</span>' +
                             '</div>';
                     }).join('');
@@ -1541,14 +1709,36 @@
                     document.getElementById('a_cancelled').textContent = cancelled;
 
                     // Service bar chart
-                    const colors = { passport: '#3b82f6', license: '#10b981', certificate: '#f59e0b', tax: '#8b5cf6', other: '#6b7280' };
-                    const maxCount = byService.length ? Math.max(...byService.map(s => s.count)) : 1;
-                    document.getElementById('serviceChart').innerHTML = byService.length ? byService.map(s => `
+                    const allServices = [
+                        'aadhaar_update',
+                        'caste_certificate_verification',
+                        'income_certificate_verification',
+                        'birth_certificate_verification',
+                        'municipal_enquiry',
+                        'other'
+                    ];
+
+                    const serviceData = allServices.map(serviceId => {
+                        const found = (byService || []).find(s => s._id === serviceId);
+                        return { _id: serviceId, count: found ? found.count : 0 };
+                    });
+
+                    const colors = {
+                        aadhaar_update: '#3b82f6',
+                        caste_certificate_verification: '#10b981',
+                        income_certificate_verification: '#f59e0b',
+                        birth_certificate_verification: '#8b5cf6',
+                        municipal_enquiry: '#6366f1',
+                        other: '#6b7280'
+                    };
+
+                    const maxCount = serviceData.length ? Math.max(...serviceData.map(s => s.count), 1) : 1;
+                    document.getElementById('serviceChart').innerHTML = serviceData.map(s => `
                     <div class="bar-row">
-                        <span class="bar-label">${s._id}</span>
+                        <span class="bar-label">${formatServiceLabel(s._id)}</span>
                         <div class="bar-track"><div class="bar-fill" style="width:${Math.round(s.count / maxCount * 100)}%;background:${colors[s._id] || '#6b7280'};"></div></div>
                         <span class="bar-count">${s.count}</span>
-                    </div>`).join('') : '<div class="empty-state"><i class="fas fa-chart-bar"></i><p>No token data yet</p></div>';
+                    </div>`).join('');
 
                     // Sparkline for last 7 days
                     const maxDay = dailyLast7.length ? Math.max(...dailyLast7.map(d => d.count), 1) : 1;
@@ -1742,6 +1932,18 @@
             return new Date(d).toLocaleDateString();
         }
 
+        function formatServiceLabel(id) {
+            const labels = {
+                aadhaar_update: 'Aadhaar Update',
+                caste_certificate_verification: 'Caste Certificate',
+                income_certificate_verification: 'Income Certificate',
+                birth_certificate_verification: 'Birth Certificate',
+                municipal_enquiry: 'Municipal Enquiry',
+                other: 'Other Services'
+            };
+            return labels[id] || (id ? id.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : '—');
+        }
+
         function timeAgo(d) {
             const diff = Date.now() - new Date(d);
             const mins = Math.floor(diff / 60000);
@@ -1753,7 +1955,147 @@
             if (days < 7) return days + 'd ago';
             return new Date(d).toLocaleDateString();
         }
+
+        /**
+         * System Config Logic
+         */
+        async function loadBroadcastBanner() {
+            try {
+                const res = await fetch('/api/admin/config', { credentials: 'include' });
+                const result = await res.json();
+                if (result.success && result.data.broadcast) {
+                    document.getElementById('broadcastText').textContent = result.data.broadcast;
+                    document.getElementById('broadcastBanner').style.display = 'flex';
+                } else {
+                    document.getElementById('broadcastBanner').style.display = 'none';
+                }
+            } catch (err) {
+                console.error('Failed to load broadcast banner:', err);
+            }
+        }
+
+        async function loadSystemConfig() {
+            try {
+                const res = await fetch('/api/admin/config', { credentials: 'include' });
+                const result = await res.json();
+
+                if (result.success) {
+                    const config = result.data;
+                    document.getElementById('broadcastMessage').value = config.broadcast || "";
+                    renderServiceAvailability(config.serviceAvailability);
+                    loadDailySummary();
+                }
+            } catch (err) {
+                console.error('Failed to load system config:', err);
+            }
+        }
+
+        async function saveBroadcast() {
+            const message = document.getElementById('broadcastMessage').value;
+            await saveConfig('broadcast', message);
+            loadBroadcastBanner();
+        }
+
+        async function clearBroadcast() {
+            document.getElementById('broadcastMessage').value = "";
+            await saveConfig('broadcast', "");
+            loadBroadcastBanner();
+        }
+
+        async function saveConfig(key, value) {
+            try {
+                const res = await fetch('/api/admin/config', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key, value })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    showToast('Configuration updated', 'success');
+                }
+            } catch (err) {
+                showToast('Failed to update config', 'error');
+            }
+        }
+
+        function renderServiceAvailability(availability) {
+            const container = document.getElementById('serviceAvailabilityList');
+            if (!container) return;
+
+            const services = {
+                aadhaar_update: 'Aadhaar Update',
+                caste_certificate_verification: 'Caste Certificate',
+                income_certificate_verification: 'Income Certificate',
+                birth_certificate_verification: 'Birth Certificate',
+                municipal_enquiry: 'Municipal Enquiry',
+                other: 'Other Services'
+            };
+
+            container.innerHTML = Object.entries(services).map(([key, label]) => `
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <strong>${label}</strong>
+                        <span>Currently ${availability[key] ? 'Active' : 'Disabled'}</span>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" ${availability[key] ? 'checked' : ''} onchange="toggleService('${key}', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            `).join('');
+        }
+
+        async function toggleService(serviceKey, isEnabled) {
+            const res = await fetch('/api/admin/config', { credentials: 'include' });
+            const result = await res.json();
+            if (result.success) {
+                const availability = result.data.serviceAvailability;
+                availability[serviceKey] = isEnabled;
+                saveConfig('serviceAvailability', availability);
+            }
+        }
+
+        async function loadDailySummary() {
+            const res = await fetch('/api/admin/analytics', { credentials: 'include' });
+            const result = await res.json();
+            if (result.success) {
+                const container = document.getElementById('dailySummaryGrid');
+                if (!container) return;
+
+                const byService = result.data.byService || [];
+
+                const services = {
+                    aadhaar_update: { label: 'Aadhaar', color: '#3b82f6' },
+                    caste_certificate_verification: { label: 'Caste', color: '#8b5cf6' },
+                    income_certificate_verification: { label: 'Income', color: '#10b981' },
+                    birth_certificate_verification: { label: 'Birth', color: '#f59e0b' },
+                    municipal_enquiry: { label: 'Municipal', color: '#ef4444' },
+                    other: { label: 'Other', color: '#6b7280' }
+                };
+
+                container.innerHTML = Object.entries(services).map(([key, info]) => {
+                    const match = byService.find(s => s._id === key);
+                    const count = match ? match.count : 0;
+                    return `
+                        <div class="stat-card" style="border-left: 4px solid ${info.color}">
+                            <div class="stat-label-top">${info.label}</div>
+                            <div class="stat-value" style="font-size: 1.5rem;">${count}</div>
+                            <div class="stat-sub">Tokens today</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // switchTab for system
+        const originalSwitchTab = window.switchTab;
+        window.switchTab = function (tabId) {
+            if (typeof originalSwitchTab === 'function') originalSwitchTab(tabId);
+            if (tabId === 'system') loadSystemConfig();
+        };
     </script>
+    <%- include('partials/scroll-to-top') %>
 </body>
 
 </html>

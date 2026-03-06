@@ -361,6 +361,8 @@ body.auth-page {
 .role-option {
     position: relative;
     cursor: pointer;
+    display: flex; /* Added display: flex */
+    height: 100%;  /* Added height: 100% */
 }
 
 .role-option input[type="radio"] {
@@ -372,12 +374,15 @@ body.auth-page {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center; /* Added justify-content: center */
     gap: 0.5rem;
     padding: 1rem;
     border: 2px solid var(--gray-200);
     border-radius: 0.5rem;
     text-align: center;
     transition: var(--transition);
+    width: 100%; /* Ensure full width */
+    height: 100%; /* Ensure full height */
 }
 
 .role-option input[type="radio"]:checked + .role-label {

@@ -490,6 +490,125 @@
             }
         }
 
+        .checklist-container {
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            display: none;
+        }
+
+        .checklist-title {
+            font-size: 0.8125rem;
+            font-weight: 700;
+            color: var(--gray-700);
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checklist-items {
+            list-style: none;
+            margin-bottom: 1rem;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .checklist-item i {
+            color: var(--primary-color);
+            margin-top: 0.2rem;
+            font-size: 0.75rem;
+        }
+
+        .confirmation-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background-color: #f0fdf4;
+            border-radius: 0.5rem;
+            border: 1px solid #dcfce7;
+            cursor: pointer;
+        }
+
+        .confirmation-group input {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .confirmation-label {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #166534;
+            cursor: pointer;
+        }
+
+        /* Broadcast Banner */
+        .broadcast-banner {
+            background: linear-gradient(90deg, #3b82f6, #1e40af);
+            color: white;
+            padding: 0.75rem 2rem;
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .broadcast-banner i {
+            font-size: 1.25rem;
+            animation: pulse-broadcast 2s infinite;
+        }
+
+        @keyframes pulse-broadcast {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .qr-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-top: 1.5rem;
+        }
+
+        .qr-section img {
+            max-width: 150px;
+            margin: 1rem 0;
+            border: 8px solid #f8fafc;
+            border-radius: 0.5rem;
+        }
+
+        .qr-section p {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
         @media (max-width: 768px) {
             .nav-container {
                 flex-wrap: wrap;
@@ -505,6 +624,38 @@
 
             .welcome-section h1 {
                 font-size: 1.5rem;
+            }
+        }
+
+        /* Task 1 & 2: Notification pulse animation for token cards */
+        @keyframes notifPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 12px rgba(59, 130, 246, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
+        }
+
+        .notification-pulse {
+            animation: notifPulse 1s ease 3;
+            border-color: var(--primary-color) !important;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
             }
         }
     </style>
@@ -540,6 +691,12 @@
             </div>
         </div>
     </nav>
+
+    <!-- Broadcast Banner -->
+    <div id="broadcastBanner" class="broadcast-banner">
+        <i class="fas fa-bullhorn"></i>
+        <span id="broadcastText"></span>
+    </div>
 
     <!-- Main Content -->
     <div class="dashboard-container">
@@ -602,12 +759,31 @@
                             <label for="serviceType">Service Type</label>
                             <select id="serviceType" name="serviceType" required>
                                 <option value="">Select a service</option>
-                                <option value="passport">Passport Application</option>
-                                <option value="license">License Renewal</option>
-                                <option value="certificate">Birth Certificate</option>
-                                <option value="tax">Tax Services</option>
+                                <option value="aadhaar_update">Aadhaar Card Update / Correction</option>
+                                <option value="caste_certificate_verification">Caste Certificate Verification</option>
+                                <option value="income_certificate_verification">Income Certificate Verification</option>
+                                <option value="birth_certificate_verification">Birth Certificate Verification</option>
+                                <option value="municipal_enquiry">Municipal Office Enquiry</option>
                                 <option value="other">Other Services</option>
                             </select>
+                        </div>
+
+                        <!-- Document Checklist -->
+                        <div id="checklistContainer" class="checklist-container">
+                            <div class="checklist-title">
+                                <i class="fas fa-clipboard-check"></i>
+                                Required Documents Checklist
+                            </div>
+                            <ul id="checklistItems" class="checklist-items">
+                                <!-- Dynamic items -->
+                            </ul>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="confirmation-group" for="confirmChecklist">
+                                    <input type="checkbox" id="confirmChecklist" name="confirmChecklist" required>
+                                    <span class="confirmation-label">I confirm I have all original required
+                                        documents</span>
+                                </label>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -656,150 +832,226 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="toast"></div>
+        <!-- QR Codes Section -->
+        <div class="dashboard-grid"
+            style="margin-top: 2rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+            <!-- Public Status QR -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-qrcode"></i> Public Status QR</h2>
+                    <p>Scan to view live queue status on your mobile</p>
+                </div>
+                <div class="card-content" style="text-align: center;">
+                    <img id="statusQR" src="" alt="Public Status QR"
+                        style="max-width: 180px; border: 10px solid #f8fafc; border-radius: 1rem; margin-bottom: 1rem;">
+                    <p style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 1rem;">Share this with friends
+                        to check crowds before visiting.</p>
+                    <button class="btn-cancel-token" style="background:var(--primary-color); border:none;"
+                        onclick="window.open('/public-queue-status', '_blank')">
+                        <i class="fas fa-external-link-alt"></i> View Public Status
+                    </button>
+                </div>
+            </div>
 
-    <!-- Scripts -->
-    <script src="/js/auth-system.js"></script>
-    <script src="/js/ui-utils.js"></script>
-    <script>
-        /**
-         * CITIZEN DASHBOARD
-         */
+            <!-- Website QR -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-globe"></i> Website QR</h2>
+                    <p>Access QueuePro portal instantly</p>
+                </div>
+                <div class="card-content" style="text-align: center;">
+                    <img id="websiteQR" src="" alt="Website QR"
+                        style="max-width: 180px; border: 10px solid #f8fafc; border-radius: 1rem; margin-bottom: 1rem;">
+                    <p style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 1rem;">Scan to share this
+                        portal or bookmark on your phone.</p>
+                    <button class="btn-cancel-token" style="background:var(--gray-600); border:none;"
+                        onclick="navigator.clipboard.writeText(window.location.origin); alert('Link copied!')">
+                        <i class="fas fa-copy"></i> Copy Website Link
+                    </button>
+                </div>
+            </div>
+        </div>
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const session = auth.getSession() || { username: 'citizen' };
+        <!-- Toast Notification -->
+        <div id="toast" class="toast"></div>
+
+        <!-- Scripts -->
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/js/auth-system.js"></script>
+        <script src="/js/ui-utils.js"></script>
+        <script>
+            /**
+             * CITIZEN DASHBOARD
+             */
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const session = auth.getSession() || { username: 'citizen' };
 
 
-            // Update user name
-            document.getElementById('userName').textContent = session.name || session.username;
+                // Update user name
+                document.getElementById('userName').textContent = session.name || session.username;
 
-            // Setup event listeners
-            const tokenForm = document.getElementById('tokenForm');
-            if (tokenForm) {
-                tokenForm.addEventListener('submit', handleTokenRequest);
-            }
+                // Service type change listener
+                const serviceSelect = document.getElementById('serviceType');
+                if (serviceSelect) {
+                    serviceSelect.addEventListener('change', updateChecklist);
+                }
 
-            // Logout button
-            // Logout moved to profile page
+                const tokenForm = document.getElementById('tokenForm');
+                if (tokenForm) {
+                    tokenForm.addEventListener('submit', handleTokenRequest);
+                }
 
-            // Load initial data
-            loadCitizenData();
+                // Logout button
+                // Logout moved to profile page
 
-            // Refresh data every 10 seconds
-            setInterval(loadCitizenData, 10000);
-        });
+                // Load initial data
+                loadCitizenData();
 
-        /**
-         * Load citizen dashboard data from API
-         */
-        function loadCitizenData() {
-            fetch('/api/queue/my-tokens', { credentials: 'include' })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.data) {
-                        displayTokens(data.data);
-                    } else {
+                // Socket.io real-time notifications
+                initSocketNotifications();
+
+                // Refresh data every 10 seconds
+                setInterval(loadCitizenData, 10000);
+            });
+
+            /**
+             * Load citizen dashboard data from API
+             */
+            function loadCitizenData() {
+                fetch('/api/queue/my-tokens', { credentials: 'include' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success && data.data) {
+                            displayTokens(data.data);
+                            // Task 1: Subscribe active tokens to socket rooms
+                            subscribeActiveTokens(data.data);
+                        } else {
+                            displayTokens([]);
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Failed to load citizen tokens:', err);
                         displayTokens([]);
-                    }
-                })
-                .catch(err => {
-                    console.error('Failed to load citizen tokens:', err);
-                    displayTokens([]);
-                });
-        }
-
-        /**
-         * Display tokens on dashboard
-         */
-        function displayTokens(userTokens) {
-            // Update stats
-            const activeTokens = userTokens.filter(t => t.status === 'pending' || t.status === 'serving').length;
-            const completedTokens = userTokens.filter(t => t.status === 'completed').length;
-
-            document.getElementById('activeTokens').textContent = activeTokens;
-            document.getElementById('completedTokens').textContent = completedTokens;
-
-            // Calculate average wait time
-            const avgWaitTime = calculateAvgWaitTime(userTokens);
-            document.getElementById('avgWaitTime').textContent = avgWaitTime || '--';
-
-            // Load tokens list
-            loadTokensList(userTokens);
-            loadHistoryList(userTokens);
-        }
-
-        /**
-         * Handle token request form submission
-         */
-        function handleTokenRequest(e) {
-            e.preventDefault();
-
-            const serviceType = document.getElementById('serviceType').value;
-            const description = document.getElementById('description').value;
-
-            if (!serviceType) {
-                UIUtils.showToast('Please select a service type', 'error');
-                return;
+                    });
             }
 
-            UIUtils.disableButton('generateTokenBtn', 'Generating Token...');
+            /**
+             * Display tokens on dashboard
+             */
+            function displayTokens(userTokens) {
+                // Update stats
+                const activeTokens = userTokens.filter(t => t.status === 'pending' || t.status === 'serving').length;
+                const completedTokens = userTokens.filter(t => t.status === 'completed').length;
 
-            fetch('/api/queue/create-token', {
-                method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ serviceType, description })
-            })
-                .then(res => res.json())
-                .then(result => {
-                    UIUtils.enableButton('generateTokenBtn');
-                    if (result.success) {
-                        document.getElementById('tokenForm').reset();
-                        UIUtils.showToast(`Token ${result.data.tokenId} generated successfully!`, 'success');
-                        setTimeout(() => loadCitizenData(), 500);
-                    } else {
-                        UIUtils.showToast(result.message || 'Failed to create token', 'error');
-                    }
+                document.getElementById('activeTokens').textContent = activeTokens;
+                document.getElementById('completedTokens').textContent = completedTokens;
+
+                // Calculate average wait time
+                const avgWaitTime = calculateAvgWaitTime(userTokens);
+                document.getElementById('avgWaitTime').textContent = avgWaitTime || '--';
+
+                // Load tokens list
+                loadTokensList(userTokens);
+                loadHistoryList(userTokens);
+            }
+
+            /**
+             * Handle token request form submission
+             */
+            function handleTokenRequest(e) {
+                e.preventDefault();
+
+                const serviceType = document.getElementById('serviceType').value;
+                const description = document.getElementById('description').value;
+                const checklistConfirmed = document.getElementById('confirmChecklist').checked;
+
+                if (!serviceType) {
+                    UIUtils.showToast('Please select a service type', 'error');
+                    return;
+                }
+
+                if (!checklistConfirmed) {
+                    UIUtils.showToast('Please confirm that you have all required documents', 'error');
+                    return;
+                }
+
+                UIUtils.disableButton('generateTokenBtn', 'Generating Token...');
+
+                fetch('/api/queue/create-token', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ serviceType, description, checklistConfirmed })
                 })
-                .catch(err => {
-                    UIUtils.enableButton('generateTokenBtn');
-                    UIUtils.showToast('Error: ' + err.message, 'error');
-                });
-        }
+                    .then(res => res.json())
+                    .then(result => {
+                        UIUtils.enableButton('generateTokenBtn');
+                        if (result.success) {
+                            document.getElementById('tokenForm').reset();
+                            document.getElementById('checklistContainer').style.display = 'none';
+                            UIUtils.showToast(`Token ${result.data.tokenId} generated successfully!`, 'success');
+                            // Subscribe this new token for socket notifications
+                            if (window._socket && result.data._id) {
+                                window._socket.emit('subscribe_token', result.data._id);
+                            }
+                            setTimeout(() => loadCitizenData(), 500);
+                        } else {
+                            UIUtils.showToast(result.message || 'Failed to create token', 'error');
+                        }
+                    })
+                    .catch(err => {
+                        UIUtils.enableButton('generateTokenBtn');
+                        UIUtils.showToast('Error: ' + err.message, 'error');
+                    });
+            }
 
-        /**
-         * Load tokens list
-         */
-        function loadTokensList(tokens) {
-            const container = document.getElementById('tokensList');
+            /**
+             * Load tokens list
+             */
+            function loadTokensList(tokens) {
+                const container = document.getElementById('tokensList');
 
-            if (!tokens || tokens.length === 0) {
-                container.innerHTML = `
+                if (!tokens || tokens.length === 0) {
+                    container.innerHTML = `
                     <p class="empty-state">
                         <i class="fas fa-inbox"></i>
                         No active tokens. Generate a new token to get started.
                     </p>
                 `;
-                return;
-            }
+                    return;
+                }
 
-            const activeTokens = tokens.filter(t => t.status === 'pending' || t.status === 'serving');
+                const activeTokens = tokens.filter(t => t.status === 'pending' || t.status === 'serving');
 
-            if (activeTokens.length === 0) {
-                container.innerHTML = `
+                if (activeTokens.length === 0) {
+                    container.innerHTML = `
                     <p class="empty-state">
                         <i class="fas fa-check-circle"></i>
                         All tokens completed!
                     </p>
                 `;
-                return;
-            }
+                    return;
+                }
 
-            container.innerHTML = activeTokens.map(token => `
-                <div class="token-item">
+                container.innerHTML = activeTokens.map(token => {
+                    // Task 2: Progress visualization
+                    const isPending = token.status === 'pending';
+                    const isServing = token.status === 'serving';
+                    const pos = token.position || null;
+                    const totalInQueue = window._queueTotalPending || pos || 1;
+                    const progressPct = isPending && pos
+                        ? Math.max(5, Math.round(((totalInQueue - pos + 1) / totalInQueue) * 100))
+                        : isServing ? 100 : 50;
+                    const waitMins = isPending && pos ? Math.max(1, (pos - 1) * 7) : 0;
+                    const positionLabel = isPending
+                        ? (pos === 1 ? '🔔 You are next!' : pos <= 3 ? `⚡ Almost there — #${pos}` : `#${pos} in queue`)
+                        : isServing ? '✅ Currently being served' : '';
+                    const barColor = isServing ? '#10b981' : pos === 1 ? '#ef4444' : pos <= 3 ? '#f59e0b' : '#3b82f6';
+
+                    return `
+                <div class="token-item" id="token-card-${token._id}">
                     <div class="item-header">
                         <span class="item-title">${token.tokenId || token.id}</span>
                         <span class="item-status ${token.status}">${token.status.toUpperCase()}</span>
@@ -811,43 +1063,60 @@
                         </div>
                         <div class="detail">
                             <span class="detail-label">Position</span>
-                            <span class="detail-value">#${token.position || 'N/A'}</span>
+                            <span class="detail-value" id="pos-${token._id}">${positionLabel || ('#' + (pos || 'N/A'))}</span>
                         </div>
+                        ${isPending && waitMins > 0 ? `
+                        <div class="detail">
+                            <span class="detail-label">Est. Wait</span>
+                            <span class="detail-value" id="wait-${token._id}" style="color:#f59e0b; font-weight:600;">~${waitMins} min</span>
+                        </div>` : ''}
                         <div class="detail">
                             <span class="detail-label">Created</span>
                             <span class="detail-value">${formatDate(token.createdAt)}</span>
                         </div>
                     </div>
-                    ${token.status === 'pending' ? `
+                    ${(isPending || isServing) ? `
+                    <div style="margin-top:1rem;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                            <span style="font-size:0.78rem; color:#6b7280; font-weight:500;">Queue Progress</span>
+                            <span style="font-size:0.78rem; color:${barColor}; font-weight:600;" id="pct-${token._id}">${progressPct}%</span>
+                        </div>
+                        <div style="background:#e5e7eb; border-radius:9999px; height:10px; overflow:hidden;">
+                            <div id="bar-${token._id}" style="height:100%; width:${progressPct}%; background:${barColor}; border-radius:9999px; transition:width 0.6s ease;"></div>
+                        </div>
+                        ${isPending && pos === 1 ? `<p style="margin-top:0.5rem; font-size:0.8rem; color:#ef4444; font-weight:600;"><i class="fas fa-bell"></i> Please proceed to the counter now.</p>` : ''}
+                        ${isPending && pos > 1 && pos <= 3 ? `<p style="margin-top:0.5rem; font-size:0.8rem; color:#f59e0b; font-weight:600;"><i class="fas fa-walking"></i> Please move towards the waiting area.</p>` : ''}
+                    </div>` : ''}
+                    ${isPending ? `
                         <div class="item-actions">
                             <button class="btn-cancel-token" onclick="cancelToken('${token._id}')">
                                 <i class="fas fa-times"></i> Cancel Token
                             </button>
                         </div>
                     ` : ''}
-                </div>
-            `).join('');
-        }
+                </div>`;
+                }).join('');
+            }
 
-        /**
-         * Load history list
-         */
-        function loadHistoryList(tokens) {
-            const container = document.getElementById('historyList');
+            /**
+             * Load history list
+             */
+            function loadHistoryList(tokens) {
+                const container = document.getElementById('historyList');
 
-            if (!tokens || tokens.length === 0) {
-                container.innerHTML = `
+                if (!tokens || tokens.length === 0) {
+                    container.innerHTML = `
                     <p class="empty-state">
                         <i class="fas fa-history"></i>
                         No application history yet.
                     </p>
                 `;
-                return;
-            }
+                    return;
+                }
 
-            const history = tokens.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                const history = tokens.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-            container.innerHTML = history.map(token => `
+                container.innerHTML = history.map(token => `
                 <div class="history-item">
                     <div class="item-header">
                         <span class="item-title">${token.tokenId || token._id}</span>
@@ -872,83 +1141,290 @@
                     ${token.description ? `<p style="margin-top: 0.5rem; color: var(--gray-600); font-size: 0.8125rem;">${token.description}</p>` : ''}
                 </div>
             `).join('');
-        }
-
-
-
-        /**
-         * Calculate average wait time
-         */
-        function calculateAvgWaitTime(tokens) {
-            const completedTokens = tokens.filter(t => t.completedAt);
-            if (completedTokens.length === 0) return null;
-
-            let totalWaitTime = 0;
-            completedTokens.forEach(token => {
-                const created = new Date(token.createdAt);
-                const completed = new Date(token.completedAt);
-                totalWaitTime += (completed - created) / (1000 * 60); // Convert to minutes
-            });
-
-            return Math.round(totalWaitTime / completedTokens.length);
-        }
-
-        /**
-         * Capitalize service type
-         */
-        function capitalizeService(service) {
-            const services = {
-                passport: 'Passport Application',
-                license: 'License Renewal',
-                certificate: 'Birth Certificate',
-                tax: 'Tax Services',
-                other: 'Other Services'
-            };
-            return services[service] || service;
-        }
-
-        /**
-         * Format date
-         */
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-
-        /**
-         * Cancel token function
-         */
-        async function cancelToken(tokenId) {
-            if (!confirm('Are you sure you want to cancel this token? This action cannot be undone.')) {
-                return;
             }
 
-            try {
-                UIUtils.showToast('Cancelling token...', 'info');
 
-                const response = await fetch(`/api/queue/cancel-token/${tokenId}`, {
-                    method: 'PUT',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ reason: 'Cancelled by citizen' })
+
+            /**
+             * Calculate average wait time
+             */
+            function calculateAvgWaitTime(tokens) {
+                const completedTokens = tokens.filter(t => t.completedAt);
+                if (completedTokens.length === 0) return null;
+
+                let totalWaitTime = 0;
+                completedTokens.forEach(token => {
+                    const created = new Date(token.createdAt);
+                    const completed = new Date(token.completedAt);
+                    totalWaitTime += (completed - created) / (1000 * 60); // Convert to minutes
                 });
 
-                const result = await response.json();
-
-                if (result.success) {
-                    UIUtils.showToast('Token cancelled successfully!', 'success');
-                    console.log('✅ Token cancelled:', result.data);
-                    setTimeout(() => loadCitizenData(), 500);
-                } else {
-                    UIUtils.showToast(result.message || 'Failed to cancel token', 'error');
-                    console.error('❌ Cancel error:', result);
-                }
-            } catch (error) {
-                console.error('Error cancelling token:', error);
-                UIUtils.showToast('Error: ' + error.message, 'error');
+                return Math.round(totalWaitTime / completedTokens.length);
             }
-        }
-    </script>
+
+            /**
+             * Capitalize service type
+             */
+            function capitalizeService(service) {
+                const services = {
+                    aadhaar_update: 'Aadhaar Update / Correction',
+                    caste_certificate_verification: 'Caste Certificate Verification',
+                    income_certificate_verification: 'Income Certificate Verification',
+                    birth_certificate_verification: 'Birth Certificate Verification',
+                    municipal_enquiry: 'Municipal Enquiry',
+                    other: 'Other Services'
+                };
+                return services[service] || service;
+            }
+
+            /**
+             * Format date
+             */
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+
+            /**
+             * Cancel token function
+             */
+            async function cancelToken(tokenId) {
+                if (!confirm('Are you sure you want to cancel this token? This action cannot be undone.')) {
+                    return;
+                }
+
+                try {
+                    UIUtils.showToast('Cancelling token...', 'info');
+
+                    const response = await fetch(`/api/queue/cancel-token/${tokenId}`, {
+                        method: 'PUT',
+                        credentials: 'include',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ reason: 'Cancelled by citizen' })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        UIUtils.showToast('Token cancelled successfully!', 'success');
+                        console.log('✅ Token cancelled:', result.data);
+                        setTimeout(() => loadCitizenData(), 500);
+                    } else {
+                        UIUtils.showToast(result.message || 'Failed to cancel token', 'error');
+                        console.error('❌ Cancel error:', result);
+                    }
+                } catch (error) {
+                    console.error('Error cancelling token:', error);
+                    UIUtils.showToast('Error: ' + error.message, 'error');
+                }
+            }
+
+            /**
+             * Update document checklist based on service
+             */
+            function updateChecklist() {
+                const service = document.getElementById('serviceType').value;
+                const container = document.getElementById('checklistContainer');
+                const itemsList = document.getElementById('checklistItems');
+                const confirmCheckbox = document.getElementById('confirmChecklist');
+
+                if (!service) {
+                    container.style.display = 'none';
+                    confirmCheckbox.checked = false;
+                    return;
+                }
+
+                const checklists = {
+                    aadhaar_update: [
+                        'Valid Proof of Identity (Aadhaar Card/Passport)',
+                        'Proof of Address (Utility Bill/Bank Statement)',
+                        'Registered Mobile Number',
+                        'Biometric Verification (In person)'
+                    ],
+                    caste_certificate_verification: [
+                        'Residence Certificate',
+                        'Parental Caste Certificate',
+                        'Affidavit of Income/Caste',
+                        'Recent Passport Size Photos'
+                    ],
+                    income_certificate_verification: [
+                        'Salary Slips (Last 3 months)',
+                        'IT Returns (Form 16/Tax records)',
+                        'Address Proof',
+                        'Ration Card copy'
+                    ],
+                    birth_certificate_verification: [
+                        'Hospital Discharge Summary',
+                        'Parents Identity Proofs',
+                        'Marriage Certificate (If applicable)',
+                        'Address Proof'
+                    ],
+                    municipal_enquiry: [
+                        'Property Tax Receipts',
+                        'Mutation Documents (If applicable)',
+                        'Application Letter',
+                        'Sketch Map of Property'
+                    ],
+                    other: [
+                        'Common Application Form',
+                        'Valid Identity Proof',
+                        '2 Passport Size Photographs',
+                        'Relevant Supporting Documents'
+                    ]
+                };
+
+                const items = checklists[service] || checklists['other'];
+                itemsList.innerHTML = items.map(item => `
+                <li class="checklist-item">
+                    <i class="fas fa-check-square"></i>
+                    <span>${item}</span>
+                </li>
+            `).join('');
+
+                container.style.display = 'block';
+                confirmCheckbox.checked = false;
+            }
+            /**
+             * System Configuration (Broadcast & Availability)
+             */
+            async function checkSystemConfig() {
+                try {
+                    const res = await fetch('/api/admin/config');
+                    const result = await res.json();
+                    if (result.success) {
+                        const banner = document.getElementById('broadcastBanner');
+                        const text = document.getElementById('broadcastText');
+                        if (result.data.broadcast) {
+                            text.textContent = result.data.broadcast;
+                            banner.style.display = 'flex';
+                        } else {
+                            banner.style.display = 'none';
+                        }
+                    }
+                } catch (err) {
+                    console.error('Failed to load system config');
+                }
+            }
+
+            function generateQR() {
+                const baseUrl = '<%= officialUrl %>';
+                const statusUrl = baseUrl + '/public-queue-status';
+
+                const statusQrImg = document.getElementById('statusQR');
+                if (statusQrImg) {
+                    statusQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(statusUrl)}`;
+                }
+
+                const websiteQrImg = document.getElementById('websiteQR');
+                if (websiteQrImg) {
+                    websiteQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(baseUrl)}`;
+                }
+            }
+
+            // Initial check and periodic refresh
+            checkSystemConfig();
+            generateQR();
+            setInterval(checkSystemConfig, 30000); // Check every 30s
+
+            /**
+             * Socket.io — Real-Time Queue Notifications
+             */
+            function initSocketNotifications() {
+                try {
+                    const socket = io();
+                    window._socket = socket;
+
+                    // Subscribe to general queue broadcasts
+                    socket.emit('subscribe_queue');
+
+                    // Task 1: Subscribe each active token to its individual room
+                    // This is called after tokens are loaded (see subscribeActiveTokens below)
+
+                    // Task 1: Handle position-specific turn notifications from backend
+                    socket.on('turn_notification', (data) => {
+                        showQueueNotification(data.message, data.type);
+                        // Also update the token card if visible
+                        if (data.tokenId) {
+                            const card = document.querySelector(`[data-token-id="${data.tokenId}"]`);
+                            if (card) card.classList.add('notification-pulse');
+                        }
+                    });
+
+                    socket.on('token_called', (data) => {
+                        showQueueNotification(data.message, 'serving');
+                    });
+
+                    socket.on('queue_update', (data) => {
+                        // Track total pending for progress bar calculation
+                        if (data.pendingCount !== undefined) {
+                            window._queueTotalPending = data.pendingCount;
+                        }
+                        // Silently refresh token data on queue changes
+                        loadCitizenData();
+                    });
+
+                    console.log('[Socket.io] Connected for real-time notifications');
+                } catch (e) {
+                    console.warn('[Socket.io] Not available:', e.message);
+                }
+            }
+
+            // Task 1: Subscribe all active tokens to their socket rooms
+            function subscribeActiveTokens(tokens) {
+                if (!window._socket || !tokens) return;
+                tokens.forEach(token => {
+                    if ((token.status === 'pending' || token.status === 'serving') && token._id) {
+                        window._socket.emit('subscribe_token', token._id);
+                    }
+                });
+            }
+
+            function showQueueNotification(message, type) {
+                // Show a dismissable notification banner
+                let notifEl = document.getElementById('queueNotifBanner');
+                if (!notifEl) {
+                    notifEl = document.createElement('div');
+                    notifEl.id = 'queueNotifBanner';
+                    notifEl.style.cssText = `
+                        position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+                        background: ${type === 'serving' ? '#059669' : type === 'next' ? '#dc2626' : '#2563eb'};
+                        color: white; padding: 1rem 2rem; border-radius: 1rem;
+                        box-shadow: 0 8px 24px rgba(0,0,0,0.3); z-index: 9999;
+                        font-weight: 600; font-size: 1rem; text-align: center;
+                        animation: slideDown 0.4s ease; max-width: 90vw;
+                        display: flex; align-items: center; gap: 1rem;
+                    `;
+                    document.body.appendChild(notifEl);
+                }
+                notifEl.innerHTML = `
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.remove()" style="background:rgba(255,255,255,0.3); border:none; color:white; padding:0.25rem 0.75rem; border-radius:0.5rem; cursor:pointer; font-weight:700;">✕</button>
+                `;
+                notifEl.style.display = 'flex';
+
+                // Auto-dismiss after 30 seconds
+                setTimeout(() => { if (notifEl) notifEl.remove(); }, 30000);
+
+                // Also update notification counter
+                const notifCount = document.getElementById('notifications');
+                if (notifCount) {
+                    notifCount.textContent = parseInt(notifCount.textContent || 0) + 1;
+                }
+
+                // Play a soft alert sound (optional)
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain); gain.connect(ctx.destination);
+                    osc.frequency.value = type === 'next' ? 880 : 660;
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+                    osc.start(); osc.stop(ctx.currentTime + 0.5);
+                } catch (e) { /* Sound not supported */ }
+            }
+        </script>
+        <%- include('partials/scroll-to-top') %>
 </body>
 
 </html>

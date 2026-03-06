@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3B82F6;
+            --primary-dark: #2563EB;
+            --bg-gray: #F3F4F6;
+            --text-main: #1F2937;
+            --text-secondary: #6B7280;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-gray);
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .status-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-left: 6px solid var(--primary);
+        }
+
+        .status-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .crowd-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .waiting-count {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .count-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .count-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .footer-note {
+            margin-top: 4rem;
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 1rem;
+            border: 1px dashed var(--text-secondary);
+        }
+
+        .footer-note i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .last-updated {
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        @media (max-width: 640px) {
+            .header h1 {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <rect width="32" height="32" rx="8" fill="#3B82F6" />
+                <rect x="8" y="8" width="6" height="6" rx="1" fill="white" />
+                <rect x="18" y="8" width="6" height="6" rx="1" fill="white" />
+                <rect x="8" y="18" width="6" height="6" rx="1" fill="white" />
+                <rect x="18" y="18" width="6" height="6" rx="1" fill="white" />
+            </svg>
+            <span>QueuePro</span>
+        </a>
+        <div class="nav-actions">
+            <a href="/login" class="btn btn-primary">Book Your Visit Slot</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>Live Queue Status</h1>
+            <p>Check the current crowd levels before visiting the office</p>
+            <div class="last-updated">Last Updated: <%= timestamp %>
+            </div>
+        </div>
+
+        <div class="status-grid">
+            <% stats.forEach(service=> { %>
+                <div class="status-card" style="border-left-color: <%= service.color %>">
+                    <div class="service-info">
+                        <span class="service-name">
+                            <%= service.name %>
+                        </span>
+                        <span class="crowd-badge"
+                            style="background-color: <%= service.color %>20; color: <%= service.color %>">
+                            <%= service.level %> Crowd
+                        </span>
+                    </div>
+                    <div class="waiting-count">
+                        <span class="count-number">
+                            <%= service.count %>
+                        </span>
+                        <span class="count-label">Citizens currently in queue</span>
+                    </div>
+                </div>
+                <% }); %>
+        </div>
+
+        <div class="footer-note">
+            <i class="fas fa-info-circle"></i>
+            <h3>Plan Your Visit Efficiently</h3>
+            <p>Use this live status to choose the best time for your visit. Most services are fastest during "Low Crowd"
+                periods.</p>
+            <div style="margin-top: 1.5rem;">
+                <a href="/login" class="btn btn-outline">Generate Token Now</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto refresh every 30 seconds
+        setTimeout(() => {
+            window.location.reload();
+        }, 30000);
+    </script>
+    <%- include('partials/scroll-to-top') %>
+</body>
+
+</html>

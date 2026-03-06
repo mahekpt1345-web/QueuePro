@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - QueuePro</title>
     <link rel="stylesheet" href="/css/auth-styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body class="auth-page">
     <!-- Navigation -->
     <nav class="auth-navbar">
@@ -33,6 +36,11 @@
                 </div>
                 <h1>Create Account</h1>
                 <p>Join QueuePro today</p>
+                <p
+                    style="font-size: 13px; color: var(--text-secondary); margin-top: 10px; line-height: 1.4; border-left: 3px solid var(--primary-color); padding-left: 10px;">
+                    <strong>Note:</strong> Registration is only for queue scheduling. No official documents are
+                    submitted through this system.
+                </p>
             </div>
 
             <form id="registerForm" class="auth-form">
@@ -42,14 +50,19 @@
                         <i class="fas fa-id-card"></i>
                         Full Name
                     </label>
-                    <input 
-                        type="text" 
-                        id="fullName" 
-                        name="fullName" 
-                        placeholder="Enter your full name"
-                        required
-                    >
+                    <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
                     <span class="error-message" id="fullNameError"></span>
+                </div>
+
+                <!-- Mobile Number -->
+                <div class="form-group">
+                    <label for="phone">
+                        <i class="fas fa-mobile-alt"></i>
+                        Mobile Number
+                    </label>
+                    <input type="tel" id="phone" name="phone" placeholder="Enter 10-digit mobile number" required
+                        pattern="[0-9]{10}" autocomplete="tel">
+                    <span class="error-message" id="phoneError"></span>
                 </div>
 
                 <!-- Email -->
@@ -58,14 +71,8 @@
                         <i class="fas fa-envelope"></i>
                         Email Address
                     </label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        name="email" 
-                        placeholder="Enter your email"
-                        required
-                        autocomplete="email"
-                    >
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required
+                        autocomplete="email">
                     <span class="error-message" id="emailError"></span>
                 </div>
 
@@ -75,14 +82,8 @@
                         <i class="fas fa-user"></i>
                         Username
                     </label>
-                    <input 
-                        type="text" 
-                        id="username" 
-                        name="username" 
-                        placeholder="Choose a username (min 3 chars)"
-                        required
-                        autocomplete="username"
-                    >
+                    <input type="text" id="username" name="username" placeholder="Choose a username" required
+                        autocomplete="username">
                     <span class="error-message" id="usernameError"></span>
                 </div>
 
@@ -120,14 +121,8 @@
                         Password
                     </label>
                     <div class="password-input">
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password" 
-                            placeholder="Min 6 characters"
-                            required
-                            autocomplete="new-password"
-                        >
+                        <input type="password" id="password" name="password" placeholder="Min 6 characters" required
+                            autocomplete="new-password">
                         <button type="button" class="toggle-password" id="togglePassword">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -143,14 +138,8 @@
                         Confirm Password
                     </label>
                     <div class="password-input">
-                        <input 
-                            type="password" 
-                            id="confirmPassword" 
-                            name="confirmPassword" 
-                            placeholder="Confirm your password"
-                            required
-                            autocomplete="new-password"
-                        >
+                        <input type="password" id="confirmPassword" name="confirmPassword"
+                            placeholder="Confirm your password" required autocomplete="new-password">
                         <button type="button" class="toggle-password" id="toggleConfirmPassword">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -220,5 +209,7 @@
     <script src="/js/auth-system.js"></script>
     <script src="/js/ui-utils.js"></script>
     <script src="/js/register-handler.js"></script>
+    <%- include('../partials/scroll-to-top') %>
 </body>
+
 </html>
