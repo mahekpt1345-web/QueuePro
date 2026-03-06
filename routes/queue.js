@@ -33,4 +33,11 @@ router.get('/officer-stats',    verifyToken, checkRole(['officer', 'admin']), qu
 router.get('/officer-activity', verifyToken, checkRole(['officer', 'admin']), queueController.officerActivity);
 router.get('/citizen-stats',    verifyToken, checkRole(['citizen']),          queueController.citizenStats);
 
+// ── NEW: Data fetch for profile migration ────
+router.get('/officer-tokens', verifyToken, checkRole(['officer', 'admin']), queueController.getOfficerTokens);
+router.get('/citizen-tokens', verifyToken, checkRole(['citizen']),          queueController.getCitizenTokens);
+router.get('/user-activity',  verifyToken,                                  queueController.getUserActivity);
+router.get('/user-prefs',     verifyToken,                                  queueController.getUserPrefs);
+router.post('/user-prefs',    verifyToken,                                  queueController.saveUserPrefs);
+
 module.exports = router;
