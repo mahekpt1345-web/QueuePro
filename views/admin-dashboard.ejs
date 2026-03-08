@@ -1406,68 +1406,103 @@
                 </div>
             </div>
 
-            <!-- QR Code for Public Queue Status — Task 3 -->
-            <div class="card" style="margin-top:2rem;">
-                <div class="card-header">
-                    <h2><i class="fas fa-qrcode"></i> Public Queue Status QR Code</h2>
-                    <p>Display or print this QR code at the office entrance for citizens to scan</p>
+            <!-- QR Codes Section — Updated for Premium Display -->
+            <div class="card" style="margin-top:2rem; border-top: 4px solid var(--indigo);">
+                <div class="card-header" style="background: rgba(99, 102, 241, 0.05);">
+                    <div>
+                        <h2 style="display:flex; align-items:center; gap:0.75rem;">
+                            <div
+                                style="width:36px; height:36px; background:var(--indigo); color:white; border-radius:0.5rem; display:flex; align-items:center; justify-content:center;">
+                                <i class="fas fa-qrcode"></i>
+                            </div>
+                            System QR Codes
+                        </h2>
+                        <p>Share your website and public queue status via QR codes</p>
+                    </div>
                 </div>
                 <div class="card-content">
-                    <div style="display:flex; flex-wrap:wrap; align-items:center; gap:2rem;">
-                        <div style="text-align:center;">
-                            <% if (qrCodeDataUrl) { %>
-                                <img src="<%= qrCodeDataUrl %>" alt="Public Queue Status QR Code"
-                                    style="width:200px; height:200px; border:12px solid #f8fafc; border-radius:1rem; box-shadow:0 4px 16px rgba(0,0,0,0.1);">
-                                <p style="margin-top:0.75rem; font-size:0.8rem; color:var(--gray-600);">Scan to view
-                                    live queue status</p>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:2rem;">
+
+                        <!-- Website QR Code -->
+                        <div style="background:var(--gray-50); padding:1.5rem; border-radius:1rem; border:1px solid var(--gray-200); text-align:center; transition:0.3s;"
+                            onmouseover="this.style.borderColor='var(--primary)'"
+                            onmouseout="this.style.borderColor='var(--gray-200)'">
+                            <h3
+                                style="font-size:1rem; font-weight:700; color:var(--gray-900); margin-bottom:1rem; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+                                <i class="fas fa-globe" style="color:var(--primary);"></i> Main Website
+                            </h3>
+                            <% if (websiteQrDataUrl) { %>
+                                <div
+                                    style="display:inline-block; padding:1rem; background:white; border-radius:1rem; box-shadow:0 4px 12px rgba(0,0,0,0.08); margin-bottom:1rem;">
+                                    <img src="<%= websiteQrDataUrl %>" alt="Website QR Code"
+                                        style="width:160px; height:160px; display:block;">
+                                </div>
+                                <div style="display:flex; flex-direction:column; gap:0.75rem;">
+                                    <p style="font-size:0.8rem; color:var(--gray-600); line-height:1.4;">Scan to visit
+                                        the main QueuePro portal from any device.</p>
+                                    <div style="display:flex; gap:0.5rem; justify-content:center;">
+                                        <a href="/" target="_blank" class="btn btn-secondary btn-sm"
+                                            style="text-decoration:none;"><i class="fas fa-external-link-alt"></i>
+                                            visit</a>
+                                        <a href="<%= websiteQrDataUrl %>" download="queuepro-website-qr.png"
+                                            class="btn btn-primary btn-sm" style="text-decoration:none;"><i
+                                                class="fas fa-download"></i> Download</a>
+                                    </div>
+                                </div>
                                 <% } else { %>
                                     <div
-                                        style="width:200px; height:200px; background:#f3f4f6; border-radius:1rem; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:0.5rem;">
-                                        <i class="fas fa-qrcode" style="font-size:3rem; color:#9ca3af;"></i>
-                                        <p style="font-size:0.75rem; color:#9ca3af; text-align:center; padding:0 1rem;">
-                                            Run <code>npm install</code> then restart server to activate</p>
+                                        style="height:220px; display:flex; align-items:center; justify-content:center; flex-direction:column; color:var(--gray-400);">
+                                        <i class="fas fa-qrcode" style="font-size:3rem; margin-bottom:1rem;"></i>
+                                        <p style="font-size:0.8rem;">QR Generation Unavailable</p>
                                     </div>
                                     <% } %>
                         </div>
-                        <div style="flex:1; min-width:220px;">
-                            <h3 style="font-size:1.1rem; font-weight:600; color:var(--gray-900); margin-bottom:1rem;">
-                                <i class="fas fa-info-circle" style="color:var(--primary); margin-right:0.5rem;"></i>
-                                How to use
+
+                        <!-- Queue Status QR Code -->
+                        <div style="background:var(--gray-50); padding:1.5rem; border-radius:1rem; border:1px solid var(--gray-200); text-align:center; transition:0.3s;"
+                            onmouseover="this.style.borderColor='var(--success)'"
+                            onmouseout="this.style.borderColor='var(--gray-200)'">
+                            <h3
+                                style="font-size:1rem; font-weight:700; color:var(--gray-900); margin-bottom:1rem; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+                                <i class="fas fa-stream" style="color:var(--success);"></i> Live Queue Status
                             </h3>
-                            <div style="display:flex; flex-direction:column; gap:0.75rem; margin-bottom:1.5rem;">
-                                <div style="display:flex; align-items:flex-start; gap:0.75rem;">
-                                    <span
-                                        style="background:#dbeafe; color:var(--primary); border-radius:50%; width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; flex-shrink:0;">1</span>
-                                    <span style="color:var(--gray-600); font-size:0.875rem;">Print or display this QR
-                                        code at the office entrance or waiting area</span>
+                            <% if (queueQrDataUrl) { %>
+                                <div
+                                    style="display:inline-block; padding:1rem; background:white; border-radius:1rem; box-shadow:0 4px 12px rgba(0,0,0,0.08); margin-bottom:1rem;">
+                                    <img src="<%= queueQrDataUrl %>" alt="Public Queue Status QR Code"
+                                        style="width:160px; height:160px; display:block;">
                                 </div>
-                                <div style="display:flex; align-items:flex-start; gap:0.75rem;">
-                                    <span
-                                        style="background:#dbeafe; color:var(--primary); border-radius:50%; width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; flex-shrink:0;">2</span>
-                                    <span style="color:var(--gray-600); font-size:0.875rem;">Citizens scan with their
-                                        phone camera to check live queue status without logging in</span>
+                                <div style="display:flex; flex-direction:column; gap:0.75rem;">
+                                    <p style="font-size:0.8rem; color:var(--gray-600); line-height:1.4;">Print this for
+                                        citizens to scan at the entrance to see live tokens.</p>
+                                    <div style="display:flex; gap:0.5rem; justify-content:center;">
+                                        <a href="/public-queue-status" target="_blank" class="btn btn-secondary btn-sm"
+                                            style="text-decoration:none;"><i class="fas fa-external-link-alt"></i>
+                                            visit</a>
+                                        <a href="<%= queueQrDataUrl %>" download="queuepro-status-qr.png"
+                                            class="btn btn-success btn-sm" style="text-decoration:none;"><i
+                                                class="fas fa-download"></i> Download</a>
+                                    </div>
                                 </div>
-                                <div style="display:flex; align-items:flex-start; gap:0.75rem;">
-                                    <span
-                                        style="background:#dbeafe; color:var(--primary); border-radius:50%; width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; flex-shrink:0;">3</span>
-                                    <span style="color:var(--gray-600); font-size:0.875rem;">They see the current token
-                                        being served and estimated wait times in real time</span>
-                                </div>
-                            </div>
-                            <div style="display:flex; gap:1rem; flex-wrap:wrap;">
-                                <a href="/public-queue-status" target="_blank" class="btn btn-primary"
-                                    style="text-decoration:none;">
-                                    <i class="fas fa-external-link-alt" style="margin-right:0.5rem;"></i> View Public
-                                    Status
-                                </a>
-                                <% if (qrCodeDataUrl) { %>
-                                    <a href="<%= qrCodeDataUrl %>" download="queue-status-qr.png"
-                                        class="btn btn-secondary" style="text-decoration:none;">
-                                        <i class="fas fa-download" style="margin-right:0.5rem;"></i> Download QR
-                                    </a>
+                                <% } else { %>
+                                    <div
+                                        style="height:220px; display:flex; align-items:center; justify-content:center; flex-direction:column; color:var(--gray-400);">
+                                        <i class="fas fa-qrcode" style="font-size:3rem; margin-bottom:1rem;"></i>
+                                        <p style="font-size:0.8rem;">QR Generation Unavailable</p>
+                                    </div>
                                     <% } %>
-                            </div>
                         </div>
+
+                    </div>
+
+                    <div
+                        style="margin-top:1.5rem; padding:1rem; background:#f5f3ff; border-radius:0.75rem; border:1px dashed var(--indigo);">
+                        <p style="font-size:0.85rem; color:#4338ca; display:flex; align-items:center; gap:0.75rem;">
+                            <i class="fas fa-lightbulb"></i>
+                            <span><strong>Admin Tip:</strong> Display the "Live Queue Status" QR code on a screen or
+                                poster at your office entrance. This allows citizens to track their position without
+                                crowding the counter.</span>
+                        </p>
                     </div>
                 </div>
             </div>

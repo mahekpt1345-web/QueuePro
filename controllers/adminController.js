@@ -335,22 +335,36 @@ exports.updateSystemConfig = async (req, res) => {
 // GET /admin-dashboard  (EJS page render)
 // ─────────────────────────────────────────────
 exports.showDashboard = async (req, res) => {
-    let qrCodeDataUrl = null;
+    let websiteQrDataUrl = null;
+    let queueQrDataUrl = null;
     try {
         if (QRCode) {
             const baseUrl = process.env.OFFICIAL_URL || `${req.protocol}://${req.get('host')}`;
             const publicQueueUrl = `${baseUrl}/public-queue-status`;
 
-            qrCodeDataUrl = await QRCode.toDataURL(publicQueueUrl, {
+            // 1. Website QR Code
+            websiteQrDataUrl = await QRCode.toDataURL(baseUrl, {
                 width: 200,
                 margin: 2,
-                color: { dark: '#1e3a5f', light: '#ffffff' }
+                color: { dark: '#000000', light: '#ffffff' }
+            });
+
+            // 2. Queue Status QR Code
+            queueQrDataUrl = await QRCode.toDataURL(publicQueueUrl, {
+                width: 200,
+                margin: 2,
+                color: { dark: '#1e3a8a', light: '#ffffff' }
             });
         }
     } catch (e) {
-        console.error('[QR] Failed to generate QR code:', e.message);
+        console.error('[QR] Failed to generate QR codes:', e.message);
     }
-    res.render('admin-dashboard', { title: 'Admin Dashboard - QueuePro', user: req.user || null, qrCodeDataUrl });
+    res.render('admin-dashboard', {
+        title: 'Admin Dashboard - QueuePro',
+        user: req.user || null,
+        websiteQrDataUrl,
+        queueQrDataUrl
+    });
 };
 
 // ─────────────────────────────────────────────
