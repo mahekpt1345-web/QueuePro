@@ -18,9 +18,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (loginForm) {
         loginForm.addEventListener('submit', handleLogin);
     }
-
-    // Load remembered username
-    loadRememberedUsername();
 });
 
 /**
@@ -48,15 +45,12 @@ async function handleLogin(e) {
 
     UIUtils.disableButton('loginBtn', 'Logging in...');
 
-    const result = await auth.login(username, password);
+    const result = await auth.login(username, password, rememberMe);
 
     UIUtils.enableButton('loginBtn');
 
     if (result.success) {
         UIUtils.showToast(result.message, 'success');
-        if (rememberMe) {
-            sessionStorage.setItem('queuepro_remember_user', username);
-        }
         setTimeout(() => {
             if (result.role === 'admin') UIUtils.redirectTo('/admin-dashboard');
             else if (result.role === 'officer') UIUtils.redirectTo('/officer-dashboard');
@@ -67,18 +61,5 @@ async function handleLogin(e) {
         if (result.message && (result.message.includes('username') || result.message.includes('password') || result.message.includes('Invalid') || result.message.includes('credentials'))) {
             UIUtils.showError('usernameError', result.message);
         }
-    }
-}
-
-/**
- * Pre-fill remember me username if available
- */
-function loadRememberedUsername() {
-    const rememberedUser = sessionStorage.getItem('queuepro_remember_user');
-    if (rememberedUser) {
-        const usernameInput = document.getElementById('username');
-        if (usernameInput) usernameInput.value = rememberedUser;
-        const rememberMeCheckbox = document.getElementById('rememberMe');
-        if (rememberMeCheckbox) rememberMeCheckbox.checked = true;
     }
 }

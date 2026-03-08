@@ -46,7 +46,8 @@
                         Username or Mobile Number
                     </label>
                     <input type="text" id="username" name="username"
-                        placeholder="Enter username or 10-digit mobile number" required autocomplete="username">
+                        placeholder="Enter username or 10-digit mobile number" required autocomplete="username"
+                        value="<%= locals.rememberedUser || '' %>">
                     <span class="error-message" id="usernameError"></span>
                 </div>
 
@@ -69,7 +70,8 @@
                 <!-- Remember Me -->
                 <div class="form-options">
                     <label class="checkbox-label">
-                        <input type="checkbox" id="rememberMe" name="rememberMe">
+                        <input type="checkbox" id="rememberMe" name="rememberMe" <%=locals.rememberedUser ? 'checked'
+                            : '' %>>
                         <span>Remember me</span>
                     </label>
                 </div>

@@ -82,6 +82,13 @@ exports.apiLogin = async (req, res) => {
 
         res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
 
+        // Handle "Remember Me"
+        if (req.body.rememberMe) {
+            res.cookie('remembered_user', user.username || username, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+        } else {
+            res.clearCookie('remembered_user');
+        }
+
         await logActivity('LOGIN', `User logged in as ${user.role}`, 'USER', user._id, 'success', null, {
             user: { _id: user._id, username: user.username, role: user.role },
             ip: req.ip, get: (h) => req.get(h)
@@ -137,6 +144,11 @@ exports.apiAdminLogin = async (req, res) => {
         );
 
         res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+
+        // Handle "Remember Me" for admin if needed (though usually admin-login doesn't have the checkbox in UI, added for consistency)
+        if (req.body.rememberMe) {
+            res.cookie('remembered_user', admin.username, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+        }
 
         await logActivity('ADMIN_LOGIN', 'Admin logged in', 'USER', admin._id, 'success', null, {
             user: { _id: admin._id, username: admin.username, role: 'admin' },
@@ -280,7 +292,13 @@ exports.showLogin = (req, res) => {
     else if (req.query.error === 'access_denied')
         message = { type: 'error', text: 'Access denied. You do not have permission to view that page.' };
 
-    res.render('auth/login', { title: 'Login - QueuePro', message });
+    const rememberedUser = req.cookies?.remembered_user || null;
+
+    res.render('auth/login', {
+        title: 'Login - QueuePro',
+        message,
+        rememberedUser
+    });
 };
 
 // ─────────────────────────────────────────────
@@ -305,6 +323,13 @@ exports.postLogin = async (req, res) => {
             JWT_SECRET, { expiresIn: '24h' }
         );
         res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+
+        // Handle "Remember Me"
+        if (req.body.rememberMe === 'on' || req.body.rememberMe === true) {
+            res.cookie('remembered_user', user.username || username, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+        } else {
+            res.clearCookie('remembered_user');
+        }
 
         await logActivity('LOGIN', `User logged in as ${user.role}`, 'USER', user._id, 'success', null, {
             user: { _id: user._id, username, role: user.role }, ip: req.ip, get: (h) => req.get(h)

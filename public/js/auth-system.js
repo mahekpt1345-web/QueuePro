@@ -79,16 +79,16 @@ class AuthSystem {
     }
 
     // Login user (async, calls API). For admin login from admin page use loginAdmin().
-    async login(username, password) {
+    async login(username, password, rememberMe = false) {
         const validation = this.validateLogin(username, password);
         if (!validation.success) return validation;
-        return this._loginRequest('/api/auth/login', { username, password }, username);
+        return this._loginRequest('/api/auth/login', { username, password, rememberMe }, username);
     }
 
-    async loginAdmin(username, password) {
+    async loginAdmin(username, password, rememberMe = false) {
         const validation = this.validateLogin(username, password);
         if (!validation.success) return validation;
-        return this._loginRequest('/api/auth/admin-login', { username, password }, username);
+        return this._loginRequest('/api/auth/admin-login', { username, password, rememberMe }, username);
     }
 
     _loginRequest(endpoint, body, username) {
@@ -106,7 +106,7 @@ class AuthSystem {
                 };
             }
             const token = data.token;
-            // Token is set as HttpOnly cookie by the server; no localStorage needed.
+            // Token is set as HttpOnly cookie by the server; no localStorage or client-side cookie needed for auth.
             // Store a non-HttpOnly readable copy for client-side session decode if needed.
             if (token && typeof document !== 'undefined') {
                 document.cookie = `queuepro_jwt=${encodeURIComponent(token)};path=/;max-age=86400;samesite=strict`;
@@ -156,7 +156,7 @@ class AuthSystem {
     }
 
     logout() {
-        // Clear the client-accessible cookie copy
+        // Clear the client-accessible cookie if any (main auth is HttpOnly token cookie)
         if (typeof document !== 'undefined') {
             document.cookie = 'queuepro_jwt=;path=/;max-age=0;samesite=strict';
         }
