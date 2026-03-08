@@ -66,6 +66,17 @@ const userSchema = new mongoose.Schema({
   assignedService: {
     type: String,
     default: null  // e.g., "Passport Counter A"
+  },
+
+  // User preferences for notifications
+  preferences: {
+    type: {
+      emailNotif: { type: Boolean, default: true },
+      queueNotif: { type: Boolean, default: true },
+      announceNotif: { type: Boolean, default: true },
+      promoNotif: { type: Boolean, default: false }
+    },
+    default: {}
   }
 });
 

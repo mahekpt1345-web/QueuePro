@@ -401,16 +401,4 @@ exports.postAdminLogin = async (req, res) => {
     }
 };
 
-// ─────────────────────────────────────────────
-// EJS: GET /logout
-// ─────────────────────────────────────────────
-exports.logout = (req, res) => {
-    if (req.user) {
-        logActivity('LOGOUT', `User ${req.user.username} logged out`, 'USER', req.user._id, 'success', null, {
-            user: { _id: req.user._id, username: req.user.username, role: req.user.role },
-            ip: req.ip, get: (h) => req.get(h)
-        }).catch(console.error);
-    }
-    res.clearCookie('token');
-    res.redirect('/');
-};
+
