@@ -97,7 +97,8 @@ app.use((req, res) => {
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
     console.log(`\n QueuePro Server Running`);
-    console.log(`   URL: http://localhost:${PORT}`);
+    console.log(`   Local URL:  http://localhost:${PORT}`);
+    console.log(`   Official:   https://queuepro-45hu.onrender.com/`);
     console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`   Database: MongoDB`);
     console.log(`   Socket.IO: Enabled\n`);
