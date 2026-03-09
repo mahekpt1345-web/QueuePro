@@ -43,15 +43,27 @@ exports.apiRegister = async (req, res) => {
         });
         await newUser.save();
 
-        await logActivity('REGISTER', `New ${newUser.role} account created`, 'USER', newUser._id, 'success', null, {
-            user: { _id: newUser._id, username, role: newUser.role },
-            ip: req.ip, get: (h) => req.get(h)
-        });
+        // Safe logging - don't let logging failure break registration
+        try {
+            await logActivity('REGISTER', `New ${newUser.role} account created`, 'USER', newUser._id, 'success', null, {
+                user: { _id: newUser._id, username, role: newUser.role },
+                ip: req.ip, get: (h) => req.get(h)
+            });
+        } catch (logErr) {
+            console.error('Registration logging failed:', logErr.message);
+        }
 
         return res.json({ success: true, message: 'Account created successfully! You can now login.' });
     } catch (error) {
         console.error('API register error:', error);
-        return res.status(500).json({ success: false, message: 'Registration failed. Please try again.' });
+
+        // Return specific Mongoose validation errors if available
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(val => val.message);
+            return res.status(400).json({ success: false, message: messages.join(', ') });
+        }
+
+        return res.status(500).json({ success: false, message: 'Registration failed: ' + error.message });
     }
 };
 
