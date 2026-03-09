@@ -112,7 +112,7 @@ const tokenSchema = new mongoose.Schema({
 });
 
 // Middleware to calculate wait time when serving starts
-tokenSchema.pre('save', function () {
+tokenSchema.pre('save', async function () {
   // Wait time calculation: Time from creation to being called (startedAt)
   if (this.startedAt && this.createdAt && this.actualWaitTime === null) {
     const waitMs = this.startedAt - this.createdAt;
