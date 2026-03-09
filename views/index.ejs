@@ -58,7 +58,7 @@
                         physical document verification services can be digitally organized using token-based workflow
                         and role-based dashboards.
                     </p>
-                    <p style="font-size: 13px; opacity: 0.7;">
+                    <p style="font-size: 11px; opacity: 0.7; margin-top: 0.5rem;">
                         This system is developed for academic demonstration purposes and is not officially integrated
                         with any government department.
                     </p>
@@ -433,7 +433,9 @@
         // Mobile menu toggle
         document.getElementById('mobileMenuBtn').addEventListener('click', function () {
             const navLinks = document.getElementById('navLinks');
+            const navActions = document.querySelector('.nav-actions');
             navLinks.classList.toggle('active');
+            if (navActions) navActions.classList.toggle('active');
         });
 
         // Smooth scroll

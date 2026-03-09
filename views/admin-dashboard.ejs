@@ -205,33 +205,36 @@
             border-left: 4px solid transparent;
         }
 
-        .stat-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, .12);
-            transform: translateY(-2px);
-        }
-
-        .stat-card.blue {
-            border-left-color: var(--primary);
-        }
-
-        .stat-card.green {
-            border-left-color: var(--success);
-        }
-
-        .stat-card.yellow {
-            border-left-color: var(--warning);
-        }
-
-        .stat-card.red {
-            border-left-color: var(--danger);
-        }
-
-        .stat-card.purple {
-            border-left-color: var(--purple);
-        }
-
         .stat-card.indigo {
             border-left-color: var(--indigo);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-container {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-section h1 {
+                font-size: 1.5rem;
+            }
         }
 
         .stat-header {

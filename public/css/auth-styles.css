@@ -34,7 +34,8 @@
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     font-family: 'Poppins', sans-serif;
 }
@@ -130,6 +131,22 @@ body.auth-page {
     margin: 2rem auto;
     padding: 0 2rem;
     width: 100%;
+    align-items: center;
+    /* Center vertically if height allows */
+}
+
+@media (max-width: 992px) {
+    .auth-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin: 1rem auto;
+    }
+
+    .auth-info {
+        order: -1;
+        /* Show info first or remove if too long */
+        text-align: center;
+    }
 }
 
 .auth-container.register-container {
@@ -143,6 +160,16 @@ body.auth-page {
     padding: 2.5rem;
     box-shadow: var(--shadow-xl);
     animation: slideInLeft 0.5s ease-out;
+}
+
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 1.5rem;
+    }
+
+    .auth-header h1 {
+        font-size: 1.5rem;
+    }
 }
 
 .auth-card.admin-card {
@@ -166,6 +193,7 @@ body.auth-page {
         opacity: 0;
         transform: translateX(-30px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -361,8 +389,10 @@ body.auth-page {
 .role-option {
     position: relative;
     cursor: pointer;
-    display: flex; /* Added display: flex */
-    height: 100%;  /* Added height: 100% */
+    display: flex;
+    /* Added display: flex */
+    height: 100%;
+    /* Added height: 100% */
 }
 
 .role-option input[type="radio"] {
@@ -374,18 +404,21 @@ body.auth-page {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center; /* Added justify-content: center */
+    justify-content: center;
+    /* Added justify-content: center */
     gap: 0.5rem;
     padding: 1rem;
     border: 2px solid var(--gray-200);
     border-radius: 0.5rem;
     text-align: center;
     transition: var(--transition);
-    width: 100%; /* Ensure full width */
-    height: 100%; /* Ensure full height */
+    width: 100%;
+    /* Ensure full width */
+    height: 100%;
+    /* Ensure full height */
 }
 
-.role-option input[type="radio"]:checked + .role-label {
+.role-option input[type="radio"]:checked+.role-label {
     border-color: var(--primary-color);
     background: rgba(37, 99, 235, 0.05);
 }
@@ -395,7 +428,7 @@ body.auth-page {
     color: var(--gray-500);
 }
 
-.role-option input[type="radio"]:checked + .role-label i {
+.role-option input[type="radio"]:checked+.role-label i {
     color: var(--primary-color);
 }
 
@@ -675,6 +708,7 @@ body.auth-page {
         opacity: 0;
         transform: translateX(30px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);

@@ -592,17 +592,23 @@
             }
         }
 
+        /* RESPONSIVE */
         @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
             .nav-container {
+                padding: 1rem;
                 flex-wrap: wrap;
             }
 
             .content-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .dashboard-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr !important;
             }
 
             .welcome-section h1 {
