@@ -229,13 +229,14 @@
 
         <div class="status-grid">
             <% stats.forEach(service=> { %>
-                <div class="status-card" style="border-left-color: <%= service.color %>">
+                <div class="status-card"
+                    style="--accent-color: <%= service.color %>; --accent-bg: <%= service.color + '20' %>; border-left-color: var(--accent-color);">
                     <div class="service-info">
                         <span class="service-name">
                             <%= service.name %>
                         </span>
                         <span class="crowd-badge"
-                            style="background-color: <%= service.color %>20; color: <%= service.color %>">
+                            style="background-color: var(--accent-bg); color: var(--accent-color);">
                             <%= service.level %> Crowd
                         </span>
                     </div>
