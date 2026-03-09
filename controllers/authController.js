@@ -288,7 +288,15 @@ exports.postRegister = async (req, res) => {
         });
     } catch (error) {
         console.error('Registration error:', error);
-        res.render('auth/register', { title: 'Register - QueuePro', message: { type: 'error', text: 'Registration failed. Please try again.' } });
+        let errorMsg = 'Registration failed. Please try again.';
+        if (error.name === 'ValidationError') {
+            errorMsg = Object.values(error.errors).map(val => val.message).join(', ');
+        } else if (error.code === 11000) {
+            errorMsg = 'This information is already registered.';
+        } else {
+            errorMsg += ' (' + error.message + ')';
+        }
+        res.render('auth/register', { title: 'Register - QueuePro', message: { type: 'error', text: errorMsg } });
     }
 };
 

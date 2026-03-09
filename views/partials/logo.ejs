@@ -1,35 +1,23 @@
-<div class="logo-svg-container" style="display: flex; align-items: center; gap: 10px;">
-    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Magnifying Glass / Q Base -->
-        <circle cx="18" cy="18" r="14" stroke="#0046AD" stroke-width="4" />
-        <line x1="28" y1="28" x2="36" y2="36" stroke="#0046AD" stroke-width="4" stroke-linecap="round" />
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" class="brand-box-logo"
+    style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+    <rect width="32" height="32" rx="8" fill="#3B82F6" />
+    <rect x="8" y="8" width="6" height="6" rx="1" fill="white" />
+    <rect x="18" y="8" width="6" height="6" rx="1" fill="white" />
+    <rect x="8" y="18" width="6" height="6" rx="1" fill="white" />
+    <rect x="18" y="18" width="6" height="6" rx="1" fill="white" />
+</svg>
+<span class="brand-name"
+    style="font-weight: 700; font-size: 1.25rem; color: #3B82F6; display: inline-block; vertical-align: middle;">QueuePro</span>
 
-        <!-- People Icons inside -->
-        <g class="people-icons">
-            <!-- Small Person -->
-            <circle cx="11" cy="24" r="2" fill="#00AEEF" />
-            <path d="M8 30C8 28.3431 9.34315 27 11 27C12.6569 27 14 28.3431 14 30" stroke="#00AEEF" stroke-width="1.5"
-                stroke-linecap="round" />
+<style>
+    @media (max-width: 640px) {
+        .brand-name {
+            font-size: 1.1rem !important;
+        }
 
-            <!-- Medium Person -->
-            <circle cx="18" cy="21" r="2.5" fill="#2BB673" />
-            <path d="M14 28C14 25.7909 15.7909 24 18 24C20.2091 24 22 25.7909 22 28" stroke="#2BB673" stroke-width="2"
-                stroke-linecap="round" />
-
-            <!-- Large Person -->
-            <circle cx="25" cy="18" r="3" fill="#F7931E" />
-            <path d="M20 26C20 23.2386 22.2386 21 25 21C27.7614 21 30 23.2386 30 26" stroke="#F7931E" stroke-width="2.5"
-                stroke-linecap="round" />
-        </g>
-
-        <!-- Checkmark -->
-        <path d="M14 16L17 19L24 12" stroke="#2BB673" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
-    <div style="display: flex; flex-direction: column; line-height: 1;">
-        <span style="font-size: 24px; font-weight: 800; color: #0046AD; letter-spacing: -0.5px;">Queue<span
-                style="color: #2BB673;">Pro</span></span>
-        <span
-            style="font-size: 10px; font-weight: 500; color: #4B5563; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;">Queue
-            Management System</span>
-    </div>
-</div>
+        .brand-box-logo {
+            width: 28px !important;
+            height: 28px !important;
+        }
+    }
+</style>
