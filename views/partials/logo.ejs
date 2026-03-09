@@ -1,41 +1,88 @@
-<div class="logo-container" style="display: flex; align-items: center; gap: 10px;">
-    <div class="logo-icon" style="position: relative; width: 32px; height: 32px;">
-        <!-- New Premium Magnifying Glass Q -->
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="14" cy="14" r="10" stroke="#2563eb" stroke-width="3" />
-            <path d="M21 21L28 28" stroke="#2563eb" stroke-width="3" stroke-linecap="round" />
-            <path d="M11 11L14 14L18 10" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"
+<div class="logo-wrapper" style="display: flex; align-items: center; gap: 12px; cursor: pointer;"
+    onclick="window.location.href='/'">
+    <div class="logo-icon-container" style="position: relative; width: 44px; height: 44px; flex-shrink: 0;">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+            <!-- Magnifying Glass Q Outer -->
+            <path d="M70 70L85 85" stroke="#0046AD" stroke-width="8" stroke-linecap="round" />
+            <circle cx="45" cy="45" r="35" stroke="#0046AD" stroke-width="8" />
+
+            <!-- People Icons -->
+            <!-- Small Blue Person -->
+            <circle cx="28" cy="55" r="5" fill="#00AEEF" />
+            <path d="M20 70C20 65 24 62 28 62C32 62 36 65 36 70" stroke="#00AEEF" stroke-width="4"
+                stroke-linecap="round" />
+
+            <!-- Medium Green Person -->
+            <circle cx="45" cy="48" r="6" fill="#2BB673" />
+            <path d="M35 68C35 61 40 58 45 58C50 58 55 61 55 68" stroke="#2BB673" stroke-width="5"
+                stroke-linecap="round" />
+
+            <!-- Large Orange Person -->
+            <circle cx="62" cy="42" r="7" fill="#F7931E" />
+            <path d="M50 65C50 56 56 52 62 52C68 52 74 56 74 65" stroke="#F7931E" stroke-width="6"
+                stroke-linecap="round" />
+
+            <!-- Green Checkmark -->
+            <path d="M48 20L54 26L68 12" stroke="#2BB673" stroke-width="6" stroke-linecap="round"
                 stroke-linejoin="round" />
         </svg>
     </div>
-    <div class="logo-text" style="display: flex; flex-direction: column; line-height: 1.1;">
-        <span class="brand-name"
-            style="font-size: 22px; font-weight: 800; color: #1e40af; letter-spacing: -0.5px;">Queue<span
-                style="color: #2563eb;">Pro</span></span>
-        <span class="tagline"
-            style="font-size: 9px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Queue
-            Management System</span>
+    <div class="logo-text-container" style="display: flex; flex-direction: column; line-height: 1.1;">
+        <div
+            style="font-family: 'Inter', 'Poppins', sans-serif; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">
+            <span style="color: #0046AD;">Queue</span><span style="color: #2BB673;">Pro</span>
+        </div>
+        <div
+            style="display: flex; align-items: center; gap: 4px; color: #4B5563; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+            <div style="height: 1px; width: 8px; background: #0046AD;"></div>
+            <span>Queue Management System</span>
+            <div style="height: 1px; width: 8px; background: #0046AD;"></div>
+        </div>
     </div>
 </div>
 
 <style>
-    @media (max-width: 640px) {
-        .brand-name {
+    @media (max-width: 768px) {
+        .logo-wrapper {
+            gap: 8px !important;
+        }
+
+        .logo-icon-container {
+            width: 32px !important;
+            height: 32px !important;
+        }
+
+        .logo-text-container div:first-child {
+            font-size: 20px !important;
+        }
+
+        .logo-text-container div:last-child {
+            font-size: 7px !important;
+            gap: 2px !important;
+        }
+
+        .logo-text-container div:last-child div {
+            width: 4px !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .logo-wrapper {
+            gap: 6px !important;
+        }
+
+        .logo-icon-container {
+            width: 28px !important;
+            height: 28px !important;
+        }
+
+        .logo-text-container div:first-child {
             font-size: 18px !important;
         }
 
-        .tagline {
-            font-size: 8px !important;
-        }
-
-        .logo-icon svg {
-            width: 28px;
-            height: 28px;
-        }
-
-        .logo-icon {
-            width: 28px !important;
-            height: 28px !important;
+        .logo-text-container div:last-child {
+            display: none !important;
+            /* Hide tagline on very small screens to save space */
         }
     }
 </style>
