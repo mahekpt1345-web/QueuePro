@@ -8,6 +8,23 @@ document.addEventListener('DOMContentLoaded', function () {
     const togglePassword = document.getElementById('togglePassword');
     const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
     const passwordInput = document.getElementById('password');
+    const googleSignUpBtn = document.getElementById('googleSignUpBtn');
+    const appleSignUpBtn = document.getElementById('appleSignUpBtn');
+
+    // OAuth Buttons - Redirect to OAuth routes
+    if (googleSignUpBtn) {
+        googleSignUpBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = '/auth/google';
+        });
+    }
+
+    if (appleSignUpBtn) {
+        appleSignUpBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = '/auth/apple';
+        });
+    }
 
     // Password toggle
     if (togglePassword) {

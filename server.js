@@ -5,6 +5,9 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const { Server } = require('socket.io');
+const session = require('express-session');
+
+const passport = require('passport');
 
 const connectDB = require('./config/database');
 
@@ -33,6 +36,30 @@ connectDB().catch(err => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// ========================================
+// SESSION CONFIGURATION (for OAuth)
+// ========================================
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'queuepro_session_secret_2024',
+    resave: false,
+    saveUninitialized: false,
+    // Using default memory store for development
+    // For production, upgrade to: MongoStore.create({ mongoUrl: process.env.MONGODB_URI })
+    cookie: {
+        secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
+
+// ========================================
+// PASSPORT AUTHENTICATION
+// ========================================
+require('./middleware/passport-config')(passport);
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.set('view engine', 'ejs');

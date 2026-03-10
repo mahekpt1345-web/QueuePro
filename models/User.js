@@ -38,11 +38,11 @@ const userSchema = new mongoose.Schema({
     default: 'citizen'
   },
 
-  // Phone (Mobile Number)
+  // Phone (Mobile Number) - Optional for OAuth users (can be added later)
   phone: {
     type: String,
-    required: true,
     unique: true,
+    sparse: true,  // Allow null values while maintaining uniqueness
     trim: true
   },
 
@@ -77,6 +77,28 @@ const userSchema = new mongoose.Schema({
       promoNotif: { type: Boolean, default: false }
     },
     default: {}
+  },
+
+  // OAuth Integration Fields
+  googleId: {
+    type: String,
+    default: null
+  },
+
+  appleId: {
+    type: String,
+    default: null
+  },
+
+  oauthProvider: {
+    type: String,
+    enum: ['manual', 'google', 'apple'],
+    default: 'manual'
+  },
+
+  phoneVerified: {
+    type: Boolean,
+    default: false  // Set to true when phone is verified by user
   }
 });
 

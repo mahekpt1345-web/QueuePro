@@ -125,6 +125,17 @@ body {
     border: none;
     cursor: pointer;
     gap: 6px;
+    padding: 12px;
+    min-width: 48px;
+    min-height: 48px;
+    border-radius: 8px;
+    transition: var(--transition);
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-menu-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
 }
 
 .mobile-menu-btn span {
@@ -142,7 +153,7 @@ body {
 .btn-primary {
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     color: white;
-    padding: 10px 24px;
+    padding: 12px 24px;
     border: none;
     border-radius: var(--radius);
     font-size: 14px;
@@ -150,6 +161,10 @@ body {
     cursor: pointer;
     transition: var(--transition);
     box-shadow: var(--shadow-md);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-primary:hover {
@@ -160,13 +175,17 @@ body {
 .btn-secondary {
     background: transparent;
     color: var(--primary);
-    padding: 10px 24px;
+    padding: 12px 24px;
     border: 2px solid var(--primary);
     border-radius: var(--radius);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-secondary:hover {
@@ -183,6 +202,10 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-outline:hover {
@@ -198,6 +221,10 @@ body {
     border: none;
     cursor: pointer;
     transition: var(--transition);
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-service {
@@ -690,6 +717,54 @@ body {
    RESPONSIVE DESIGN
    =========================== */
 
+/* Extra small screens: 320px - 375px */
+@media (max-width: 375px) {
+    .container {
+        padding: 0 12px;
+    }
+
+    .nav-container {
+        padding: 0 12px;
+    }
+
+    .hero h1 {
+        font-size: 20px;
+        line-height: 1.3;
+    }
+
+    .hero-description {
+        font-size: 14px;
+    }
+
+    .btn-large {
+        padding: 12px 20px;
+        font-size: 14px;
+        min-height: 44px;
+    }
+
+    .hero-buttons {
+        gap: 12px;
+    }
+
+    .section-header h2 {
+        font-size: 22px;
+    }
+
+    .stat-item {
+        padding: 12px;
+    }
+
+    .stat-item h3 {
+        font-size: 24px;
+    }
+
+    .service-card,
+    .feature-item {
+        padding: 16px;
+    }
+}
+
+/* Tablet & small screens: 376px - 768px */
 @media (max-width: 768px) {
     .nav-links.active {
         display: flex;
@@ -733,6 +808,7 @@ body {
     .nav-links.active~.nav-actions button {
         pointer-events: auto;
         width: 100%;
+        min-height: 44px;
     }
 
     .hero-content {
@@ -755,8 +831,16 @@ body {
         animation: none;
     }
 
+    .floating-card.card-1,
+    .floating-card.card-2,
+    .floating-card.card-3 {
+        width: 100%;
+        position: static;
+    }
+
     .hero-buttons {
         flex-direction: column;
+        gap: 12px;
     }
 
     .btn-large {
@@ -765,6 +849,7 @@ body {
 
     .hero-stats {
         grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
     }
 
     .services-grid {
@@ -777,6 +862,10 @@ body {
 
     .section-header h2 {
         font-size: 28px;
+    }
+
+    .section-header p {
+        font-size: 15px;
     }
 
     .footer-content {
@@ -792,8 +881,18 @@ body {
     .cta-section h2 {
         font-size: 28px;
     }
+
+    .cta-buttons {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .cta-buttons .btn-large {
+        width: 100%;
+    }
 }
 
+/* Small phones: 480px and below */
 @media (max-width: 480px) {
     .container {
         padding: 0 16px;
@@ -803,20 +902,35 @@ body {
         padding: 0 16px;
     }
 
+    .hero {
+        padding: 40px 0;
+    }
+
     .hero h1 {
         font-size: 24px;
+        line-height: 1.3;
+    }
+
+    .hero-description {
+        font-size: 15px;
     }
 
     .hero-stats {
         grid-template-columns: 1fr;
+        gap: 12px;
     }
 
     .stat-item {
         padding: 16px;
     }
 
+    .stat-item h3 {
+        font-size: 22px;
+    }
+
     .cta-buttons {
         flex-direction: column;
+        gap: 10px;
     }
 
     .hero-description {
@@ -825,6 +939,30 @@ body {
 
     .section-header h2 {
         font-size: 24px;
+    }
+
+    .section-header p {
+        font-size: 14px;
+    }
+
+    .service-card,
+    .feature-item {
+        padding: 16px;
+    }
+
+    .btn-large {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+
+    /* Ensure inputs and form elements are touch-friendly */
+    input,
+    textarea,
+    select {
+        min-height: 44px;
+        font-size: 16px;
+        /* Prevents auto-zoom on iOS */
     }
 }
 

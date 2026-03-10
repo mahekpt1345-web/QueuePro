@@ -435,4 +435,138 @@ exports.logout = (req, res) => {
     res.redirect('/');
 };
 
+// ─────────────────────────────────────────────
+// OAUTH: Google Callback Handler
+// ─────────────────────────────────────────────
+exports.googleCallback = async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.redirect('/register?error=google_signup_failed');
+        }
+
+        // Passport authenticated the user; log activity
+        await logActivity('GOOGLE_SIGNUP', `User registered via Google OAuth`, 'USER', req.user._id, 'success', null, {
+            user: { _id: req.user._id, email: req.user.email, name: req.user.name },
+            ip: req.ip, get: (h) => req.get(h)
+        }).catch(console.error);
+
+        // Redirect to login page with success message
+        res.redirect('/login?oauth=success&provider=google');
+    } catch (error) {
+        console.error('Google callback error:', error);
+        res.redirect('/register?error=google_callback_failed');
+    }
+};
+
+// ─────────────────────────────────────────────
+// OAUTH: Apple Callback Handler
+// ─────────────────────────────────────────────
+exports.appleCallback = async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.redirect('/register?error=apple_signup_failed');
+        }
+
+        // Passport authenticated the user; log activity
+        await logActivity('APPLE_SIGNUP', `User registered via Apple OAuth`, 'USER', req.user._id, 'success', null, {
+            user: { _id: req.user._id, email: req.user.email, name: req.user.name },
+            ip: req.ip, get: (h) => req.get(h)
+        }).catch(console.error);
+
+        // Redirect to login page with success message
+        res.redirect('/login?oauth=success&provider=apple');
+    } catch (error) {
+        console.error('Apple callback error:', error);
+        res.redirect('/register?error=apple_callback_failed');
+    }
+};
+
+// ─────────────────────────────────────────────
+// API: POST /api/auth/phone
+// Add or update phone number for OAuth users
+// ─────────────────────────────────────────────
+exports.updateUserPhone = async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: 'Not authenticated' });
+        }
+
+        const { phone } = req.body;
+
+        if (!phone) {
+            return res.status(400).json({ success: false, message: 'Phone number is required' });
+        }
+
+        // Validate phone format (10 digits)
+        if (!/^\d{10}$/.test(phone.replace(/\D/g, ''))) {
+            return res.status(400).json({ success: false, message: 'Please provide a valid 10-digit phone number' });
+        }
+
+        // Check if phone is already in use
+        const existingPhone = await User.findOne({ phone, _id: { $ne: req.user.userId } });
+        if (existingPhone) {
+            return res.status(400).json({ success: false, message: 'Phone number already in use' });
+        }
+
+        // Update user with phone
+        const user = await User.findByIdAndUpdate(
+            req.user.userId,
+            { phone, phoneVerified: true },
+            { new: true, runValidators: true }
+        );
+
+        await logActivity('UPDATE_PHONE', `Phone number added/updated`, 'USER', req.user.userId, 'success', null, {
+            user: { _id: req.user.userId, username: req.user.username },
+            ip: req.ip, get: (h) => req.get(h)
+        }).catch(console.error);
+
+        res.json({
+            success: true,
+            message: 'Phone number updated successfully',
+            user: {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                phone: user.phone,
+                name: user.name,
+                role: user.role
+            }
+        });
+    } catch (error) {
+        console.error('Update phone error:', error);
+        res.status(500).json({ success: false, message: 'Failed to update phone number' });
+    }
+};
+
+// ─────────────────────────────────────────────
+// API: GET /api/auth/oauth-login-status
+// Check OAuth login status and phone requirement
+// ─────────────────────────────────────────────
+exports.getOAuthLoginStatus = async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: 'Not authenticated' });
+        }
+
+        const user = await User.findById(req.user.userId);
+
+        res.json({
+            success: true,
+            user: {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                phone: user.phone,
+                name: user.name,
+                role: user.role,
+                phoneVerified: user.phoneVerified,
+                phoneRequired: !user.phone && user.oauthProvider !== 'manual'
+            }
+        });
+    } catch (error) {
+        console.error('OAuth status error:', error);
+        res.status(500).json({ success: false, message: 'Failed to get OAuth status' });
+    }
+};
+
 

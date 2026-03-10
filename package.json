@@ -9,23 +9,34 @@
     "seed": "node scripts/seed.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["queue", "management", "citizen", "officer", "admin"],
+  "keywords": [
+    "queue",
+    "management",
+    "citizen",
+    "officer",
+    "admin"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "connect-mongo": "^6.0.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.6",
     "dotenv": "^17.2.4",
     "ejs": "^4.0.1",
     "express": "^5.2.1",
     "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.19.0",
     "express-static-gzip": "^3.0.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.0",
-    "socket.io": "^4.8.3",
-    "qrcode": "^1.5.3"
+    "passport": "^0.7.0",
+    "passport-apple": "^2.0.2",
+    "passport-google-oauth20": "^2.0.0",
+    "qrcode": "^1.5.3",
+    "socket.io": "^4.8.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
