@@ -656,21 +656,6 @@ body.auth-page {
     font-weight: 500;
 }
 
-.btn-apple {
-    background: #000;
-    border-color: #000;
-    color: white;
-}
-
-.btn-apple:hover {
-    background: #1a1a1a;
-    border-color: #1a1a1a;
-}
-
-.btn-apple span {
-    color: white;
-    font-weight: 500;
-}
 
 /* ==============================
    HERO / WELCOME SECTION

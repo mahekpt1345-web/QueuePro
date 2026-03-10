@@ -1,6 +1,5 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const AppleStrategy = require('passport-apple').Strategy;
 const User = require('../models/User');
 
 module.exports = (passport) => {
@@ -108,88 +107,4 @@ module.exports = (passport) => {
   })();
 
   // ========================================
-  // APPLE OAUTH STRATEGY (conditional)
-  // ========================================
-  (function registerApple() {
-    const required = ['APPLE_SERVICE_ID', 'APPLE_TEAM_ID', 'APPLE_KEY_ID', 'APPLE_PRIVATE_KEY', 'APPLE_CALLBACK_URL'];
-    const missing = missingEnv(required);
-    if (missing.length && !allowOverride) {
-      console.warn(
-        `Apple OAuth not registered. Missing env: ${missing.join(', ')}. Add these or set ALLOW_OAUTH_REGISTRATION=true to force registration.`
-      );
-      return;
-    }
-
-    try {
-      passport.use(
-        'apple',
-        new AppleStrategy(
-          {
-            clientID: process.env.APPLE_SERVICE_ID,
-            teamID: process.env.APPLE_TEAM_ID,
-            keyID: process.env.APPLE_KEY_ID,
-            privateKeyString: process.env.APPLE_PRIVATE_KEY,
-            callbackURL: process.env.APPLE_CALLBACK_URL
-          },
-          async (accessToken, refreshToken, idToken, user, done) => {
-            try {
-              const email = user?.email;
-              const name = user?.name?.firstName && user?.name?.lastName
-                ? `${user.name.firstName} ${user.name.lastName}`
-                : user?.name?.firstName || 'Apple User';
-
-              if (!email) {
-                return done(null, false, { message: 'No email provided by Apple' });
-              }
-
-              // Check if user exists with this Apple ID
-              let existingUser = await User.findOne({ appleId: user.sub });
-
-              if (existingUser) {
-                existingUser.lastLogin = new Date();
-                await existingUser.save();
-                return done(null, existingUser);
-              }
-
-              // Check if email already exists
-              const existingEmail = await User.findOne({ email });
-              if (existingEmail) {
-                return done(null, false, { message: 'Email already registered. Please login with your password or reset it.' });
-              }
-
-              // Generate unique username from email
-              let username = email.split('@')[0];
-              let counter = 1;
-              while (await User.findOne({ username })) {
-                username = username + counter;
-                counter++;
-              }
-
-              // Create new user with Apple OAuth
-              existingUser = new User({
-                appleId: user.sub,
-                email,
-                name,
-                username,
-                password: 'oauth-' + user.sub,
-                role: 'citizen',
-                oauthProvider: 'apple',
-                phoneVerified: false,
-                createdAt: new Date(),
-                lastLogin: new Date(),
-                isActive: true
-              });
-
-              await existingUser.save();
-              done(null, existingUser);
-            } catch (error) {
-              done(error, null);
-            }
-          }
-        )
-      );
-    } catch (err) {
-      console.error('Failed to initialize AppleStrategy:', err.message || err);
-    }
-  })();
 };

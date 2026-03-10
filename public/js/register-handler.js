@@ -9,20 +9,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
     const passwordInput = document.getElementById('password');
     const googleSignUpBtn = document.getElementById('googleSignUpBtn');
-    const appleSignUpBtn = document.getElementById('appleSignUpBtn');
 
     // OAuth Buttons - Redirect to OAuth routes
     if (googleSignUpBtn) {
         googleSignUpBtn.addEventListener('click', (e) => {
             e.preventDefault();
             window.location.href = '/auth/google';
-        });
-    }
-
-    if (appleSignUpBtn) {
-        appleSignUpBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.location.href = '/auth/apple';
         });
     }
 

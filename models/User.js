@@ -85,14 +85,9 @@ const userSchema = new mongoose.Schema({
     default: null
   },
 
-  appleId: {
-    type: String,
-    default: null
-  },
-
   oauthProvider: {
     type: String,
-    enum: ['manual', 'google', 'apple'],
+    enum: ['manual', 'google'],
     default: 'manual'
   },
 
