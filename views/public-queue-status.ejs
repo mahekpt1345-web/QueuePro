@@ -194,6 +194,17 @@
         }
 
         @media (max-width: 640px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .nav-actions, .nav-actions .btn {
+                width: 100%;
+            }
+
             .header h1 {
                 font-size: 1.75rem;
             }
@@ -204,6 +215,19 @@
 
             .status-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .status-card {
+                padding: 1rem;
+            }
+
+            .count-number {
+                font-size: 2rem;
+            }
+
+            .footer-note {
+                margin-top: 2rem;
+                padding: 1.5rem;
             }
         }
     </style>

@@ -41,7 +41,7 @@ body {
 }
 
 body {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0046AD 0%, #2BB673 100%);
     color: var(--gray-800);
     line-height: 1.6;
 }
@@ -50,7 +50,7 @@ body.auth-page {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0046AD 0%, #2BB673 100%);
 }
 
 /* NAVIGATION */
@@ -662,8 +662,8 @@ body.auth-page {
 ============================== */
 
 .hero-section {
-    background: linear-gradient(135deg, #7066c2, #afaeb4);
-    color: #1f458f;
+    background: transparent;
+    color: white;
     padding: 80px 60px;
     min-height: 90vh;
     display: flex;
@@ -692,7 +692,7 @@ body.auth-page {
     font-weight: 700;
     line-height: 1.2;
     margin-bottom: 10px;
-    color: #0f172a;
+    color: white;
 }
 
 .hero-content h2 {
@@ -700,14 +700,14 @@ body.auth-page {
     font-weight: 700;
     line-height: 1.2;
     margin-bottom: 24px;
-    color: #0f172a;
+    color: white;
 }
 
 /* Description */
 .hero-content p {
     font-size: 1.05rem;
     line-height: 1.7;
-    color: #1f2937;
+    color: rgba(255, 255, 255, 0.9);
     max-width: 540px;
     margin-bottom: 30px;
 }
@@ -725,11 +725,11 @@ body.auth-page {
     gap: 10px;
     font-size: 0.95rem;
     margin-bottom: 12px;
-    color: #1f2937;
+    color: white;
 }
 
 .hero-features li i {
-    color: #111827;
+    color: white;
     font-size: 0.85rem;
 }
 
@@ -1199,13 +1199,25 @@ body.auth-page {
     .auth-container {
         display: flex !important;
         flex-direction: column !important;
-        margin: 1rem 0 !important;
+        margin: 1rem auto !important;
         gap: 1.5rem !important;
+        padding: 0 1rem !important;
     }
 
-    .auth-card, .auth-info {
+    .auth-card {
+        order: 1 !important;
         width: 100% !important;
-        box-sizing: border-box;
+        margin-bottom: 0 !important;
+    }
+
+    .auth-info, .hero-section, .register-info, .admin-info {
+        order: 2 !important;
+        width: 100% !important;
+        padding: 2rem 1.5rem !important;
+        min-height: auto !important;
+        border-radius: 1rem !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(10px) !important;
     }
 
     .role-selection {
@@ -1215,8 +1227,8 @@ body.auth-page {
     }
 
     .oauth-buttons-container {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: 1fr;
         gap: 10px;
     }
 

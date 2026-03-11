@@ -412,9 +412,70 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
+            .nav-right {
+                display: none; /* Hide by default on mobile */
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 1rem;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                gap: 1rem;
+                z-index: 1001;
+            }
+
+            .nav-right.active {
+                display: flex;
+            }
+
             .user-info {
+                display: flex !important;
+                flex-direction: column;
+                gap: 1rem;
+                width: 100%;
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+            }
+
+            .nav-center {
                 display: none;
             }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            flex-direction: column;
+            background: none;
+            border: none;
+            cursor: pointer;
+            gap: 6px;
+            padding: 8px;
+            border-radius: 4px;
+            transition: .3s;
+        }
+
+        .mobile-menu-btn span {
+            width: 24px;
+            height: 2px;
+            background: var(--gray-700);
+            border-radius: 2px;
+            transition: .3s;
+        }
+
+        .mobile-menu-btn.active span:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .mobile-menu-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu-btn.active span:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
         }
     </style>
 </head>
@@ -438,7 +499,7 @@
                 </svg>
                 Dashboard
             </a>
-            <div class="nav-right">
+            <div class="nav-right" id="citizenProfileNavLinks">
                 <div class="user-info">
                     <span class="user-name" id="userName">
                         <%= user ? user.name || user.username : 'Citizen' %>
@@ -449,6 +510,11 @@
                     </button>
                 </div>
             </div>
+            <button class="mobile-menu-btn" id="citizenProfileMobileMenuBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </nav>
 
@@ -696,6 +762,24 @@
         function formatDate(dateString) {
             const date = new Date(dateString);
             return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        // Citizen Profile Mobile Menu Toggle
+        const profileMobileMenuBtn = document.getElementById('citizenProfileMobileMenuBtn');
+        const profileNavLinks = document.getElementById('citizenProfileNavLinks');
+
+        if (profileMobileMenuBtn && profileNavLinks) {
+            profileMobileMenuBtn.addEventListener('click', () => {
+                profileNavLinks.classList.toggle('active');
+                profileMobileMenuBtn.classList.toggle('active');
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!profileNavLinks.contains(e.target) && !profileMobileMenuBtn.contains(e.target)) {
+                    profileNavLinks.classList.remove('active');
+                    profileMobileMenuBtn.classList.remove('active');
+                }
+            });
         }
     </script>
 

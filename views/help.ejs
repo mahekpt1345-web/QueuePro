@@ -139,13 +139,37 @@
             transform: translateY(-50%);
             color: var(--gray-400);
         }
+        @media (max-width: 640px) {
+            .help-hero {
+                padding: 40px 20px;
+            }
+
+            .help-hero h1 {
+                font-size: 2rem !important;
+            }
+
+            .content-card {
+                padding: 1.5rem;
+                margin-top: -30px;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .step-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="help-hero">
         <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-            <%- include('partials/logo') %>
+            <div style="background: white; padding: 8px 20px; border-radius: 50px; display: inline-flex; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+                <%- include('partials/logo') %>
+            </div>
         </div>
         <h1 style="font-size: 3rem; font-weight: 800; margin: 0;">How can we help?</h1>
         <div class="search-container">

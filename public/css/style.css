@@ -146,6 +146,14 @@ body {
     transition: var(--transition);
 }
 
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex !important;
+        position: relative;
+        z-index: 1100;
+    }
+}
+
 /* ===========================
    BUTTONS
    =========================== */
@@ -673,14 +681,6 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.footer-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 12px;
-}
 
 .footer-description {
     font-size: 13px;
@@ -871,15 +871,25 @@ body {
     .footer-content {
         grid-template-columns: 1fr;
         gap: 40px;
+        text-align: center;
+        justify-items: center;
     }
 
     .footer-links {
-        grid-template-columns: 1fr;
-        gap: 24px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+        text-align: left;
+        width: 100%;
+    }
+
+    .footer-column h4 {
+        margin-bottom: 12px;
+        color: white;
+        font-size: 15px;
     }
 
     .cta-section h2 {
-        font-size: 28px;
+        font-size: 26px;
     }
 
     .cta-buttons {
@@ -1029,6 +1039,7 @@ body {
     /* Hero Section Fixes */
     .hero {
         padding: 40px 0;
+        text-align: center;
     }
 
     .hero-content {
@@ -1040,35 +1051,40 @@ body {
     .hero-text {
         text-align: center;
         align-items: center;
+        padding: 0 10px;
     }
 
     .hero h1 {
         font-size: 2.2rem;
         line-height: 1.2;
+        margin-bottom: 1rem;
     }
 
     .hero-description {
         font-size: 1rem;
         max-width: 100%;
+        margin-bottom: 1.5rem;
     }
 
     .hero-buttons {
         flex-direction: column;
         width: 100%;
-        gap: 15px;
+        gap: 12px;
     }
 
     .btn-large {
         width: 100%;
         display: flex;
+        justify-content: center;
     }
 
     .hero-visual {
         height: auto;
         display: flex;
         flex-direction: column;
-        gap: 15px;
+        gap: 20px;
         width: 100%;
+        margin-top: 2rem;
     }
 
     /* Card Stacking (1 per row on mobile) */
@@ -1082,29 +1098,34 @@ body {
         animation: none !important;
         transform: none !important;
         margin-bottom: 0;
+        box-shadow: var(--shadow-md);
     }
 
-    .services-grid, .features-grid, .hero-stats, .footer-links {
-        display: flex;
-        flex-direction: column;
+    .services-grid, .features-grid, .hero-stats {
+        display: grid;
+        grid-template-columns: 1fr;
         width: 100%;
         gap: 20px;
     }
 
     /* Navigation Menu */
-    .nav-links.active {
-        display: flex;
+    .nav-links {
+        display: none;
         flex-direction: column;
         position: absolute;
         top: 100%;
         left: 0;
         right: 0;
         background: white;
-        padding: 1.5rem;
-        box-shadow: var(--shadow-lg);
+        padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         border-top: 1px solid var(--gray-100);
-        gap: 1.5rem;
+        gap: 1rem;
         z-index: 1001;
+    }
+
+    .nav-links.active {
+        display: flex;
     }
 
     .mobile-menu-btn {
@@ -1112,43 +1133,64 @@ body {
     }
 
     .nav-actions {
-        display: none !important; /* Hide desktop nav actions by default */
-    }
-
-    .nav-links.active ~ .nav-actions {
-        display: flex !important;
-        position: static; /* Let it sit inside the nav-links dropdown logic by appending it via JS if needed, but styling it properly */
+        display: none !important;
         flex-direction: column;
         width: 100%;
-        padding: 0 1.5rem 1.5rem 1.5rem;
+        padding: 0.5rem 1.5rem 1.5rem 1.5rem;
         background: white;
-        box-shadow: 0 10px 15px -10px rgba(0, 0, 0, 0.1);
+        position: absolute;
+        top: auto; /* Allow natural flow after nav-links if we adjust JS */
+        left: 0;
+        right: 0;
+        box-shadow: 0 10px 15px -5px rgba(0, 0, 0, 0.1);
         z-index: 1000;
-        pointer-events: auto;
+        gap: 10px;
+        border-bottom: 3px solid var(--primary);
+    }
+    
+    .nav-actions.active {
+        display: flex !important;
     }
 
-    .nav-links.active ~ .nav-actions button {
-        width: 100%;
-        font-size: 1rem;
+    /* Position nav-actions dynamic based on nav-links presence */
+    .nav-links.active ~ .nav-actions.active {
+        top: calc(100% + 235px); /* This is still a bit static, but better for now */
+    }
+
+    .nav-links.active {
+        padding-bottom: 0.5rem;
+    }
+    
+    /* Better approach: container for mobile menu */
+    .nav-container {
+        position: relative;
     }
 
     /* Footer Fixes */
     .footer-content {
         display: flex;
         flex-direction: column;
-        gap: 30px;
-        padding-bottom: 20px;
+        gap: 40px;
+        text-align: center;
     }
 
-    .footer-column {
-        width: 100%;
+    .footer-left {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .footer-links {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 30px;
     }
 
     .cta-buttons {
         flex-direction: column;
         width: 100%;
-        gap: 10px;
-        padding: 0 1rem;
+        gap: 15px;
+        padding: 0;
     }
 
     .cta-buttons button {

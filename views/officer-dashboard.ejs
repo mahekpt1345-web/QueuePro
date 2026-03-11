@@ -613,6 +613,39 @@
                 flex-wrap: wrap;
             }
 
+            .nav-right {
+                display: none; /* Hide by default on mobile */
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 1rem;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                gap: 1rem;
+                z-index: 1001;
+            }
+
+            .nav-right.active {
+                display: flex;
+            }
+
+            .user-info {
+                display: flex !important;
+                flex-direction: column;
+                gap: 1rem;
+                width: 100%;
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+            }
+
+            .nav-center {
+                display: none;
+            }
+
             .content-grid {
                 grid-template-columns: 1fr !important;
                 width: 100%;
@@ -626,14 +659,42 @@
                 flex-direction: column;
             }
 
-            .user-info {
-                display: none;
-            }
-
             .btn {
                 width: 100%;
                 justify-content: center;
             }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            flex-direction: column;
+            background: none;
+            border: none;
+            cursor: pointer;
+            gap: 6px;
+            padding: 8px;
+            border-radius: 4px;
+            transition: .3s;
+        }
+
+        .mobile-menu-btn span {
+            width: 24px;
+            height: 2px;
+            background: var(--gray-700);
+            border-radius: 2px;
+            transition: .3s;
+        }
+
+        .mobile-menu-btn.active span:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .mobile-menu-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu-btn.active span:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
         }
 
         /* Service Tags */
@@ -713,17 +774,22 @@
                 </svg>
                 My Profile
             </a>
-            <div class="nav-right">
+            <div class="nav-right" id="officerNavLinks">
                 <div class="user-info">
                     <span class="user-name" id="userName">
                         <%= user ? user.name || user.username : 'Officer' %>
                     </span>
-                    <button class="btn-logout" id="logoutBtn">
+                    <button class="btn-logout" id="logoutBtn" onclick="logout()">
                         <i class="fas fa-sign-out-alt"></i>
                         Logout
                     </button>
                 </div>
             </div>
+            <button class="mobile-menu-btn" id="officerMobileMenuBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </nav>
 
@@ -1335,6 +1401,24 @@
         // Initial check and periodic refresh
         checkSystemConfig();
         setInterval(checkSystemConfig, 30000); // Check every 30s
+        // Officer Mobile Menu Toggle
+        const officerMobileMenuBtn = document.getElementById('officerMobileMenuBtn');
+        const officerNavLinks = document.getElementById('officerNavLinks');
+
+        if (officerMobileMenuBtn && officerNavLinks) {
+            officerMobileMenuBtn.addEventListener('click', () => {
+                officerNavLinks.classList.toggle('active');
+                officerMobileMenuBtn.classList.toggle('active');
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!officerNavLinks.contains(e.target) && !officerMobileMenuBtn.contains(e.target)) {
+                    officerNavLinks.classList.remove('active');
+                    officerMobileMenuBtn.classList.remove('active');
+                }
+            });
+        }
     </script>
     <%- include('partials/scroll-to-top') %>
 </body>

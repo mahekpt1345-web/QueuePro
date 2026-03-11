@@ -97,13 +97,47 @@
             font-size: 1.25rem;
             margin-bottom: 0.5rem;
         }
+        @media (max-width: 768px) {
+            .about-hero {
+                padding: 40px 20px;
+            }
+
+            .card {
+                padding: 2rem 1.5rem;
+                margin-top: -30px;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-item {
+                padding: 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .button-group a {
+                width: 100%;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="about-hero">
         <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-            <%- include('partials/logo') %>
+            <div style="background: white; padding: 8px 20px; border-radius: 50px; display: inline-flex; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+                <%- include('partials/logo') %>
+            </div>
         </div>
         <p style="font-size: 1.25rem; opacity: 0.9; margin-top: 1rem;">Transforming Public Service Experiences</p>
     </div>
@@ -138,7 +172,7 @@
 
             <div style="margin-top: 4rem; text-align: center;">
                 <h2 class="section-title">Ready to get started?</h2>
-                <div style="display:flex; justify-content:center; gap:1rem; margin-top:2rem;">
+                <div class="button-group" style="display:flex; justify-content:center; gap:1rem; margin-top:2rem;">
                     <a href="/"
                         style="text-decoration:none; padding:1rem 2rem; background:var(--primary); color:white; border-radius:0.5rem; font-weight:600;">Back
                         to Home</a>

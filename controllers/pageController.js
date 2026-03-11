@@ -71,7 +71,10 @@ exports.about = (req, res) => {
 };
 
 exports.showContact = (req, res) => {
-    res.render('contact', { title: 'Contact Us - QueuePro', message: null });
+    // Read flash message from session (one-time use)
+    const message = req.session.contactFlash || null;
+    delete req.session.contactFlash; // Clear immediately so refresh won't show it again
+    res.render('contact', { title: 'Contact Us - QueuePro', message });
 };
 
 exports.postContact = (req, res) => {
@@ -83,19 +86,19 @@ exports.postContact = (req, res) => {
             subject,
             message: contactMessage
         });
-        res.render('contact', {
-            title: 'Contact Us - QueuePro',
-            message: {
-                type: 'success',
-                text: `Thank you ${name}! We received your message and will get back to you within 24 hours at ${email}.`
-            }
-        });
+        // Store message in session flash and redirect (PRG pattern)
+        req.session.contactFlash = {
+            type: 'success',
+            text: `Thank you ${name}! We received your message and will get back to you within 24 hours at ${email}.`
+        };
+        res.redirect('/contact');
     } catch (error) {
         console.error('Error processing contact form:', error);
-        res.render('contact', {
-            title: 'Contact Us - QueuePro',
-            message: { type: 'error', text: 'There was an error submitting your message. Please try again later.' }
-        });
+        req.session.contactFlash = {
+            type: 'error',
+            text: 'There was an error submitting your message. Please try again later.'
+        };
+        res.redirect('/contact');
     }
 };
 
