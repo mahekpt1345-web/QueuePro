@@ -14,23 +14,17 @@ const mongoose = require('mongoose');
 const engagementContentSchema = new mongoose.Schema({
     type: {
         type: String,
-        enum: ['puzzle', 'quote', 'reading'],
+        enum: ['quote', 'reading', 'poetry', 'fact', 'tip', 'info'],
         required: true
     },
     content: {
         type: String,
         required: true
     },
-    // For puzzles: easy / medium / hard. For others: null.
-    difficulty: {
+    ageGroup: {
         type: String,
-        enum: ['easy', 'medium', 'hard', null],
-        default: null
-    },
-    category: {
-        type: String,
-        default: 'general'
-        // e.g., 'general', 'government', 'health', 'civic'
+        enum: ['kids', 'teens', 'adults', 'seniors', 'all'],
+        default: 'all'
     },
     isActive: {
         type: Boolean,

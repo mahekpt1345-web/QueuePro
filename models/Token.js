@@ -108,6 +108,11 @@ const tokenSchema = new mongoose.Schema({
   checklistConfirmed: {
     type: Boolean,
     default: false
+  },
+  notificationSent: {
+    type: String,
+    enum: [null, 'approaching', 'next'],
+    default: null
   }
 });
 

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .age-selection-container {
+            max-width: 600px;
+            margin: 4rem auto;
+            padding: 2rem;
+            text-align: center;
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .age-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .age-card {
+            padding: 2rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .age-card:hover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+            transform: translateY(-5px);
+        }
+
+        .age-card i {
+            font-size: 3rem;
+            color: #3b82f6;
+        }
+
+        .age-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .age-card span {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .selected {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        p {
+            color: #4b5563;
+            margin-top: 0.5rem;
+        }
+
+        .btn-continue {
+            margin-top: 2.5rem;
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.125rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <nav class="navbar" style="background: white; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); padding: 1rem 2rem;">
+        <div class="nav-container" style="max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between;">
+            <a href="/" class="logo-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: #3b82f6; font-weight: 700; font-size: 1.5rem;">
+                <%- include('partials/logo') %>
+                <span>QueuePro</span>
+            </a>
+            <div class="nav-right">
+                <a href="/citizen-dashboard" class="btn btn-secondary" style="text-decoration: none;">Back to Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="age-selection-container">
+        <h1>Welcome!</h1>
+        <p>Before we start your waiting experience, please select your age group so we can show you the best content.</p>
+
+        <div class="age-grid">
+            <div class="age-card" onclick="selectAge('kids', this)">
+                <h3>Kids</h3>
+                <span>Under 15</span>
+            </div>
+            <div class="age-card" onclick="selectAge('teens', this)">
+                <h3>Teenagers</h3>
+                <span>15 – 20</span>
+            </div>
+            <div class="age-card" onclick="selectAge('adults', this)">
+                <h3>Adults</h3>
+                <span>20 – 45</span>
+            </div>
+            <div class="age-card" onclick="selectAge('seniors', this)">
+                <h3>Seniors</h3>
+                <span>45+</span>
+            </div>
+        </div>
+
+        <button id="continueBtn" class="btn btn-primary btn-continue" disabled onclick="proceed()">Continue to Engagement</button>
+    </main>
+
+    <%- include('partials/footer') %>
+
+    <script>
+        let selectedAge = null;
+
+        function selectAge(age, element) {
+            selectedAge = age;
+            
+            // UI Update
+            document.querySelectorAll('.age-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            // Enable button
+            document.getElementById('continueBtn').disabled = false;
+        }
+
+        function proceed() {
+            if (!selectedAge) return;
+            sessionStorage.setItem('queuepro_age', selectedAge);
+            window.location.href = '/engagement-puzzles';
+        }
+    </script>
+</body>
+</html>

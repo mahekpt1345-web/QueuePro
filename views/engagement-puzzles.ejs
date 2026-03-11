@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .while-you-wait-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Top Section: Queue Status */
+        .queue-status-bar {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            border-radius: 1.25rem;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .metric-item h4 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.9;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-item .value {
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+
+        /* Middle Section: Tabs */
+        .engagement-tabs {
+            display: flex;
+            background: #e5e7eb;
+            padding: 0.5rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            gap: 0.5rem;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #2563eb;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-btn i {
+            font-size: 1.25rem;
+        }
+
+        /* Content Card */
+        .engagement-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 3rem 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-decoration {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 8rem;
+            opacity: 0.05;
+            color: #3b82f6;
+            transform: rotate(15deg);
+        }
+
+        .content-label {
+            display: inline-block;
+            padding: 0.25rem 1rem;
+            background: #eff6ff;
+            color: #2563eb;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        .content-body {
+            font-size: 1.5rem;
+            font-weight: 600;
+            line-height: 1.5;
+            color: #111827;
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+        }
+
+        /* Puzzle Options */
+        .puzzle-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 2rem;
+        }
+
+        .option-btn {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            padding: 1rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .option-btn.correct { background: #dcfce7; border-color: #10b981; color: #166534; }
+        .option-btn.incorrect { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+
+        .answer-reveal {
+            background: #f0f9ff;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            color: #1e40af;
+            font-weight: 500;
+            width: 100%;
+            max-width: 500px;
+            display: none;
+        }
+
+        /* Actions */
+        .action-bar {
+            display: flex;
+            gap: 1rem;
+            margin-top: auto;
+        }
+
+        .btn-action {
+            padding: 0.75rem 2rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .queue-status-bar {
+                grid-template-columns: repeat(2, 1fr);
+                padding: 1rem;
+            }
+            .puzzle-options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Notification Overlay */
+        #turnOverlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+        .overlay-card {
+            background: #ef4444;
+            padding: 3rem;
+            border-radius: 2rem;
+            max-width: 500px;
+            box-shadow: 0 0 50px rgba(239, 68, 68, 0.5);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <nav class="navbar" style="background: white; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); padding: 1rem 2rem;">
+        <div class="nav-container" style="max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between;">
+            <a href="/" class="logo-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: #3b82f6; font-weight: 700; font-size: 1.5rem;">
+                <%- include('partials/logo') %>
+                <span>QueuePro</span>
+            </a>
+            <div class="nav-right" style="display: flex; align-items: center; gap: 1.5rem;">
+                <div class="user-info" style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
+                    <i class="fas fa-user-circle"></i>
+                    <span><%= user ? (user.name || user.username) : 'Citizen' %></span>
+                </div>
+                <a href="/citizen-dashboard" class="btn btn-secondary" style="text-decoration: none;">Exit Engagement</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="while-you-wait-container">
+        <!-- Top Section: Real-time Queue Stats -->
+        <div class="queue-status-bar" id="statusBar">
+            <div class="metric-item">
+                <h4>Your Token</h4>
+                <div class="value" id="dispToken">-</div>
+            </div>
+            <div class="metric-item">
+                <h4>Current</h4>
+                <div class="value" id="dispCurrent">-</div>
+            </div>
+            <div class="metric-item">
+                <h4>Ahead</h4>
+                <div class="value" id="dispAhead">-</div>
+            </div>
+            <div class="metric-item">
+                <h4>Est. Wait</h4>
+                <div class="value" id="dispWait">-</div>
+            </div>
+        </div>
+
+        <!-- Mode Selection Tabs -->
+        <div class="engagement-tabs">
+            <button class="tab-btn active" onclick="switchMode('puzzle')" id="puzzleTab">
+                Solve Puzzles
+            </button>
+            <button class="tab-btn" onclick="switchMode('reading')" id="readingTab">
+                Interesting Content
+            </button>
+        </div>
+
+        <!-- Main Engagement Card -->
+        <div class="engagement-card" id="engagementCard">
+            
+            <div id="loadingState">
+                <p style="margin-top: 1rem;">Finding something special for you...</p>
+            </div>
+
+            <div id="contentArea" style="display: none; width: 100%; flex-direction: column; align-items: center;">
+                <div class="content-label" id="contentLabel">Category</div>
+                <div class="content-body" id="contentBody">
+                    This is where the magic happens. A puzzle or a quote will appear here.
+                </div>
+
+                <!-- Puzzle Specific UI -->
+                <div class="puzzle-options" id="puzzleOptions"></div>
+                <div class="answer-reveal" id="answerReveal"></div>
+
+                <div class="action-bar">
+                    <button class="btn btn-secondary btn-action" id="showAnswerBtn" style="display: none;" onclick="revealAnswer()">
+                        Show Answer
+                    </button>
+                    <button class="btn btn-primary btn-action" onclick="fetchContent()">
+                        <span id="nextBtnText">Next Puzzle</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Turn Notification Overlay -->
+    <div id="turnOverlay">
+        <div class="overlay-card">
+            <h1 id="overlayTitle">Your Turn!</h1>
+            <p id="overlayMsg" style="font-size: 1.25rem; margin-bottom: 2rem;">Please proceed to the counter now.</p>
+            <button class="btn" style="background:white; color:#ef4444; font-weight:800; padding:1rem 2rem;" onclick="location.href='/citizen-dashboard'">Go to Dashboard</button>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let currentMode = 'puzzle';
+        let ageGroup = sessionStorage.getItem('queuepro_age') || 'adults';
+        let currentContent = null;
+        let activeToken = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initQueueTracking();
+            fetchContent();
+            initSocket();
+        });
+
+        function switchMode(mode) {
+            currentMode = mode;
+            document.getElementById('puzzleTab').classList.toggle('active', mode === 'puzzle');
+            document.getElementById('readingTab').classList.toggle('active', mode === 'reading');
+            
+            document.getElementById('nextBtnText').textContent = mode === 'puzzle' ? 'Next Puzzle' : 'Next Reading';
+            
+            fetchContent();
+        }
+
+        async function fetchContent() {
+            const loading = document.getElementById('loadingState');
+            const content = document.getElementById('contentArea');
+            loading.style.display = 'block';
+            content.style.display = 'none';
+
+            try {
+                const endpoint = currentMode === 'puzzle' ? '/api/engagement/puzzle' : '/api/engagement/reading';
+                const response = await fetch(`${endpoint}?ageGroup=${ageGroup}`, {
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                console.log(`[ENGAGEMENT] Fetched ${currentMode}:`, result);
+
+                if (result.success && result.data) {
+                    currentContent = result.data;
+                    renderContent(result.data, result.meta || {});
+                    
+                    // Update wait time if returned in meta
+                    if (result.meta && result.meta.waitTime !== undefined) {
+                        document.getElementById('dispWait').textContent = result.meta.waitTime + ' min';
+                    }
+                } else {
+                    const msg = result.message || "We're looking for more content, please try again!";
+                    document.getElementById('contentBody').textContent = msg;
+                    document.getElementById('puzzleOptions').innerHTML = '';
+                    document.getElementById('showAnswerBtn').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                document.getElementById('contentBody').textContent = "Connection error. Please check if the server is running.";
+            } finally {
+                loading.style.display = 'none';
+                content.style.display = 'flex';
+            }
+        }
+
+        function renderContent(data, meta) {
+            const body = document.getElementById('contentBody');
+            const label = document.getElementById('contentLabel');
+            const options = document.getElementById('puzzleOptions');
+            const reveal = document.getElementById('answerReveal');
+            const showBtn = document.getElementById('showAnswerBtn');
+
+            options.innerHTML = '';
+            reveal.style.display = 'none';
+            showBtn.style.display = 'none';
+
+            if (currentMode === 'puzzle') {
+                label.textContent = `${data.category || 'Puzzle'} - ${meta.difficulty || 'Normal'}`;
+                body.textContent = data.question;
+
+                if (data.options && data.options.length > 0) {
+                    data.options.forEach(opt => {
+                        const btn = document.createElement('button');
+                        btn.className = 'option-btn';
+                        btn.textContent = opt;
+                        btn.onclick = () => checkAnswer(opt, btn);
+                        options.appendChild(btn);
+                    });
+                } else {
+                    showBtn.style.display = 'flex';
+                }
+            } else {
+                label.textContent = data.type || 'Reading';
+                body.textContent = data.content;
+            }
+        }
+
+        function checkAnswer(selected, btn) {
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            if (selected === currentContent.answer) {
+                btn.classList.add('correct');
+            } else {
+                btn.classList.add('incorrect');
+                // Highlight correct one
+                allBtns.forEach(b => {
+                    if (b.textContent === currentContent.answer) b.classList.add('correct');
+                });
+            }
+        }
+
+        function revealAnswer() {
+            const reveal = document.getElementById('answerReveal');
+            reveal.innerHTML = `<strong>Answer:</strong> ${currentContent.answer}`;
+            reveal.style.display = 'block';
+            document.getElementById('showAnswerBtn').style.display = 'none';
+        }
+
+        // --- Queue Tracking Logic ---
+
+        async function initQueueTracking() {
+            try {
+                const res = await fetch('/api/queue/my-tokens', { credentials: 'include' });
+                const result = await res.json();
+                if (result.success && result.data.length > 0) {
+                    // Get the most relevant active token
+                    activeToken = result.data.find(t => t.status === 'pending' || t.status === 'serving') || result.data[0];
+                    if (activeToken) {
+                        document.getElementById('dispToken').textContent = activeToken.tokenId;
+                        updateLiveStatus();
+                    }
+                }
+            } catch (err) {
+                console.error('Error tracking queue:', err);
+            }
+        }
+
+        async function updateLiveStatus() {
+            if (!activeToken) return;
+            try {
+                // Fetch latest stats and token position
+                const res = await fetch(`/api/queue/status/${activeToken.tokenId}`, { credentials: 'include' });
+                const result = await res.json();
+                
+                if (result.success) {
+                    document.getElementById('dispAhead').textContent = result.data.positionAhead;
+                    document.getElementById('dispCurrent').textContent = result.data.currentlyServing || '-';
+                    document.getElementById('dispWait').textContent = (result.data.positionAhead + 1) * 5 + ' min';
+                }
+            } catch (err) {
+                console.error('Error updating live status:', err);
+            }
+        }
+
+        function initSocket() {
+            const socket = io();
+            socket.on('connect', () => {
+                console.log('Connected to real-time updates');
+                if (activeToken) {
+                    socket.emit('subscribe_token', activeToken._id);
+                    socket.emit('subscribe_queue');
+                }
+            });
+
+            socket.on('queue_update', (data) => {
+                updateLiveStatus();
+            });
+
+            socket.on('turn_notification', (data) => {
+                const overlay = document.getElementById('turnOverlay');
+                const title = document.getElementById('overlayTitle');
+                const msg = document.getElementById('overlayMsg');
+                
+                overlay.style.display = 'flex';
+                title.textContent = data.type === 'next' ? 'You Are Next!' : 'Turn Approaching';
+                msg.textContent = data.message;
+
+                if (data.type === 'next') {
+                    document.getElementById('statusBar').style.background = 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)';
+                }
+            });
+
+            socket.on('token_called', (data) => {
+                const overlay = document.getElementById('turnOverlay');
+                overlay.style.display = 'flex';
+                document.getElementById('overlayTitle').textContent = "It's Your Turn!";
+                document.getElementById('overlayMsg').textContent = data.message || "Please proceed to the counter.";
+            });
+
+            socket.on('disconnect', () => {
+                console.log('Disconnected from real-time updates');
+            });
+        }
+    </script>
+</body>
+</html>

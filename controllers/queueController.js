@@ -8,9 +8,11 @@
  */
 
 const Token = require('../models/Token');
+const User = require('../models/User');
 const ActivityLog = require('../models/ActivityLog');
 const { logActivity } = require('../middleware/auth');
 const { SERVICE_TYPES, SERVICE_TIME, calculateEstimatedWaitTime } = require('../utils/serviceConfig');
+const notificationService = require('../utils/notificationService');
 
 // ─────────────────────────────────────────────
 // Helper: emit queue update events via Socket.io
@@ -33,7 +35,7 @@ async function emitQueueUpdate(req, targetUserId = null) {
         });
 
         // Send position-specific notifications to each citizen
-        pendingTokens.forEach((token, idx) => {
+        for (const [idx, token] of pendingTokens.entries()) {
             const position = idx + 1;
             const room = `token_${token._id}`;
 
@@ -44,15 +46,35 @@ async function emitQueueUpdate(req, targetUserId = null) {
                     message: '🔔 You are next. Please proceed to the counter.',
                     tokenId: token.tokenId
                 });
+
+                // SMS Notification for NEXT
+                if (token.notificationSent !== 'next') {
+                    const user = await User.findById(token.userId);
+                    if (user && user.phone) {
+                        await notificationService.sendSMS(user.phone, `QueuePro Update: Your turn is NEXT (Token ${token.tokenId}). Please proceed to the counter.`);
+                        await Token.findByIdAndUpdate(token._id, { notificationSent: 'next' });
+                    }
+                }
             } else if (position <= 3) {
+                const isApproaching = token.notificationSent === 'approaching' || token.notificationSent === 'next';
+                
                 io.to(room).emit('turn_notification', {
                     type: 'approaching',
                     position,
-                    message: '🔔 Your turn will arrive in approximately 5–7 minutes. Please move towards the waiting area.',
+                    message: `🔔 Your turn will arrive in approximately 5–7 minutes (Position: ${position}).`,
                     tokenId: token.tokenId
                 });
+
+                // SMS Notification for APPROACHING
+                if (!isApproaching) {
+                    const user = await User.findById(token.userId);
+                    if (user && user.phone) {
+                        await notificationService.sendSMS(user.phone, `QueuePro Update: Your turn is approaching (Position: ${position}, Token ${token.tokenId}). Stay near the counter.`);
+                        await Token.findByIdAndUpdate(token._id, { notificationSent: 'approaching' });
+                    }
+                }
             }
-        });
+        }
     } catch (err) {
         console.error('[SOCKET] Error emitting queue update:', err.message);
     }

@@ -28,12 +28,15 @@ module.exports = (passport) => {
   // GOOGLE OAUTH 2.0 STRATEGY (conditional)
   // ========================================
   (function registerGoogle() {
-    const required = ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'GOOGLE_CALLBACK_URL'];
-    const missing = missingEnv(required);
-    if (missing.length && !allowOverride) {
-      console.warn(
-        `Google OAuth not registered. Missing env: ${missing.join(', ')}. Set these or set ALLOW_OAUTH_REGISTRATION=true to force registration.`
-      );
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const callbackURL = process.env.GOOGLE_CALLBACK_URL;
+
+    // Check if credentials are missing, empty, or just placeholders
+    const isMissingOrPlaceholder = (val) => !val || val.trim() === '' || val.includes('your-google-client');
+
+    if (isMissingOrPlaceholder(clientId) || isMissingOrPlaceholder(clientSecret) || !callbackURL) {
+      console.warn('⚠️ Google OAuth disabled: Missing or placeholder credentials in .env');
       return;
     }
 
@@ -42,9 +45,9 @@ module.exports = (passport) => {
         'google',
         new GoogleStrategy(
           {
-            clientID: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: process.env.GOOGLE_CALLBACK_URL
+            clientID: clientId,
+            clientSecret: clientSecret,
+            callbackURL: callbackURL
           },
           async (accessToken, refreshToken, profile, done) => {
             try {
@@ -96,13 +99,14 @@ module.exports = (passport) => {
               await user.save();
               done(null, user);
             } catch (error) {
+              console.error('Error in Google Strategy callback:', error);
               done(error, null);
             }
           }
         )
       );
     } catch (err) {
-      console.error('Failed to initialize GoogleStrategy:', err.message || err);
+      console.error('⚠️ Failed to initialize GoogleStrategy:', err.message || err);
     }
   })();
 

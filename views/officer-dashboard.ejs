@@ -594,21 +594,28 @@
 
         /* RESPONSIVE */
         @media (max-width: 768px) {
-            .dashboard-container {
-                padding: 1rem;
+            body, html {
+                overflow-x: hidden;
             }
 
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .dashboard-container, .nav-container {
+                padding: 1rem;
+                width: 100%;
+                max-width: 100vw;
+                box-sizing: border-box;
+            }
+
+            .stats-grid, .dashboard-grid {
+                grid-template-columns: 1fr;
             }
 
             .nav-container {
-                padding: 1rem;
                 flex-wrap: wrap;
             }
 
             .content-grid {
                 grid-template-columns: 1fr !important;
+                width: 100%;
             }
 
             .welcome-section h1 {
@@ -617,6 +624,10 @@
 
             .queue-controls {
                 flex-direction: column;
+            }
+
+            .user-info {
+                display: none;
             }
 
             .btn {

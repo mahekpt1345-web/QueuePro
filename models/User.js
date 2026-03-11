@@ -94,6 +94,12 @@ const userSchema = new mongoose.Schema({
   phoneVerified: {
     type: Boolean,
     default: false  // Set to true when phone is verified by user
+  },
+
+  // Engagement History
+  engagementHistory: {
+    puzzles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Puzzle' }],
+    reading: [{ type: mongoose.Schema.Types.ObjectId, ref: 'EngagementContent' }]
   }
 });
 

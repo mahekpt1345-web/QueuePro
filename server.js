@@ -37,19 +37,23 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+const MongoStore = require('connect-mongo');
+
 // ========================================
-// SESSION CONFIGURATION (for OAuth)
+// SESSION CONFIGURATION
 // ========================================
 app.use(session({
     secret: process.env.SESSION_SECRET || 'queuepro_session_secret_2024',
     resave: false,
-    saveUninitialized: false,
-    // Using default memory store for development
-    // For production, upgrade to: MongoStore.create({ mongoUrl: process.env.MONGODB_URI })
+    saveUninitialized: true,
+    store: (MongoStore.create ? MongoStore : MongoStore.default).create({
+        mongoUrl: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/queuepro',
+        ttl: 24 * 60 * 60 // 1 day
+    }),
     cookie: {
-        secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+        secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        maxAge: 24 * 60 * 60 * 1000
     }
 }));
 
@@ -105,6 +109,7 @@ io.on('connection', (socket) => {
 app.use('/', require('./routes/auth'));       // Auth: /api/auth/*, /register, /login, /admin-login, /logout
 app.use('/', require('./routes/admin'));      // Admin: /api/admin/*, /api/users, /admin-dashboard, /admin-profile
 app.use('/api/queue', require('./routes/queue'));  // Queue: /api/queue/*
+app.use('/api/engagement', require('./routes/engagement')); // Engagement Content
 app.use('/', require('./routes/pages'));     // Pages: /, /citizen-*, /officer-*, /about, /contact, /help
 
 // ========================================
@@ -122,6 +127,7 @@ app.use((req, res) => {
 // START SERVER
 // ========================================
 const PORT = process.env.PORT || 5000;
+
 server.listen(PORT, () => {
     console.log(`\n QueuePro Server Running`);
     console.log(`   Local URL:  http://localhost:${PORT}`);
@@ -129,4 +135,22 @@ server.listen(PORT, () => {
     console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`   Database: MongoDB`);
     console.log(`   Socket.IO: Enabled\n`);
+}).on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.error(`\n[FATAL ERROR] Port ${PORT} is already in use.`);
+        console.error(`Please kill the process using port ${PORT} or change the port in .env`);
+        process.exit(1);
+    } else {
+        console.error('\n[FATAL ERROR] Server failed to start:', err);
+        process.exit(1);
+    }
+});
+
+// Handle graceful shutdown
+process.on('SIGINT', () => {
+    console.log('\nShutting down server gracefully...');
+    server.close(() => {
+        console.log('Server closed. Goodbye!');
+        process.exit(0);
+    });
 });

@@ -22,6 +22,8 @@ router.get('/api/health', pageController.health);
 // ── Citizen (protected) ──────────────────────
 router.get('/citizen-dashboard', ensureAuthenticated, ensureRole(['citizen']), pageController.citizenDashboard);
 router.get('/citizen-profile', ensureAuthenticated, ensureRole(['citizen']), pageController.citizenProfile);
+router.get('/age-selection',   ensureAuthenticated, ensureRole(['citizen']), pageController.ageSelection);
+router.get('/engagement-puzzles', ensureAuthenticated, ensureRole(['citizen']), pageController.engagementPuzzles);
 
 // ── Officer (protected) ──────────────────────
 router.get('/officer-dashboard', ensureAuthenticated, ensureRole(['officer']), pageController.officerDashboard);

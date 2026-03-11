@@ -1178,3 +1178,56 @@ body.auth-page {
         font-size: 0.7rem;
     }
 }
+
+/* ===============================
+   ROBUST MOBILE RESPONSIVENESS OVERRIDES
+   =============================== */
+@media (max-width: 768px) {
+    body, html {
+        overflow-x: hidden;
+        max-width: 100vw;
+    }
+
+    .nav-container, .auth-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        box-sizing: border-box;
+    }
+
+    .auth-container {
+        display: flex !important;
+        flex-direction: column !important;
+        margin: 1rem 0 !important;
+        gap: 1.5rem !important;
+    }
+
+    .auth-card, .auth-info {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    .role-selection {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .oauth-buttons-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn, .btn-oauth, .btn-primary {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .form-group input, .form-group select {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}

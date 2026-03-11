@@ -22,14 +22,23 @@ router.post('/api/auth/change-password', authController.apiChangePassword);
 
 // ── OAuth Routes ─────────────────────────────
 // Google OAuth
-router.get('/auth/google',
-    passport.authenticate('google', { scope: ['profile', 'email'] })
-);
+router.get('/auth/google', (req, res, next) => {
+    try {
+        passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
+    } catch (error) {
+        console.warn('Google OAuth strategy not configured.');
+        res.redirect('/login?error=google_auth_disabled');
+    }
+});
 
-router.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/register?error=google_auth_failed' }),
-    authController.googleCallback
-);
+router.get('/auth/google/callback', (req, res, next) => {
+    try {
+        passport.authenticate('google', { failureRedirect: '/register?error=google_auth_failed' })(req, res, next);
+    } catch (error) {
+        console.warn('Google OAuth strategy not configured.');
+        res.redirect('/login?error=google_auth_disabled');
+    }
+}, authController.googleCallback);
 
 // Phone number management for OAuth users
 router.post('/api/auth/phone', verifyToken, authController.updateUserPhone);

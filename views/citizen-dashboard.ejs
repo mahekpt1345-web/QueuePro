@@ -611,31 +611,43 @@
         }
 
         @media (max-width: 768px) {
-            .nav-container {
+            body, html {
+                overflow-x: hidden;
+            }
+
+            .nav-container, .dashboard-container {
                 padding: 1rem;
+                width: 100%;
+                max-width: 100vw;
+                box-sizing: border-box;
             }
 
             .content-grid {
                 grid-template-columns: 1fr;
                 gap: 1.5rem;
+                width: 100%;
             }
 
             .dashboard-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr;
+                width: 100%;
             }
 
             .welcome-section h1 {
                 font-size: 1.5rem;
             }
 
-            .dashboard-container {
-                padding: 1rem;
-            }
-
             .item-details {
                 grid-template-columns: 1fr;
-                /* Stack details on mobile */
                 gap: 0.75rem;
+            }
+
+            .nav-brand {
+                font-size: 1.25rem;
+            }
+
+            .user-info {
+                display: none;
             }
         }
 
@@ -650,7 +662,6 @@
 
             .user-info {
                 display: none;
-                /* Hide non-essential info on tiny screens */
             }
         }
 
@@ -841,6 +852,21 @@
                     </div>
                 </div>
             </div>
+            </div>
+
+            <!-- Engagement & Puzzles Link -->
+            <div class="card" id="engagementSection" style="display: none; border: 2px solid #bfdbfe; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);">
+                <div class="card-header" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);">
+                    <h2><i class="fas fa-brain" style="color:#c026d3;"></i> While You Wait</h2>
+                    <p>Keep yourself entertained while in the queue</p>
+                </div>
+                <div class="card-content" style="text-align: center; padding: 2rem;">
+                    <p style="margin-bottom: 2rem; color: var(--gray-700);">We have fun puzzles ready for you based on your wait time.</p>
+                    <a href="/engagement-puzzles" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-puzzle-piece"></i> Play While You Wait Puzzles
+                    </a>
+                </div>
+            </div>
         </div>
 
         <!-- Applications History -->
@@ -1022,7 +1048,10 @@
                             if (window._socket && result.data._id) {
                                 window._socket.emit('subscribe_token', result.data._id);
                             }
-                            setTimeout(() => loadCitizenData(), 500);
+                            // Redirect to Age Selection for engagement
+                            setTimeout(() => {
+                                window.location.href = '/age-selection';
+                            }, 1500);
                         } else {
                             UIUtils.showToast(result.message || 'Failed to create token', 'error');
                         }
@@ -1058,8 +1087,11 @@
                         All tokens completed!
                     </p>
                 `;
+                    document.getElementById('engagementSection').style.display = 'none';
                     return;
                 }
+
+                document.getElementById('engagementSection').style.display = 'block';
 
                 container.innerHTML = activeTokens.map(token => {
                     // Task 2: Progress visualization
@@ -1449,6 +1481,7 @@
                     osc.start(); osc.stop(ctx.currentTime + 0.5);
                 } catch (e) { /* Sound not supported */ }
             }
+
         </script>
         <%- include('partials/scroll-to-top') %>
 </body>

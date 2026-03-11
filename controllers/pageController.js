@@ -47,6 +47,14 @@ exports.citizenProfile = (req, res) => {
     res.render('citizen-profile', { title: 'Citizen Profile - QueuePro', user: req.user || null });
 };
 
+exports.ageSelection = (req, res) => {
+    res.render('age-selection', { title: 'Select Your Age Group', user: req.user || null });
+};
+
+exports.engagementPuzzles = (req, res) => {
+    res.render('engagement-puzzles', { title: 'While You Wait - Engagement', user: req.user || null });
+};
+
 exports.officerDashboard = (req, res) => {
     res.render('officer-dashboard', { title: 'Officer Dashboard - QueuePro', user: req.user || null });
 };
