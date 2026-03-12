@@ -154,6 +154,11 @@ body {
     }
 }
 
+.mobile-only-actions {
+    display: none;
+}
+
+
 /* ===========================
    BUTTONS
    =========================== */
@@ -766,6 +771,29 @@ body {
 
 /* Tablet & small screens: 376px - 768px */
 @media (max-width: 768px) {
+    body {
+        padding-top: 72px; /* Add top spacing for fixed header */
+        overflow-x: hidden;
+    }
+
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .container {
+        width: 100%;
+        padding: 0 16px;
+    }
+
     .nav-links.active {
         display: flex;
         flex-direction: column;
@@ -781,35 +809,28 @@ body {
         z-index: 1001;
     }
 
+    .mobile-only-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--gray-200);
+    }
+    
+    .mobile-only-actions button {
+        width: 100%;
+        min-height: 44px;
+    }
+
     .mobile-menu-btn {
         display: flex;
     }
 
     .nav-actions {
-        display: none;
+        display: none !important;
     }
 
-    /* Show actions inside mobile menu when active */
-    .nav-links.active~.nav-actions {
-        display: flex;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        padding: 180px 2rem 2rem;
-        /* Give space for nav-links */
-        background: transparent;
-        pointer-events: none;
-        z-index: 1000;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .nav-links.active~.nav-actions button {
-        pointer-events: auto;
-        width: 100%;
-        min-height: 44px;
-    }
 
     .hero-content {
         grid-template-columns: 1fr;

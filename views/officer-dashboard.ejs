@@ -594,8 +594,24 @@
 
         /* RESPONSIVE */
         @media (max-width: 768px) {
-            body, html {
+            body {
+                padding-top: 70px;
+                padding-bottom: 70px; /* Space for bottom nav */
                 overflow-x: hidden;
+            }
+            html {
+                overflow-x: hidden;
+            }
+            .navbar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                z-index: 1000;
+            }
+            img {
+                max-width: 100%;
+                height: auto;
             }
 
             .dashboard-container, .nav-container {
@@ -614,32 +630,60 @@
             }
 
             .nav-right {
-                display: none; /* Hide by default on mobile */
-                flex-direction: column;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: white;
-                padding: 1rem;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                gap: 1rem;
-                z-index: 1001;
-            }
-
-            .nav-right.active {
-                display: flex;
-            }
-
-            .user-info {
-                display: flex !important;
-                flex-direction: column;
-                gap: 1rem;
-                width: 100%;
+                display: none !important; /* Replaced by bottom nav */
             }
 
             .mobile-menu-btn {
+                display: none !important; /* Replaced by bottom nav */
+            }
+
+            /* BOTTOM NAVIGATION */
+            .bottom-nav {
+                display: flex !important;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: white;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+                z-index: 1000;
+                justify-content: space-around;
+                align-items: center;
+                height: 65px;
+                padding: 0 0.5rem;
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+
+            .bottom-nav-item {
                 display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                color: var(--gray-500);
+                text-decoration: none;
+                flex: 1;
+                height: 100%;
+                gap: 4px;
+                transition: color 0.2s;
+            }
+
+            .bottom-nav-item:hover,
+            .bottom-nav-item.active {
+                color: var(--primary-color);
+            }
+
+            .bottom-nav-item i {
+                font-size: 1.25rem;
+            }
+
+            .bottom-nav-item span {
+                font-size: 0.65rem;
+                font-weight: 500;
+            }
+
+            /* Hide original desktop tabs when bottom nav is active */
+            .tabs {
+                display: none !important;
             }
 
             .nav-center {
@@ -665,36 +709,8 @@
             }
         }
 
-        .mobile-menu-btn {
+        .bottom-nav {
             display: none;
-            flex-direction: column;
-            background: none;
-            border: none;
-            cursor: pointer;
-            gap: 6px;
-            padding: 8px;
-            border-radius: 4px;
-            transition: .3s;
-        }
-
-        .mobile-menu-btn span {
-            width: 24px;
-            height: 2px;
-            background: var(--gray-700);
-            border-radius: 2px;
-            transition: .3s;
-        }
-
-        .mobile-menu-btn.active span:nth-child(1) {
-            transform: translateY(8px) rotate(45deg);
-        }
-
-        .mobile-menu-btn.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .mobile-menu-btn.active span:nth-child(3) {
-            transform: translateY(-8px) rotate(-45deg);
         }
 
         /* Service Tags */
@@ -767,14 +783,14 @@
                     Officer
                 </span>
             </div>
-            <a href="/officer-profile" class="menu-item">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                </svg>
-                My Profile
-            </a>
             <div class="nav-right" id="officerNavLinks">
+                <a href="/officer-profile" class="menu-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    My Profile
+                </a>
                 <div class="user-info">
                     <span class="user-name" id="userName">
                         <%= user ? user.name || user.username : 'Officer' %>
@@ -785,11 +801,28 @@
                     </button>
                 </div>
             </div>
-            <button class="mobile-menu-btn" id="officerMobileMenuBtn">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+            <div class="bottom-nav">
+                <a href="javascript:void(0)" class="bottom-nav-item active" onclick="switchTheme('dashboard')">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="javascript:void(0)" class="bottom-nav-item" onclick="switchTheme('tokens')">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Tokens</span>
+                </a>
+                <a href="javascript:void(0)" class="bottom-nav-item" onclick="switchTheme('queue')">
+                    <i class="fas fa-users"></i>
+                    <span>Queue</span>
+                </a>
+                <a href="javascript:void(0)" class="bottom-nav-item" onclick="switchTheme('applications')">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Apps</span>
+                </a>
+                <a href="/officer-profile" class="bottom-nav-item">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Profile</span>
+                </a>
+            </div>
         </div>
     </nav>
 
@@ -1406,7 +1439,8 @@
         const officerNavLinks = document.getElementById('officerNavLinks');
 
         if (officerMobileMenuBtn && officerNavLinks) {
-            officerMobileMenuBtn.addEventListener('click', () => {
+            officerMobileMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 officerNavLinks.classList.toggle('active');
                 officerMobileMenuBtn.classList.toggle('active');
             });

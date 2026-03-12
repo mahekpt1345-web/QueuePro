@@ -8,15 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const togglePassword = document.getElementById('togglePassword');
     const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
     const passwordInput = document.getElementById('password');
-    const googleSignUpBtn = document.getElementById('googleSignUpBtn');
-
-    // OAuth Buttons - Redirect to OAuth routes
-    if (googleSignUpBtn) {
-        googleSignUpBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.location.href = '/auth/google';
-        });
-    }
+    // OAuth Buttons removed.
 
     // Password toggle
     if (togglePassword) {

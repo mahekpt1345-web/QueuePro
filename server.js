@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const { Server } = require('socket.io');
 const session = require('express-session');
 
-const passport = require('passport');
+
 
 const connectDB = require('./config/database');
 
@@ -57,12 +57,7 @@ app.use(session({
     }
 }));
 
-// ========================================
-// PASSPORT AUTHENTICATION
-// ========================================
-require('./middleware/passport-config')(passport);
-app.use(passport.initialize());
-app.use(passport.session());
+// Passport removed as it was only used for Google OAuth
 
 app.use(express.static(path.join(__dirname, 'public')));
 

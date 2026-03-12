@@ -8,7 +8,7 @@
 
 const express = require('express');
 const router = express.Router();
-const passport = require('passport');
+
 const authController = require('../controllers/authController');
 const { verifyToken } = require('../middleware/auth');
 
@@ -20,29 +20,7 @@ router.get('/api/auth/me', authController.apiMe);
 router.post('/api/auth/logout', authController.apiLogout);
 router.post('/api/auth/change-password', authController.apiChangePassword);
 
-// ── OAuth Routes ─────────────────────────────
-// Google OAuth
-router.get('/auth/google', (req, res, next) => {
-    try {
-        passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
-    } catch (error) {
-        console.warn('Google OAuth strategy not configured.');
-        res.redirect('/login?error=google_auth_disabled');
-    }
-});
-
-router.get('/auth/google/callback', (req, res, next) => {
-    try {
-        passport.authenticate('google', { failureRedirect: '/register?error=google_auth_failed' })(req, res, next);
-    } catch (error) {
-        console.warn('Google OAuth strategy not configured.');
-        res.redirect('/login?error=google_auth_disabled');
-    }
-}, authController.googleCallback);
-
-// Phone number management for OAuth users
-router.post('/api/auth/phone', verifyToken, authController.updateUserPhone);
-router.get('/api/auth/oauth-login-status', verifyToken, authController.getOAuthLoginStatus);
+// phone number management logic removed as it was for OAuth users.
 
 // ── EJS Form Routes ──────────────────────────
 router.get('/register', authController.showRegister);

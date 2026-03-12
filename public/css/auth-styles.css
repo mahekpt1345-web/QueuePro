@@ -386,16 +386,15 @@ body.auth-page {
 .role-selection {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
 }
 
 .role-option {
     position: relative;
     cursor: pointer;
     display: flex;
-    /* Added display: flex */
-    height: 100%;
-    /* Added height: 100% */
+    flex-direction: column;
 }
 
 .role-option input[type="radio"] {
@@ -410,38 +409,48 @@ body.auth-page {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.15rem;
-    padding: 0.5rem 0.75rem;
-    border: 2px solid var(--gray-200);
-    border-radius: 0.5rem;
     text-align: center;
+    padding: 0.75rem 0.5rem;
+    border: 2px solid var(--gray-200);
+    border-radius: 0.65rem;
+    background: white;
     transition: var(--transition);
-    width: 100%;
+    height: 100%;
+    min-height: 110px;
+    gap: 0.4rem;
 }
 
 .role-option input[type="radio"]:checked+.role-label {
     border-color: var(--primary-color);
-    background: rgba(37, 99, 235, 0.05);
+    background: rgba(37, 99, 235, 0.04);
+    box-shadow: 0 0 0 1px var(--primary-color);
 }
 
 .role-option .role-label i {
-    font-size: 1.25rem;
-    color: var(--gray-500);
+    font-size: 1.5rem;
+    color: var(--gray-400);
+    margin-bottom: 0.15rem;
+    transition: var(--transition);
 }
 
 .role-option input[type="radio"]:checked+.role-label i {
     color: var(--primary-color);
+    transform: scale(1.05);
 }
 
 .role-option .role-label strong {
-    font-size: 0.8125rem;
-    color: var(--gray-700);
+    font-size: 0.875rem;
+    color: var(--gray-800);
+    display: block;
+    margin-bottom: 0.1rem;
 }
 
 .role-option .role-label p {
     font-size: 0.7rem;
     color: var(--gray-500);
-    line-height: 1.2;
+    line-height: 1.3;
+    max-width: 130px;
+    margin: 0 auto;
 }
 
 /* FORM OPTIONS */
@@ -577,84 +586,7 @@ body.auth-page {
     color: white;
 }
 
-/* ==============================
-   OAUTH BUTTONS & STYLING
-============================== */
-
-.oauth-divider {
-    display: flex;
-    align-items: center;
-    margin: 1.5rem 0;
-    gap: 1rem;
-}
-
-.oauth-divider::before,
-.oauth-divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--gray-300);
-}
-
-.oauth-divider span {
-    color: var(--gray-500);
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.oauth-buttons-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-}
-
-.btn-oauth {
-    background: white;
-    border: 1px solid var(--gray-300);
-    color: var(--gray-700);
-    padding: 0.75rem 1rem;
-    font-size: 0.8125rem;
-    border-radius: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    transition: var(--transition);
-    min-height: 44px;
-}
-
-.btn-oauth:hover {
-    border-color: var(--gray-400);
-    background: var(--gray-50);
-    box-shadow: var(--shadow-sm);
-}
-
-.btn-oauth:active {
-    transform: scale(0.98);
-}
-
-.btn-oauth svg {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-}
-
-.btn-google {
-    border-color: #dadce0;
-}
-
-.btn-google:hover {
-    background: #f8f9fa;
-    border-color: #dadce0;
-}
-
-.btn-google span {
-    color: #3c4043;
-    font-weight: 500;
-}
+/* OAuth styles removed */
 
 
 /* ==============================
@@ -738,8 +670,41 @@ body.auth-page {
 ============================== */
 
 @media (max-width: 768px) {
+    body {
+        padding-top: 70px; /* Add top spacing for fixed header */
+        overflow-x: hidden;
+    }
+
+    .auth-navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        padding: 1rem;
+    }
+
+    .nav-container {
+        width: 100%;
+        padding: 0;
+    }
+
+    .auth-container {
+        padding: 0 1rem;
+        gap: 1.5rem;
+        margin: 1rem auto;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .auth-card {
+        padding: 1.25rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
     .hero-section {
-        padding: 60px 24px;
+        padding: 40px 16px;
         min-height: auto;
     }
 
@@ -750,6 +715,20 @@ body.auth-page {
 
     .hero-content p {
         font-size: 0.95rem;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group input[type="password"],
+    .form-group input[type="tel"],
+    .form-group input[type="number"],
+    .btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .password-input {
+        width: 100%;
     }
 }
 
