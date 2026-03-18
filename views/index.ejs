@@ -16,7 +16,33 @@
 <body>
     <!-- Navigation -->
     <%- include('partials/public-header') %>
-
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo" onclick="window.location.href='/'">
+                <%- include('partials/logo') %>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="/public-queue-status" class="nav-link">Queue Status</a>
+                <a href="#services" class="nav-link">Services</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="/about" class="nav-link">About</a>
+                <div class="mobile-only-actions">
+                    <button class="btn-secondary" onclick="goToLogin()">Login</button>
+                    <button class="btn-primary" onclick="goToToken()">Get Token</button>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-secondary" onclick="goToLogin()">Login</button>
+                <button class="btn-primary" onclick="goToToken()">Get Token</button>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
     <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="container">
@@ -449,6 +475,35 @@
                 getServiceToken(service);
             });
         });
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navLinks = document.getElementById('navLinks');
+        const navActions = document.querySelector('.nav-actions');
+
+        if (mobileMenuBtn && navLinks) {
+            mobileMenuBtn.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                if (navActions) navActions.classList.toggle('active');
+                mobileMenuBtn.classList.toggle('active');
+
+                // Toggle body scroll when menu is open
+                if (navLinks.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            });
+
+            // Close menu when clicking on a link or button
+            navLinks.querySelectorAll('a, button').forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                    if (navActions) navActions.classList.remove('active');
+                    mobileMenuBtn.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            });
+        }
     </script>
     <%- include('partials/scroll-to-top') %>
 </body>

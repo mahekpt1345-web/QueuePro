@@ -160,6 +160,11 @@ body {
     }
 }
 
+.mobile-only-actions {
+    display: none;
+}
+
+
 /* ===========================
    BUTTONS
    =========================== */
@@ -772,6 +777,18 @@ body {
 
 /* Tablet & small screens: 376px - 768px */
 @media (max-width: 768px) {
+    body {
+        padding-top: 72px; /* Add top spacing for fixed header */
+        overflow-x: hidden;
+    }
+
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+    }
     img {
         max-width: 100%;
         height: auto;
@@ -789,6 +806,10 @@ body {
     }
 
     .nav-dropdown-mobile.active {
+        padding: 0 16px;
+    }
+
+    .nav-links.active {
         display: flex;
         flex-direction: column;
         position: absolute;
@@ -828,14 +849,28 @@ body {
         min-height: 44px;
     }
 
+    .mobile-only-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--gray-200);
+    }
+    
+    .mobile-only-actions button {
+        width: 100%;
+        min-height: 44px;
+    }
+
     .mobile-menu-btn {
         display: flex;
     }
 
     .nav-actions {
-        display: none;
+        display: none !important;
     }
-
+    
     .hero-content {
         grid-template-columns: 1fr;
         gap: 40px;

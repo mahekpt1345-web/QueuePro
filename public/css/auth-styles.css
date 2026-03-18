@@ -670,8 +670,41 @@ body.auth-page {
 ============================== */
 
 @media (max-width: 768px) {
+    body {
+        padding-top: 70px; /* Add top spacing for fixed header */
+        overflow-x: hidden;
+    }
+
+    .auth-navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        padding: 1rem;
+    }
+
+    .nav-container {
+        width: 100%;
+        padding: 0;
+    }
+
+    .auth-container {
+        padding: 0 1rem;
+        gap: 1.5rem;
+        margin: 1rem auto;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .auth-card {
+        padding: 1.25rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
     .hero-section {
-        padding: 60px 24px;
+        padding: 40px 16px;
         min-height: auto;
     }
 
@@ -682,6 +715,20 @@ body.auth-page {
 
     .hero-content p {
         font-size: 0.95rem;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group input[type="password"],
+    .form-group input[type="tel"],
+    .form-group input[type="number"],
+    .btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .password-input {
+        width: 100%;
     }
 }
 
