@@ -7,6 +7,7 @@
     <title>
         <%= title %>
     </title>
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -139,6 +140,9 @@
             transform: translateY(-50%);
             color: var(--gray-400);
         }
+        @media (max-width: 768px) {
+            body, html { overflow-x: hidden; max-width: 100vw; }
+        }
         @media (max-width: 640px) {
             .help-hero {
                 padding: 40px 20px;
@@ -165,21 +169,12 @@
 </head>
 
 <body>
+    <%- include('partials/public-header') %>
     <div class="help-hero">
-        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-            <div style="background: white; padding: 8px 20px; border-radius: 50px; display: inline-flex; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-                <%- include('partials/logo') %>
-            </div>
-        </div>
         <h1 style="font-size: 3rem; font-weight: 800; margin: 0;">How can we help?</h1>
         <div class="search-container">
             <i class="fas fa-search search-icon"></i>
             <input type="text" class="search-input" placeholder="Search FAQ, guides, and more...">
-        </div>
-        <div style="margin-top: 2rem;">
-            <a href="/"
-                style="text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem; background:rgba(255,255,255,0.2); color:white; padding:0.6rem 1.2rem; border-radius:30px; border:1.5px solid rgba(255,255,255,0.4); font-size:0.9rem; font-weight:600; cursor:pointer; transition:0.3s; backdrop-filter:blur(5px);"><i
-                    class="fas fa-home"></i> Back to Home</a>
         </div>
     </div>
 
@@ -254,6 +249,7 @@
         &copy; 2024 QueuePro - Queue Management System. All rights reserved.
     </footer>
 
+    <script src="/js/mobile-menu.js"></script>
     <%- include('partials/scroll-to-top') %>
 </body>
 

@@ -79,17 +79,7 @@ const userSchema = new mongoose.Schema({
     default: {}
   },
 
-  // OAuth Integration Fields
-  googleId: {
-    type: String,
-    default: null
-  },
-
-  oauthProvider: {
-    type: String,
-    enum: ['manual', 'google'],
-    default: 'manual'
-  },
+  // OAuth fields removed
 
   phoneVerified: {
     type: Boolean,

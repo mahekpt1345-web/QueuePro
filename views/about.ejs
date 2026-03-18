@@ -7,6 +7,7 @@
     <title>
         <%= title %>
     </title>
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -98,6 +99,7 @@
             margin-bottom: 0.5rem;
         }
         @media (max-width: 768px) {
+            body, html { overflow-x: hidden; max-width: 100vw; }
             .about-hero {
                 padding: 40px 20px;
             }
@@ -133,13 +135,9 @@
 </head>
 
 <body>
+    <%- include('partials/public-header') %>
     <div class="about-hero">
-        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-            <div style="background: white; padding: 8px 20px; border-radius: 50px; display: inline-flex; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-                <%- include('partials/logo') %>
-            </div>
-        </div>
-        <p style="font-size: 1.25rem; opacity: 0.9; margin-top: 1rem;">Transforming Public Service Experiences</p>
+        <p style="font-size: 1.25rem; opacity: 0.9; margin: 0;">Transforming Public Service Experiences</p>
     </div>
 
     <div class="container">
@@ -188,6 +186,7 @@
         &copy; 2024 QueuePro - Queue Management System. All rights reserved.
     </footer>
 
+    <script src="/js/mobile-menu.js"></script>
     <%- include('partials/scroll-to-top') %>
 </body>
 

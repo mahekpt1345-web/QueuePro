@@ -21,6 +21,18 @@
 ">
     <i class="fas fa-arrow-up"></i>
 </button>
+<style>
+    /* On mobile, sit above the bottom nav (56px) so they don't overlap */
+    @media (max-width: 768px) {
+        #scrollToTopBtn {
+            bottom: 72px !important;
+            right: 16px;
+            width: 48px;
+            height: 48px;
+            z-index: 998;
+        }
+    }
+</style>
 
 <script>
     const scrollToTopBtn = document.getElementById("scrollToTopBtn");

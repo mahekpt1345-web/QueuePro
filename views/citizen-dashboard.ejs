@@ -610,6 +610,14 @@
             color: var(--gray-600);
         }
 
+        .bottom-nav-mobile {
+            display: none;
+        }
+
+        .btn-logout-topbar-mobile {
+            display: none;
+        }
+
         @media (max-width: 768px) {
             body, html {
                 overflow-x: hidden;
@@ -622,12 +630,73 @@
                 box-sizing: border-box;
             }
 
+            .dashboard-container {
+                padding-bottom: 72px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bottom-nav-mobile {
+                display: flex;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 56px;
+                background: #fff;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+                z-index: 999;
+                justify-content: space-around;
+                align-items: center;
+                padding: 0 8px;
+            }
+
+            .bottom-nav-mobile .bottom-nav-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 2px;
+                color: #6b7280;
+                text-decoration: none;
+                font-size: 10px;
+                flex: 1;
+                min-width: 0;
+                padding: 6px 4px;
+            }
+
+            .bottom-nav-mobile .bottom-nav-item i {
+                font-size: 18px;
+            }
+
+            .bottom-nav-mobile .bottom-nav-item:hover,
+            .bottom-nav-mobile .bottom-nav-item.active {
+                color: var(--primary-color);
+            }
+
             .nav-container {
                 flex-wrap: wrap;
             }
 
             .nav-center {
                 display: none;
+            }
+
+            .menu-item-profile {
+                display: none !important;
+            }
+
+            .btn-logout-topbar-mobile {
+                display: flex !important;
+                align-items: center;
+                gap: 0.5rem;
+                min-height: 44px;
             }
 
             .nav-right {
@@ -753,13 +822,16 @@
                     Citizen
                 </span>
             </div>
-            <a href="/citizen-profile" class="menu-item">
+            <a href="/citizen-profile" class="menu-item menu-item-profile">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                     <circle cx="12" cy="7" r="4" />
                 </svg>
                 My Profile
             </a>
+            <button type="button" class="btn-logout btn-logout-topbar-mobile" onclick="UIUtils.logout()" aria-label="Logout">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
             <div class="nav-right" id="citizenNavLinks">
                 <div class="user-info">
                     <span class="user-name" id="userName">
@@ -1551,7 +1623,14 @@
             });
         }
     </script>
-        <%- include('partials/scroll-to-top') %>
+    <nav class="bottom-nav-mobile" aria-label="Mobile navigation">
+        <a href="/citizen-dashboard" class="bottom-nav-item"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
+        <a href="/citizen-dashboard" class="bottom-nav-item"><i class="fas fa-ticket-alt"></i><span>Token</span></a>
+        <a href="/public-queue-status" class="bottom-nav-item"><i class="fas fa-list"></i><span>Status</span></a>
+        <a href="/age-selection" class="bottom-nav-item"><i class="fas fa-puzzle-piece"></i><span>Engagement</span></a>
+        <a href="/citizen-profile" class="bottom-nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+    </nav>
+    <%- include('partials/scroll-to-top') %>
 </body>
 
 </html>

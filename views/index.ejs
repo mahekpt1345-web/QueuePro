@@ -15,29 +15,7 @@
 
 <body>
     <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo" onclick="window.location.href='/'">
-                <%- include('partials/logo') %>
-            </div>
-            <div class="nav-links" id="navLinks">
-                <a href="#home" class="nav-link active">Home</a>
-                <a href="/public-queue-status" class="nav-link">Queue Status</a>
-                <a href="#services" class="nav-link">Services</a>
-                <a href="#features" class="nav-link">Features</a>
-                <a href="/about" class="nav-link">About</a>
-            </div>
-            <div class="nav-actions">
-                <button class="btn-secondary" onclick="goToLogin()">Login</button>
-                <button class="btn-primary" onclick="goToToken()">Get Token</button>
-            </div>
-            <button class="mobile-menu-btn" id="mobileMenuBtn">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-        </div>
-    </nav>
+    <%- include('partials/public-header') %>
 
     <!-- Hero Section -->
     <section class="hero" id="home">
@@ -411,16 +389,8 @@
 
     <!-- Scripts -->
     <script src="/js/ui-utils.js"></script>
-
+    <script src="/js/mobile-menu.js"></script>
     <script>
-        // Mobile menu toggle
-        document.getElementById('mobileMenuBtn').addEventListener('click', function () {
-            const navLinks = document.getElementById('navLinks');
-            const navActions = document.querySelector('.nav-actions');
-            navLinks.classList.toggle('active');
-            if (navActions) navActions.classList.toggle('active');
-        });
-
         // Smooth scroll
         function scrollToSection(sectionId) {
             const element = document.getElementById(sectionId);
@@ -429,19 +399,8 @@
             }
         }
 
-        // Navigation functions
-        function goToLogin() {
-            window.location.href = '/login';
-        }
-
-        function goToToken() {
-            // Redirect to login page and let the backend handle authentication flow
-            window.location.href = '/login';
-        }
-
-        // Get service token
+        // Get service token (index page)
         function getServiceToken(service) {
-            // Redirect to login page and let the backend handle authentication flow
             window.location.href = '/login';
         }
 
@@ -490,36 +449,6 @@
                 getServiceToken(service);
             });
         });
-
-        // Mobile menu toggle
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const navLinks = document.getElementById('navLinks');
-        const navActions = document.querySelector('.nav-actions');
-
-        if (mobileMenuBtn && navLinks) {
-            mobileMenuBtn.addEventListener('click', () => {
-                navLinks.classList.toggle('active');
-                if (navActions) navActions.classList.toggle('active');
-                mobileMenuBtn.classList.toggle('active');
-
-                // Toggle body scroll when menu is open
-                if (navLinks.classList.contains('active')) {
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    document.body.style.overflow = '';
-                }
-            });
-
-            // Close menu when clicking on a link
-            navLinks.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', () => {
-                    navLinks.classList.remove('active');
-                    if (navActions) navActions.classList.remove('active');
-                    mobileMenuBtn.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            });
-        }
     </script>
     <%- include('partials/scroll-to-top') %>
 </body>
