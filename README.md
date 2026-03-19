@@ -127,6 +127,13 @@ Passionate about building user-friendly and practical web applications 🚀
 
 ---
 
+## 🌐 Live Demo
+
+Check out the deployed project here:  
+👉  https://queuepro-45hu.onrender.com/
+
+---
+
 ## ⭐ Final Note
 
 QueuePro is designed not just as a project, but as a step towards building **real-world usable systems** that improve everyday user experiences.
