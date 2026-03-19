@@ -5,10 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - QueuePro</title>
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/dashboard-styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.css">
     <style>
         :root {
             --primary: #3b82f6;
@@ -239,15 +240,7 @@
             transform: translateY(-8px) rotate(-45deg);
         }
 
-        @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
 
-            .welcome-section h1 {
-                font-size: 1.5rem;
-            }
-        }
 
         .stat-header {
             display: flex;
@@ -1044,235 +1037,7 @@
             display: none;
         }
 
-        @media (max-width: 768px) {
-            body {
-                padding-top: 70px; /* Add top spacing for fixed header */
-                padding-bottom: 70px; /* Space for bottom nav */
-                overflow-x: hidden;
-            }
 
-            html {
-                overflow-x: hidden;
-            }
-
-            .navbar {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                z-index: 1000;
-            }
-
-            img {
-                max-width: 100%;
-                height: auto;
-            }
-
-            .dashboard-container {
-                padding: 1rem;
-            }
-
-            .dashboard-container {
-                padding-bottom: 72px;
-            }
-
-            .bottom-nav-mobile {
-                display: flex;
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 56px;
-                background: #fff;
-                box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
-                z-index: 999;
-                justify-content: space-around;
-                align-items: center;
-                padding: 0 8px;
-            }
-
-            .bottom-nav-mobile .bottom-nav-item {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                gap: 2px;
-                color: #6b7280;
-                text-decoration: none;
-                font-size: 10px;
-                flex: 1;
-                min-width: 0;
-                padding: 6px 4px;
-            }
-
-            .bottom-nav-mobile .bottom-nav-item i {
-                font-size: 18px;
-            }
-
-            .bottom-nav-mobile .bottom-nav-item:hover,
-            .bottom-nav-mobile .bottom-nav-item.active {
-                color: var(--primary);
-            }
-
-            .nav-container {
-                padding: 1rem;
-                width: 100%;
-                max-width: 100vw;
-                box-sizing: border-box;
-                position: relative;
-            }
-
-            .nav-center-badge {
-                display: flex !important;
-                flex: 1;
-                justify-content: center;
-                margin: 0 10px;
-            }
-
-            .role-badge {
-                padding: 0.4rem 0.75rem;
-                font-size: 0.75rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr !important;
-                width: 100%;
-                display: grid !important;
-            }
-
-            .two-col {
-                grid-template-columns: 1fr !important;
-                width: 100%;
-                display: grid !important;
-            }
-
-            .menu-item-profile {
-                display: none !important;
-            }
-
-            .btn-logout-topbar-mobile {
-                display: flex !important;
-                align-items: center;
-                gap: 0.5rem;
-                min-height: 44px;
-            }
-
-            .nav-right {
-                display: none;
-                flex-direction: column;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: white;
-                padding: 1.5rem;
-                box-shadow: 0 10px 15px -10px rgba(0,0,0,0.15);
-                border-top: 1px solid var(--gray-100);
-                gap: 1rem;
-                z-index: 1000;
-                align-items: flex-start;
-            }
-
-            .nav-right.active {
-                display: flex;
-            }
-
-            .nav-right .btn-logout {
-                display: none !important;
-            }
-
-            .nav-right .menu-item {
-                width: 100%;
-                padding: 0.75rem 0;
-                background: none !important;
-            }
-
-            .nav-right .user-name {
-                width: 100%;
-                padding: 0.5rem 0;
-                border-bottom: 1px solid var(--gray-100);
-                margin-bottom: 0.5rem;
-            }
-
-            .nav-right .btn-logout {
-                width: 100%;
-                justify-content: center;
-                margin-top: 0.5rem;
-                display: none !important; /* Hidden in mobile menu */
-            }
-
-            .mobile-menu-btn {
-                display: none !important; /* Replaced by bottom nav */
-            }
-
-            /* BOTTOM NAVIGATION */
-            .bottom-nav {
-                display: flex !important;
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                background: white;
-                box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-                z-index: 1000;
-                justify-content: space-around;
-                align-items: center;
-                height: 65px;
-                padding: 0 0.5rem;
-                padding-bottom: env(safe-area-inset-bottom);
-            }
-
-            .bottom-nav-item {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                color: var(--gray-500);
-                text-decoration: none;
-                flex: 1;
-                height: 100%;
-                gap: 4px;
-                transition: color 0.2s;
-            }
-
-            .bottom-nav-item:hover,
-            .bottom-nav-item.active {
-                color: var(--primary);
-            }
-
-            .bottom-nav-item i {
-                font-size: 1.25rem;
-            }
-
-            .bottom-nav-item span {
-                font-size: 0.65rem;
-                font-weight: 500;
-            }
-
-            /* Hide original desktop tabs when bottom nav is active */
-            .tabs {
-                display: none !important;
-            }
-            
-            .tabs {
-                display: flex;
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                justify-content: flex-start;
-                white-space: nowrap;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
-                margin-bottom: 1rem;
-            }
-            
-            .tabs::-webkit-scrollbar {
-                display: none;
-            }
-
-            .tab-btn {
-                flex-shrink: 0;
-            }
-        }
 
         .broadcast-banner {
             background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
@@ -1298,15 +1063,19 @@
             <div class="nav-center-badge" style="flex:1;display:flex;justify-content:center;">
                 <span class="role-badge"><i class="fas fa-shield-alt"></i> Administrator</span>
             </div>
-            <button type="button" class="btn-logout btn-logout-topbar-mobile" aria-label="Logout">
-                <i class="fas fa-sign-out-alt"></i> Logout
+
+            <button class="mobile-menu-btn" id="adminMobileMenuBtn">
+                <span></span>
+                <span></span>
+                <span></span>
             </button>
             <div class="nav-right" id="adminNavLinks">
                 <a href="/admin-profile" class="menu-item menu-item-profile"><i class="fas fa-user"></i> My Profile</a>
-                <span class="user-name" id="userName">
-                    <%= user ? (user.name || user.username || "Administrator" ) : "Administrator" %>
-                </span>
-                <button class="btn-logout" id="logoutBtn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                <div class="user-info">
+                    <span class="user-name" id="userName">
+                        <%= user ? (user.name || user.username || "Administrator" ) : "Administrator" %>
+                    </span>
+                </div>
             </div>
             <div class="bottom-nav">
                 <a href="javascript:void(0)" class="bottom-nav-item active" onclick="switchTab('overview')">
@@ -1362,7 +1131,7 @@
                         <div class="stat-icon blue"><i class="fas fa-users"></i></div><span class="stat-label-top">Total
                             Users</span>
                     </div>
-                    <div class="stat-value" id="totalUsers">—</div>
+                    <div class="stat-value" id="totalUsers"><%=initialUsers.total%></div>
                     <div class="stat-sub">All registered accounts</div>
                 </div>
                 <div class="stat-card green">
@@ -1370,7 +1139,7 @@
                         <div class="stat-icon green"><i class="fas fa-ticket-alt"></i></div><span
                             class="stat-label-top">Total Tokens</span>
                     </div>
-                    <div class="stat-value" id="totalTokens">—</div>
+                    <div class="stat-value" id="totalTokens"><%=initialStats.totalTokens%></div>
                     <div class="stat-sub">All time</div>
                 </div>
                 <div class="stat-card yellow">
@@ -1378,7 +1147,7 @@
                         <div class="stat-icon yellow"><i class="fas fa-calendar-day"></i></div><span
                             class="stat-label-top">Today's Tokens</span>
                     </div>
-                    <div class="stat-value" id="todayTokens">—</div>
+                    <div class="stat-value" id="todayTokens"><%=initialStats.todayTokens%></div>
                     <div class="stat-sub">Generated today</div>
                 </div>
                 <div class="stat-card indigo">
@@ -1386,7 +1155,7 @@
                         <div class="stat-icon indigo"><i class="fas fa-clock"></i></div><span class="stat-label-top">Avg
                             Wait Time</span>
                     </div>
-                    <div class="stat-value" id="avgWait">—</div>
+                    <div class="stat-value" id="avgWait"><%=initialStats.avgWaitTime%></div>
                     <div class="stat-sub">Minutes per token</div>
                 </div>
             </div>
@@ -1409,26 +1178,25 @@
                     <div
                         style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--gray-200);">
                         <div style="padding:.875rem .5rem;text-align:center;border-right:1px solid var(--gray-200);">
-                            <div style="font-size:1.5rem;font-weight:700;color:var(--warning);" id="qa_pending">—</div>
+                            <div style="font-size:1.5rem;font-weight:700;color:var(--warning);" id="qa_pending"><%=initialStats.pending%></div>
                             <div
                                 style="font-size:.68rem;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em;margin-top:.15rem;">
                                 Pending</div>
                         </div>
                         <div style="padding:.875rem .5rem;text-align:center;border-right:1px solid var(--gray-200);">
-                            <div style="font-size:1.5rem;font-weight:700;color:var(--primary);" id="qa_serving">—</div>
+                            <div style="font-size:1.5rem;font-weight:700;color:var(--primary);" id="qa_serving"><%=initialStats.serving%></div>
                             <div
                                 style="font-size:.68rem;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em;margin-top:.15rem;">
                                 Serving</div>
                         </div>
                         <div style="padding:.875rem .5rem;text-align:center;border-right:1px solid var(--gray-200);">
-                            <div style="font-size:1.5rem;font-weight:700;color:var(--success);" id="qa_completed">—
-                            </div>
+                            <div style="font-size:1.5rem;font-weight:700;color:var(--success);" id="qa_completed"><%=initialStats.completed%></div>
                             <div
                                 style="font-size:.68rem;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em;margin-top:.15rem;">
                                 Completed</div>
                         </div>
                         <div style="padding:.875rem .5rem;text-align:center;">
-                            <div style="font-size:1.5rem;font-weight:700;color:var(--danger);" id="qa_cancelled">—</div>
+                            <div style="font-size:1.5rem;font-weight:700;color:var(--danger);" id="qa_cancelled"><%=initialStats.cancelled%></div>
                             <div
                                 style="font-size:.68rem;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em;margin-top:.15rem;">
                                 Cancelled</div>
@@ -1452,8 +1220,8 @@
                         style="border-top:1px solid var(--gray-200);padding:.75rem 1.25rem;display:flex;justify-content:space-between;align-items:center;background:var(--gray-50);flex-wrap:wrap;gap:.5rem;">
                         <span style="font-size:.78rem;font-weight:600;color:var(--gray-700);"><i class="fas fa-users"
                                 style="color:var(--indigo);margin-right:.35rem;"></i><span id="qa_citizens"
-                                style="color:var(--primary);font-weight:700;">—</span> citizens &nbsp;·&nbsp; <span
-                                id="qa_officers" style="color:var(--warning);font-weight:700;">—</span> officers</span>
+                                style="color:var(--primary);font-weight:700;"><%=initialUsers.citizens%></span> citizens &nbsp;·&nbsp; <span
+                                id="qa_officers" style="color:var(--warning);font-weight:700;"><%=initialUsers.officers%></span> officers</span>
                         <div style="display:flex;gap:.5rem;">
                             <button class="btn btn-secondary btn-sm" onclick="switchTab('logs')"><i
                                     class="fas fa-history"></i> Logs</button>

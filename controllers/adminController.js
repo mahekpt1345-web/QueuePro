@@ -337,35 +337,64 @@ exports.updateSystemConfig = async (req, res) => {
 exports.showDashboard = async (req, res) => {
     let websiteQrDataUrl = null;
     let queueQrDataUrl = null;
+    let initialStats = { totalTokens: 0, todayTokens: 0, avgWaitTime: 0, pending: 0, serving: 0, completed: 0, cancelled: 0 };
+    let initialUsers = { total: 0, citizens: 0, officers: 0 };
+
     try {
         if (QRCode) {
             const baseUrl = process.env.OFFICIAL_URL || `${req.protocol}://${req.get('host')}`;
             const publicQueueUrl = `${baseUrl}/public-queue-status`;
-
-            // 1. Website QR Code
-            websiteQrDataUrl = await QRCode.toDataURL(baseUrl, {
-                width: 200,
-                margin: 2,
-                color: { dark: '#000000', light: '#ffffff' }
-            });
-
-            // 2. Queue Status QR Code
-            queueQrDataUrl = await QRCode.toDataURL(publicQueueUrl, {
-                width: 200,
-                margin: 2,
-                color: { dark: '#1e3a8a', light: '#ffffff' }
-            });
+            websiteQrDataUrl = await QRCode.toDataURL(baseUrl, { width: 200, margin: 2, color: { dark: '#000000', light: '#ffffff' } });
+            queueQrDataUrl = await QRCode.toDataURL(publicQueueUrl, { width: 200, margin: 2, color: { dark: '#1e3a8a', light: '#ffffff' } });
         }
     } catch (e) {
         console.error('[QR] Failed to generate QR codes:', e.message);
     }
+
+    // Pre-load initial dashboard stats from DB so they render immediately (SSR)
+    try {
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+        const [
+            totalTokens, todayTokens, pending, serving, completed, cancelled,
+            completedWithTime, totalUsers, userBreakdown
+        ] = await Promise.all([
+            Token.countDocuments(),
+            Token.countDocuments({ createdAt: { $gte: todayStart } }),
+            Token.countDocuments({ status: 'pending' }),
+            Token.countDocuments({ status: 'serving' }),
+            Token.countDocuments({ status: 'completed' }),
+            Token.countDocuments({ status: 'cancelled' }),
+            Token.find({ status: { $in: ['completed', 'serving'] }, actualWaitTime: { $ne: null } }).select('actualWaitTime').lean(),
+            User.countDocuments(),
+            User.aggregate([{ $group: { _id: '$role', count: { $sum: 1 } } }])
+        ]);
+
+        const avgWaitTime = completedWithTime.length
+            ? Math.round(completedWithTime.reduce((s, t) => s + t.actualWaitTime, 0) / completedWithTime.length)
+            : 0;
+
+        initialStats = { totalTokens, todayTokens, avgWaitTime, pending, serving, completed, cancelled };
+
+        const citizens = (userBreakdown.find(u => u._id === 'citizen') || {}).count || 0;
+        const officers = (userBreakdown.find(u => u._id === 'officer') || {}).count || 0;
+        initialUsers = { total: totalUsers, citizens, officers };
+
+    } catch (e) {
+        console.error('[Dashboard] Failed to pre-fetch stats:', e.message);
+    }
+
     res.render('admin-dashboard', {
         title: 'Admin Dashboard - QueuePro',
         user: req.user || null,
         websiteQrDataUrl,
-        queueQrDataUrl
+        queueQrDataUrl,
+        initialStats,
+        initialUsers
     });
 };
+
 
 // ─────────────────────────────────────────────
 // GET /admin-profile  (EJS page render)

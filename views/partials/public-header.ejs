@@ -3,23 +3,5 @@
         <div class="logo" onclick="window.location.href='/'">
             <%- include('logo') %>
         </div>
-        <div class="nav-dropdown-mobile" id="navDropdownMobile">
-            <div class="nav-links" id="navLinks">
-                <a href="/#home" class="nav-link">Home</a>
-                <a href="/public-queue-status" class="nav-link">Queue Status</a>
-                <a href="/#services" class="nav-link">Services</a>
-                <a href="/#features" class="nav-link">Features</a>
-                <a href="/about" class="nav-link">About</a>
-            </div>
-            <div class="nav-actions">
-                <button class="btn-secondary" onclick="typeof goToLogin === 'function' ? goToLogin() : (window.location.href='/login')">Login</button>
-                <button class="btn-primary" onclick="typeof goToToken === 'function' ? goToToken() : (window.location.href='/login')">Get Token</button>
-            </div>
-        </div>
-        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
     </div>
 </nav>

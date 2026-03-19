@@ -53,7 +53,10 @@ body.auth-page {
     background: linear-gradient(135deg, #0046AD 0%, #2BB673 100%);
 }
 
-/* NAVIGATION */
+.bottom-nav {
+    display: none;
+}
+
 .auth-navbar {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
@@ -132,14 +135,7 @@ body.auth-page {
     /* Align to top for better readability of side-by-side content */
 }
 
-@media (max-width: 992px) {
-    .auth-container {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-        margin: 1rem auto;
-    }
 
-}
 
 .auth-info.register-info {
     margin-top: 3.5rem;
@@ -162,15 +158,7 @@ body.auth-page {
     animation: slideInLeft 0.5s ease-out;
 }
 
-@media (max-width: 480px) {
-    .auth-card {
-        padding: 1.5rem;
-    }
 
-    .auth-header h1 {
-        font-size: 1.5rem;
-    }
-}
 
 .auth-card.admin-card {
     border: 2px solid var(--danger-color);
@@ -596,15 +584,19 @@ body.auth-page {
 .hero-section {
     background: transparent;
     color: white;
-    padding: 80px 60px;
-    min-height: 90vh;
+    padding: 32px 60px;
+    min-height: auto;
     display: flex;
     align-items: center;
 }
 
-/* Content container */
-.hero-content {
+/* Content container — scoped to auth hero to override index page flex layout */
+.hero-section .hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     max-width: 720px;
+    gap: 1rem;
 }
 
 /* Brand */
@@ -614,7 +606,7 @@ body.auth-page {
     gap: 10px;
     font-weight: 600;
     font-size: 1.1rem;
-    margin-bottom: 40px;
+    margin-bottom: 0.5rem;
     color: #111827;
 }
 
@@ -623,7 +615,7 @@ body.auth-page {
     font-size: 3.2rem;
     font-weight: 700;
     line-height: 1.2;
-    margin-bottom: 10px;
+    margin-bottom: 0;
     color: white;
 }
 
@@ -631,7 +623,7 @@ body.auth-page {
     font-size: 3.2rem;
     font-weight: 700;
     line-height: 1.2;
-    margin-bottom: 24px;
+    margin-bottom: 0.5rem;
     color: white;
 }
 
@@ -641,14 +633,14 @@ body.auth-page {
     line-height: 1.7;
     color: rgba(255, 255, 255, 0.9);
     max-width: 540px;
-    margin-bottom: 30px;
+    margin-bottom: 1rem;
 }
 
 /* Feature list */
 .hero-features {
     list-style: none;
     padding: 0;
-    margin: 0 0 40px 0;
+    margin: 0;
 }
 
 .hero-features li {
@@ -669,68 +661,7 @@ body.auth-page {
    RESPONSIVE
 ============================== */
 
-@media (max-width: 768px) {
-    body {
-        padding-top: 70px; /* Add top spacing for fixed header */
-        overflow-x: hidden;
-    }
 
-    .auth-navbar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        z-index: 1000;
-        padding: 1rem;
-    }
-
-    .nav-container {
-        width: 100%;
-        padding: 0;
-    }
-
-    .auth-container {
-        padding: 0 1rem;
-        gap: 1.5rem;
-        margin: 1rem auto;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .auth-card {
-        padding: 1.25rem;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .hero-section {
-        padding: 40px 16px;
-        min-height: auto;
-    }
-
-    .hero-content h1,
-    .hero-content h2 {
-        font-size: 2.2rem;
-    }
-
-    .hero-content p {
-        font-size: 0.95rem;
-    }
-
-    .form-group input[type="text"],
-    .form-group input[type="email"],
-    .form-group input[type="password"],
-    .form-group input[type="tel"],
-    .form-group input[type="number"],
-    .btn {
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .password-input {
-        width: 100%;
-    }
-}
 
 /* FORM FOOTER */
 .form-footer {
@@ -999,255 +930,10 @@ body.auth-page {
 }
 
 /* RESPONSIVE DESIGN */
-@media (max-width: 768px) {
-    .auth-container {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-        margin: 1rem auto;
-        padding: 0 1rem;
-        padding-top: 72px;
-    }
 
-    .auth-card {
-        padding: 1.5rem;
-    }
 
-    .auth-info {
-        order: -1;
-    }
 
-    .auth-header h1 {
-        font-size: 1.5rem;
-    }
-
-    .role-selection {
-        grid-template-columns: 1fr 1fr;
-        gap: 0.5rem;
-    }
-
-    .role-option .role-label {
-        min-height: 90px;
-        padding: 0.5rem 0.35rem;
-    }
-
-    .role-option .role-label p {
-        font-size: 0.65rem;
-    }
-
-    .checkbox-label {
-        flex-wrap: wrap;
-        align-items: flex-start;
-    }
-
-    .checkbox-label input[type="checkbox"] {
-        width: 16px;
-        height: 16px;
-        flex-shrink: 0;
-        margin-top: 2px;
-    }
-
-    .checkbox-label span {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .demo-buttons {
-        grid-template-columns: 1fr;
-    }
-
-    .nav-links {
-        flex-direction: column;
-        gap: 0.5rem;
-        align-items: flex-end;
-    }
-
-    .form-options {
-        flex-direction: column;
-        gap: 0.75rem;
-        align-items: flex-start;
-    }
-}
-
-@media (max-width: 480px) {
-    body {
-        padding: 0;
-    }
-
-    .auth-navbar {
-        padding: 1rem;
-    }
-
-    .nav-container {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .nav-brand {
-        font-size: 1.25rem;
-    }
-
-    .auth-container {
-        gap: 1.5rem;
-        margin: 1rem 0;
-        padding: 0 1rem;
-    }
-
-    .auth-card {
-        padding: 1.25rem;
-    }
-
-    .auth-header h1 {
-        font-size: 1.25rem;
-    }
-
-    .auth-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 1.75rem;
-    }
-
-    .form-group {
-        gap: 0.375rem;
-    }
-
-    .form-group input,
-    .form-group input[type="text"],
-    .form-group input[type="email"],
-    .form-group input[type="password"],
-    .form-group input[type="tel"],
-    .form-group input[type="number"] {
-        padding: 0.75rem;
-        font-size: 16px;
-        min-height: 44px;
-    }
-
-    .btn {
-        padding: 0.75rem 1rem;
-        font-size: 0.875rem;
-        min-height: 44px;
-    }
-
-    .btn-primary,
-    .btn-secondary {
-        min-height: 44px;
-    }
-
-    .toggle-password {
-        right: 0.75rem;
-        padding: 0.375rem;
-    }
-
-    .toast {
-        left: 1rem;
-        right: 1rem;
-        transform: translateX(0);
-        max-width: unset;
-    }
-
-    .info-list {
-        gap: 0.75rem;
-    }
-
-    .info-item {
-        gap: 0.75rem;
-    }
-
-    /* OAuth Buttons Mobile */
-    .oauth-buttons-container {
-        grid-template-columns: 1fr 1fr;
-        gap: 0.5rem;
-    }
-
-    .btn-oauth {
-        padding: 0.75rem;
-        font-size: 0.8125rem;
-        min-height: 44px;
-    }
-
-    .btn-oauth svg {
-        width: 16px;
-        height: 16px;
-    }
-
-    .btn-oauth span {
-        display: inline;
-    }
-
-    .oauth-divider {
-        margin: 1rem 0;
-    }
-
-    .password-strength {
-        margin-top: 0.375rem;
-    }
-
-    .strength-text {
-        font-size: 0.7rem;
-    }
-}
 
 /* ===============================
    ROBUST MOBILE RESPONSIVENESS OVERRIDES
-   =============================== */
-@media (max-width: 768px) {
-    body, html {
-        overflow-x: hidden;
-        max-width: 100vw;
-    }
-
-    .nav-container, .auth-container {
-        width: 100% !important;
-        max-width: 100% !important;
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-        box-sizing: border-box;
-    }
-
-    .auth-container {
-        display: flex !important;
-        flex-direction: column !important;
-        margin: 1rem auto !important;
-        gap: 1.5rem !important;
-        padding: 0 1rem !important;
-        padding-top: 72px !important;
-    }
-
-    .auth-card {
-        order: 1 !important;
-        width: 100% !important;
-        margin-bottom: 0 !important;
-    }
-
-    .auth-info, .hero-section, .register-info, .admin-info {
-        order: 2 !important;
-        width: 100% !important;
-        padding: 2rem 1.5rem !important;
-        min-height: auto !important;
-        border-radius: 1rem !important;
-        background: rgba(255, 255, 255, 0.1) !important;
-        backdrop-filter: blur(10px) !important;
-    }
-
-    .role-selection {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 0.5rem !important;
-    }
-
-    .oauth-buttons-container {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-
-    .btn, .btn-oauth, .btn-primary {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-    }
-
-    .form-group input, .form-group select {
-        width: 100%;
-        box-sizing: border-box;
-    }
-}
+   =============================== */

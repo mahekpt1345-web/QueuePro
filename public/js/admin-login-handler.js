@@ -15,9 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // On page load, clear any existing admin session and JWT
-    auth.logout();
-
     // Form submission
     if (adminLoginForm) {
         adminLoginForm.addEventListener('submit', handleAdminLogin);

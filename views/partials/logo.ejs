@@ -1,3 +1,8 @@
+<style>
+    a:has(.logo-wrapper), .logo-wrapper, .logo-wrapper * {
+        text-decoration: none !important;
+    }
+</style>
 <div class="logo-wrapper" style="display: flex; align-items: center; gap: 12px; cursor: pointer;"
     onclick="window.location.href='/'">
     <div class="logo-icon-container" style="position: relative; width: 44px; height: 44px; flex-shrink: 0;">
@@ -40,49 +45,4 @@
         </div>
     </div>
 </div>
-
-<style>
-    @media (max-width: 768px) {
-        .logo-wrapper {
-            gap: 8px !important;
-        }
-
-        .logo-icon-container {
-            width: 32px !important;
-            height: 32px !important;
-        }
-
-        .logo-text-container div:first-child {
-            font-size: 20px !important;
-        }
-
-        .logo-text-container div:last-child {
-            font-size: 7px !important;
-            gap: 2px !important;
-        }
-
-        .logo-text-container div:last-child div {
-            width: 4px !important;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .logo-wrapper {
-            gap: 6px !important;
-        }
-
-        .logo-icon-container {
-            width: 28px !important;
-            height: 28px !important;
-        }
-
-        .logo-text-container div:first-child {
-            font-size: 18px !important;
-        }
-
-        .logo-text-container div:last-child {
-            display: none !important;
-            /* Hide tagline on very small screens to save space */
-        }
-    }
-</style>
+

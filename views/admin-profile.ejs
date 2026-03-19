@@ -5,10 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Profile - QueuePro</title>
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/dashboard-styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.css">
     <style>
         :root {
             --primary-color: #3b82f6;
@@ -423,142 +424,7 @@
             }
         }
 
-        @media (max-width: 768px) {
-            body, html {
-                overflow-x: hidden;
-            }
-            body {
-                padding-bottom: 2rem;
-            }
-            .nav-container {
-                padding: 1rem;
-                position: relative;
-            }
 
-            .profile-container {
-                padding: 1rem;
-                padding-bottom: 72px;
-            }
-
-            .bottom-nav-mobile {
-                display: flex;
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 56px;
-                background: #fff;
-                box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
-                z-index: 999;
-                justify-content: space-around;
-                align-items: center;
-                padding: 0 8px;
-            }
-            .bottom-nav-mobile .bottom-nav-item {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                gap: 2px;
-                color: #6b7280;
-                text-decoration: none;
-                font-size: 10px;
-                flex: 1;
-                min-width: 0;
-                padding: 6px 4px;
-            }
-            .bottom-nav-mobile .bottom-nav-item i { font-size: 18px; }
-            .bottom-nav-mobile .bottom-nav-item:hover,
-            .bottom-nav-mobile .bottom-nav-item.active { color: var(--primary-color); }
-
-            .profile-header {
-                padding: 1.5rem;
-            }
-
-            .profile-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .profile-info {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .nav-center {
-                display: none;
-            }
-
-            .nav-container .menu-item {
-                display: none;
-            }
-
-            .nav-right {
-                display: none;
-                flex-direction: column;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: white;
-                padding: 1rem 1.25rem;
-                box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-                gap: 0.75rem;
-                z-index: 1001;
-                border-top: 1px solid var(--gray-200);
-            }
-
-            .nav-right.active {
-                display: flex;
-            }
-
-            .nav-right .menu-item-mobile {
-                display: flex !important;
-                align-items: center;
-                gap: 0.5rem;
-                padding: 0.75rem 0;
-                color: var(--gray-700);
-                text-decoration: none;
-                font-weight: 500;
-                border-bottom: 1px solid var(--gray-100);
-            }
-            .nav-right .menu-item-mobile:hover {
-                color: var(--primary-color);
-            }
-
-            .user-info {
-                display: flex !important;
-                flex-direction: column;
-                gap: 0.75rem;
-                width: 100%;
-            }
-
-            .user-info .user-name {
-                padding: 0.5rem 0;
-            }
-
-            .nav-right .btn-logout {
-                width: 100%;
-                justify-content: center;
-                min-height: 44px;
-            }
-
-            .mobile-menu-btn {
-                display: flex;
-            }
-
-            .admin-profile-footer {
-                margin-top: 2rem;
-                padding: 1.5rem 1rem;
-                background: white;
-                border-top: 1px solid var(--gray-200);
-                text-align: center;
-                color: var(--gray-600);
-                font-size: 0.875rem;
-            }
-        }
 
         .mobile-menu-btn {
             display: none;
@@ -614,12 +480,9 @@
                 Dashboard
             </a>
             <div class="nav-right" id="adminProfileNavLinks">
-                <a href="/admin-dashboard" class="menu-item-mobile">
-                    <i class="fas fa-th-large"></i> Dashboard
-                </a>
                 <div class="user-info">
                     <span class="user-name" id="userName">
-                        <%= user ? user.name || 'Administrator' : 'Administrator' %>
+                        <%= user ? user.name || user.username : 'Admin' %>
                     </span>
                     <button class="btn-logout" id="logoutBtn">
                         <i class="fas fa-sign-out-alt"></i>
