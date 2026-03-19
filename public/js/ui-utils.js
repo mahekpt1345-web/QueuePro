@@ -21,6 +21,29 @@ class UIUtils {
         }, 3000);
     }
 
+    static showNotification(message) {
+        const box = document.createElement("div");
+        box.innerText = message;
+        
+        box.style.position = "fixed";
+        box.style.top = "20px";
+        box.style.right = "20px";
+        box.style.background = "#3b82f6";
+        box.style.color = "#fff";
+        box.style.padding = "12px 16px";
+        box.style.borderRadius = "8px";
+        box.style.zIndex = "9999";
+        box.style.boxShadow = "0 5px 15px rgba(0,0,0,0.2)";
+        box.style.transition = "opacity 0.3s ease";
+        
+        document.body.appendChild(box);
+        
+        setTimeout(() => {
+            box.style.opacity = "0";
+            setTimeout(() => box.remove(), 300);
+        }, 4000);
+    }
+
     static showError(elementId, message) {
         const element = document.getElementById(elementId);
         if (element) {

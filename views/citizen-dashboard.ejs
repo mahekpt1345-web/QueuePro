@@ -730,6 +730,13 @@
         <div class="welcome-section">
             <h1>Welcome to Citizen Dashboard</h1>
             <p>Manage your queue requests and view application status</p>
+            <div class="user-flow-steps" style="display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.875rem; color: var(--primary-color); font-weight: 600; flex-wrap: wrap;">
+                <span><i class="fas fa-hand-pointer"></i> Step 1: Select Service</span>
+                <span><i class="fas fa-arrow-right" style="color: var(--gray-400);"></i></span>
+                <span><i class="fas fa-ticket-alt"></i> Step 2: Get Token</span>
+                <span><i class="fas fa-arrow-right" style="color: var(--gray-400);"></i></span>
+                <span><i class="fas fa-eye"></i> Step 3: Track Queue</span>
+            </div>
         </div>
 
         <!-- Dashboard Grid -->
@@ -850,6 +857,7 @@
                     <p>Keep yourself entertained while in the queue</p>
                 </div>
                 <div class="card-content" style="text-align: center; padding: 2rem;">
+                    <div id="engagementStats" style="margin-bottom: 1.5rem; padding: 1rem; background: #f8fafc; border-radius: 0.5rem; display: none; transition: background-color 0.3s ease;"></div>
                     <p style="margin-bottom: 2rem; color: var(--gray-700);">We have fun puzzles ready for you based on your wait time.</p>
                     <a href="/engagement-puzzles" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
                         <i class="fas fa-puzzle-piece"></i> Play While You Wait Puzzles
@@ -907,7 +915,7 @@
                     <p style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 1rem;">Scan to share this
                         portal or bookmark on your phone.</p>
                     <button class="btn-cancel-token" style="background:var(--gray-600); border:none;"
-                        onclick="navigator.clipboard.writeText(window.location.origin); alert('Link copied!')">
+                        onclick="navigator.clipboard.writeText(window.location.origin); UIUtils.showToast('Link copied!', 'success')">
                         <i class="fas fa-copy"></i> Copy Website Link
                     </button>
                 </div>
@@ -1082,6 +1090,19 @@
 
                 document.getElementById('engagementSection').style.display = 'block';
 
+                const firstPending = activeTokens.find(t => t.status === 'pending');
+                const engagementStats = document.getElementById('engagementStats');
+                if (firstPending && firstPending.position && firstPending.position > 1) {
+                    const usersAhead = firstPending.position - 1;
+                    const approxWait = usersAhead * 7;
+                    engagementStats.innerHTML = `<h3 style="color: var(--primary-color); font-size: 1.25rem; margin-bottom: 0.5rem;">You have ${usersAhead} users ahead</h3>
+                                                 <p style="color: var(--gray-600); font-weight: 500;">Approx wait: ${approxWait} minutes</p>`;
+                    engagementStats.style.display = 'block';
+                    engagementStats.style.animation = 'notifPulse 1s ease 1';
+                } else {
+                    engagementStats.style.display = 'none';
+                }
+
                 container.innerHTML = activeTokens.map(token => {
                     // Task 2: Progress visualization
                     const isPending = token.status === 'pending';
@@ -1092,6 +1113,22 @@
                         ? Math.max(5, Math.round(((totalInQueue - pos + 1) / totalInQueue) * 100))
                         : isServing ? 100 : 50;
                     const waitMins = isPending && pos ? Math.max(1, (pos - 1) * 7) : 0;
+
+                    // Trigger popup notification for pos 1 or 2 only once per position per token
+                    if (isPending && pos && UIUtils.showNotification) {
+                        window._notifiedPositions = window._notifiedPositions || {};
+                        const key = token._id + '_' + pos;
+                        if (!window._notifiedPositions[key]) {
+                            if (pos === 2) {
+                                UIUtils.showNotification("You are next in line");
+                                window._notifiedPositions[key] = true;
+                            } else if (pos === 1) {
+                                UIUtils.showNotification("Your turn is now");
+                                window._notifiedPositions[key] = true;
+                            }
+                        }
+                    }
+
                     const positionLabel = isPending
                         ? (pos === 1 ? '🔔 You are next!' : pos <= 3 ? `⚡ Almost there — #${pos}` : `#${pos} in queue`)
                         : isServing ? '✅ Currently being served' : '';
@@ -1109,12 +1146,12 @@
                             <span class="detail-value">${capitalizeService(token.serviceType)}</span>
                         </div>
                         <div class="detail">
-                            <span class="detail-label">Position</span>
+                            <span class="detail-label">Your Position</span>
                             <span class="detail-value" id="pos-${token._id}">${positionLabel || ('#' + (pos || 'N/A'))}</span>
                         </div>
                         ${isPending && waitMins > 0 ? `
                         <div class="detail">
-                            <span class="detail-label">Est. Wait</span>
+                            <span class="detail-label">Estimated Wait Time</span>
                             <span class="detail-value" id="wait-${token._id}" style="color:#f59e0b; font-weight:600;">~${waitMins} min</span>
                         </div>` : ''}
                         <div class="detail">
