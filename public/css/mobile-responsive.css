@@ -101,10 +101,48 @@
     }
 
     /* Hide other desktop elements */
-    .nav-links,
+    .nav-links:not(.active),
     .nav-center,
-    .nav-actions:not(.active) {
+    .nav-actions {
         display: none !important;
+    }
+
+    /* Index Page Unified Dropdown (Active State) */
+    .nav-links.active {
+        display: flex !important;
+        flex-direction: column !important;
+        position: absolute !important;
+        top: 60px !important;
+        right: 10px !important;
+        background: white !important;
+        padding: 1rem !important;
+        border-radius: 0.75rem !important;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15) !important;
+        z-index: 1005 !important;
+        min-width: 200px !important;
+        gap: 0.5rem !important;
+    }
+
+    .nav-links.active .nav-link {
+        color: #1a1a1a !important;
+        text-decoration: none !important;
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+        padding: 0.5rem !important;
+        border-bottom: 1px solid #f3f4f6 !important;
+    }
+
+    .nav-links.active .mobile-only-actions {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+        margin-top: 0.5rem !important;
+    }
+
+    .nav-links.active .mobile-only-actions button {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0.75rem 1rem !important;
     }
 
     /* Unified Mobile Dropdown (Active State) */
@@ -370,7 +408,8 @@
 
     .dashboard-cards,
     .stats-grid,
-    .dashboard-grid {
+    .dashboard-grid,
+    .two-col {
         display: grid !important;
         grid-template-columns: 1fr !important;
         gap: 1rem !important;

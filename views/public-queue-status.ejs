@@ -9,7 +9,8 @@
     </title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/mobile-responsive.css">
@@ -197,10 +198,6 @@
         .bottom-nav-mobile {
             display: none;
         }
-
-
-
-
     </style>
 </head>
 
@@ -211,16 +208,18 @@
             <%- include('partials/logo') %>
         </a>
         <div class="nav-actions">
-            <% if (typeof user !== 'undefined' && user && user.role) { %>
-            <a href="<%= user.role === 'admin' ? '/admin-dashboard' : user.role === 'officer' ? '/officer-dashboard' : '/citizen-dashboard' %>" class="btn btn-outline">Back to Dashboard</a>
-            <% } else { %>
-            <a href="/login" class="btn btn-primary">Book Your Visit Slot</a>
-            <% } %>
+            <% if (typeof user !=='undefined' && user && user.role) { %>
+                <a href="<%= user.role === 'admin' ? '/admin-dashboard' : user.role === 'officer' ? '/officer-dashboard' : '/citizen-dashboard' %>"
+                    class="btn btn-outline">Back to Dashboard</a>
+                <% } else { %>
+                    <a href="/login" class="btn btn-primary">Book Your Visit Slot</a>
+                    <% } %>
         </div>
     </nav>
 
     <div class="container">
-        <button class="back-to-dashboard-btn" onclick="window.location.href='/citizen-dashboard'">← Back to Dashboard</button>
+        <button class="back-to-dashboard-btn" onclick="window.location.href='/citizen-dashboard'">← Back to
+            Dashboard</button>
         <div class="header">
             <h1>Live Queue Status</h1>
             <p>Check the current crowd levels before visiting the office</p>
@@ -268,26 +267,37 @@
             window.location.reload();
         }, 30000);
     </script>
-    <% if (typeof user !== 'undefined' && user && (user.role === 'admin' || user.role === 'officer' || user.role === 'citizen')) { %>
-    <nav class="bottom-nav-mobile" aria-label="Mobile navigation">
-        <% if (user.role === 'citizen') { %>
-        <a href="/citizen-dashboard" class="bottom-nav-item"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
-        <a href="/citizen-dashboard#tokenSection" class="bottom-nav-item"><i class="fas fa-ticket-alt"></i><span>Token</span></a>
-        <a href="/public-queue-status" class="bottom-nav-item"><i class="fas fa-list"></i><span>Status</span></a>
-        <a href="/age-selection" class="bottom-nav-item"><i class="fas fa-puzzle-piece"></i><span>Engagement</span></a>
-        <a href="/citizen-profile" class="bottom-nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
-        <% } else if (user.role === 'officer') { %>
-        <a href="/officer-dashboard" class="bottom-nav-item"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
-        <a href="/public-queue-status" class="bottom-nav-item"><i class="fas fa-list"></i><span>Status</span></a>
-        <a href="/officer-profile" class="bottom-nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
-        <% } else if (user.role === 'admin') { %>
-        <a href="/admin-dashboard" class="bottom-nav-item"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
-        <a href="/public-queue-status" class="bottom-nav-item"><i class="fas fa-list"></i><span>Status</span></a>
-        <a href="/admin-profile" class="bottom-nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+    <% if (typeof user !=='undefined' && user && (user.role==='admin' || user.role==='officer' || user.role==='citizen'
+        )) { %>
+        <nav class="bottom-nav-mobile" aria-label="Mobile navigation">
+            <% if (user.role==='citizen' ) { %>
+                <a href="/citizen-dashboard" class="bottom-nav-item"><i
+                        class="fas fa-th-large"></i><span>Dashboard</span></a>
+                <a href="/citizen-dashboard#tokenSection" class="bottom-nav-item"><i
+                        class="fas fa-ticket-alt"></i><span>Token</span></a>
+                <a href="/public-queue-status" class="bottom-nav-item"><i
+                        class="fas fa-list"></i><span>Status</span></a>
+                <a href="/age-selection" class="bottom-nav-item"><i
+                        class="fas fa-puzzle-piece"></i><span>Engagement</span></a>
+                <a href="/citizen-profile" class="bottom-nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+                <% } else if (user.role==='officer' ) { %>
+                    <a href="/officer-dashboard" class="bottom-nav-item"><i
+                            class="fas fa-th-large"></i><span>Dashboard</span></a>
+                    <a href="/public-queue-status" class="bottom-nav-item"><i
+                            class="fas fa-list"></i><span>Status</span></a>
+                    <a href="/officer-profile" class="bottom-nav-item"><i
+                            class="fas fa-user"></i><span>Profile</span></a>
+                    <% } else if (user.role==='admin' ) { %>
+                        <a href="/admin-dashboard" class="bottom-nav-item"><i
+                                class="fas fa-th-large"></i><span>Dashboard</span></a>
+                        <a href="/public-queue-status" class="bottom-nav-item"><i
+                                class="fas fa-list"></i><span>Status</span></a>
+                        <a href="/admin-profile" class="bottom-nav-item"><i
+                                class="fas fa-user"></i><span>Profile</span></a>
+                        <% } %>
+        </nav>
         <% } %>
-    </nav>
-    <% } %>
-    <%- include('partials/scroll-to-top') %>
+            <%- include('partials/scroll-to-top') %>
 </body>
 
 </html>
