@@ -197,8 +197,9 @@ exports.apiMe = async (req, res) => {
 // API: POST /api/auth/logout
 // ─────────────────────────────────────────────
 exports.apiLogout = (req, res) => {
-    if (req.user) {
-        logActivity('LOGOUT', `User ${req.user.username} logged out (API)`, 'USER', req.user.userId, 'success', null, {
+    if (req.user && req.user.role !== 'admin') {
+        const logoutMsg = `User ${req.user.username} logged out (API)`;
+        logActivity('LOGOUT', logoutMsg, 'USER', req.user.userId, 'success', null, {
             user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
             ip: req.ip, get: (h) => req.get(h)
         }).catch(console.error);
@@ -438,10 +439,11 @@ exports.postAdminLogin = async (req, res) => {
 // EJS: GET /logout
 // ─────────────────────────────────────────────
 exports.logout = (req, res) => {
-    if (req.user) {
-        logActivity('LOGOUT', `User ${req.user.username} logged out`, 'USER', req.user._id, 'success', null, {
+    if (req.user && req.user.role !== 'admin') {
+        const logoutMsg = `User ${req.user.username} logged out`;
+        logActivity('LOGOUT', logoutMsg, 'USER', req.user._id, 'success', null, {
             user: { _id: req.user._id, username: req.user.username, role: req.user.role },
-            ip: req.ip, get: (h) => req.get(h)
+            ip: req.user.ipAddress || req.ip, get: (h) => req.get(h)
         }).catch(console.error);
     }
     res.clearCookie('token');

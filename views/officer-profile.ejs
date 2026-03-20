@@ -598,12 +598,7 @@
         document.addEventListener('DOMContentLoaded', async function () {
             await loadProfileData();
 
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', function () {
-                    UIUtils.logout();
-                });
-            }
+
 
             // Refresh stats and activity every 30 seconds
             setInterval(loadPerformanceStats, 30000);

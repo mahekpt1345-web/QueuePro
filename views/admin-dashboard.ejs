@@ -1678,22 +1678,7 @@
 
             document.getElementById('systemSettingsBtn').addEventListener('click', () => { loadSettingsToModal(); openModal('systemSettingsModal'); });
             document.getElementById('backupBtn').addEventListener('click', performBackup);
-            function doLogout() {
-                fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
-                    .catch(() => { })
-                    .finally(() => { window.location.href = '/'; });
-            }
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    doLogout();
-                });
-            }
-            
-            document.querySelectorAll('.btn-logout-topbar-mobile').forEach(function (btn) {
-                btn.addEventListener('click', function (e) { e.preventDefault(); doLogout(); });
-            });
+
             const createUserBtn = document.getElementById('createUserBtn');
             if (createUserBtn) createUserBtn.addEventListener('click', () => openModal('createUserModal'));
 

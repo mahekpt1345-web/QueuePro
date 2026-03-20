@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const Puzzle = require('./models/Puzzle');
-const EngagementContent = require('./models/EngagementContent');
+const Puzzle = require('../models/Puzzle');
+const EngagementContent = require('../models/EngagementContent');
 
 const puzzles = [
     // KIDS (Under 15)

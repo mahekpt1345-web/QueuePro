@@ -629,12 +629,7 @@
         document.addEventListener('DOMContentLoaded', async function () {
             await loadAdminProfileData();
 
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', function () {
-                    UIUtils.logout();
-                });
-            }
+
 
             // Refresh logs every 30 seconds
             setInterval(loadActivityLogs, 30000);

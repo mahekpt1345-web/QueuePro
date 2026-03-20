@@ -890,13 +890,7 @@
             document.getElementById('skipBtn').addEventListener('click', skipCurrentToken);
             document.getElementById('pauseBtn').addEventListener('click', pauseQueue);
 
-            // Logout button
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', function () {
-                    UIUtils.logout();
-                });
-            }
+
 
             // Load initial data
             loadOfficerData();
