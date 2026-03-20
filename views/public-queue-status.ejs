@@ -218,8 +218,15 @@
     </nav>
 
     <div class="container">
-        <button class="back-to-dashboard-btn" onclick="window.location.href='/citizen-dashboard'">← Back to
-            Dashboard</button>
+        <% if (typeof user !== 'undefined' && user && user.role) { %>
+            <a href="<%= user.role === 'admin' ? '/admin-dashboard' : user.role === 'officer' ? '/officer-dashboard' : '/citizen-dashboard' %>" class="back-to-dashboard-btn">
+                ← Back to Dashboard
+            </a>
+        <% } else { %>
+            <a href="/" class="back-to-dashboard-btn">
+                ← Back to Home
+            </a>
+        <% } %>
         <div class="header">
             <h1>Live Queue Status</h1>
             <p>Check the current crowd levels before visiting the office</p>

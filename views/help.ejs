@@ -141,6 +141,29 @@
             color: var(--gray-400);
         }
 
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .help-hero {
+                padding: 60px 0;
+            }
+            .help-hero h1 {
+                font-size: 2.25rem !important;
+            }
+            .content-card {
+                padding: 1.5rem;
+                margin-top: -40px;
+            }
+            .section-title {
+                font-size: 1.5rem;
+            }
+            .step-grid {
+                grid-template-columns: 1fr;
+            }
+            .search-container {
+                padding: 0 1rem;
+            }
+        }
+
     </style>
 </head>
 
@@ -214,9 +237,13 @@
                 style="margin-top: 3rem; padding: 2rem; background: var(--primary-light); border-radius: 0.75rem; text-align: center;">
                 <h3 style="color: var(--primary); margin-bottom: 0.5rem;">Still have questions?</h3>
                 <p style="margin-bottom: 1.5rem;">Our support team is ready to help you.</p>
-                <a href="/contact"
-                    style="text-decoration:none; padding:0.75rem 1.5rem; background:var(--primary); color:white; border-radius:0.5rem; font-weight:600;">Contact
-                    Support</a>
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                    <a href="/"
+                        style="text-decoration:none; padding:0.75rem 1.5rem; border:2px solid var(--primary); color:var(--primary); border-radius:0.5rem; font-weight:600;">Back to Home</a>
+                    <a href="/contact"
+                        style="text-decoration:none; padding:0.75rem 1.5rem; background:var(--primary); color:white; border-radius:0.5rem; font-weight:600;">Contact
+                        Support</a>
+                </div>
             </div>
         </div>
     </div>
