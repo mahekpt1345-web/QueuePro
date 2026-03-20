@@ -702,6 +702,10 @@
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
+                <a href="#serving-section" class="bottom-nav-item">
+                    <i class="fas fa-play-circle"></i>
+                    <span>Serving</span>
+                </a>
                 <a href="javascript:void(0)" class="bottom-nav-item" onclick="switchTheme('tokens')">
                     <i class="fas fa-ticket-alt"></i>
                     <span>Tokens</span>
@@ -779,7 +783,7 @@
         <!-- Main Content Area -->
         <div class="content-grid">
             <!-- Queue Management -->
-            <div class="card">
+            <div class="card" id="serving-section">
                 <div class="card-header">
                     <h2>Queue Management</h2>
                     <p>Control queue operations</p>
@@ -1352,6 +1356,7 @@
     </script>
     <nav class="bottom-nav-mobile" aria-label="Mobile navigation">
         <a href="/officer-dashboard" class="bottom-nav-item"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
+        <a href="#serving-section" class="bottom-nav-item"><i class="fas fa-play-circle"></i><span>Serving</span></a>
         <a href="/public-queue-status" class="bottom-nav-item"><i class="fas fa-list"></i><span>Status</span></a>
         <a href="/officer-profile" class="bottom-nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
     </nav>
