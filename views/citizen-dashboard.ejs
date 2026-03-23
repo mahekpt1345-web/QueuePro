@@ -837,7 +837,7 @@
             <div class="card">
                 <div class="card-header">
                     <h2>Your Active Tokens</h2>
-                    <p>Track your current queue status</p>
+                    <p>Track your current queue status <span id="lastUpdated" style="font-size: 0.8rem; color: var(--gray-500); margin-left: 10px; font-weight: normal;"></span></p>
                 </div>
                 <div class="card-content">
                     <div id="tokensList" class="tokens-list">
@@ -972,6 +972,7 @@
                 fetch('/api/queue/my-tokens', { credentials: 'include' })
                     .then(res => res.json())
                     .then(data => {
+                        updateLastUpdated();
                         if (data.success && data.data) {
                             displayTokens(data.data);
                             // Task 1: Subscribe active tokens to socket rooms
@@ -1526,6 +1527,29 @@
                     citizenMobileMenuBtn.classList.remove('active');
                 }
             });
+        }
+
+        /**
+         * Real-time "Last Updated" Indicator
+         */
+        let updateSeconds = 0;
+        let lastUpdateInterval = null;
+
+        function updateLastUpdated() {
+            updateSeconds = 0;
+            const element = document.getElementById("lastUpdated");
+            if (!element) return;
+            element.innerText = "Last updated: just now";
+            
+            if (lastUpdateInterval) clearInterval(lastUpdateInterval);
+            
+            lastUpdateInterval = setInterval(() => {
+                updateSeconds++;
+                const el = document.getElementById("lastUpdated");
+                if (el) {
+                    el.innerText = `Last updated: ${updateSeconds}s ago`;
+                }
+            }, 1000);
         }
     </script>
     <nav class="bottom-nav-mobile" aria-label="Mobile navigation">

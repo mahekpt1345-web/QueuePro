@@ -786,7 +786,7 @@
             <div class="card" id="serving-section">
                 <div class="card-header">
                     <h2>Queue Management</h2>
-                    <p>Control queue operations</p>
+                    <p>Control queue operations <span id="lastUpdated" style="font-size: 0.8rem; color: var(--gray-600); margin-left: 10px; font-weight: normal;"></span></p>
                 </div>
                 <div class="card-content">
                     <div class="queue-controls">
@@ -933,6 +933,7 @@
                     return res.json();
                 })
                 .then(data => {
+                    updateLastUpdated();
                     console.log('[OFFICER] Pending tokens response:', data);
                     if (!data.success) {
                         console.error('[OFFICER] API returned success=false:', data.message);
@@ -1346,6 +1347,29 @@
                     officerMobileMenuBtn.classList.remove('active');
                 }
             });
+        }
+
+        /**
+         * Real-time "Last Updated" Indicator
+         */
+        let updateSeconds = 0;
+        let lastUpdateInterval = null;
+
+        function updateLastUpdated() {
+            updateSeconds = 0;
+            const element = document.getElementById("lastUpdated");
+            if (!element) return;
+            element.innerText = "Last updated: just now";
+            
+            if (lastUpdateInterval) clearInterval(lastUpdateInterval);
+            
+            lastUpdateInterval = setInterval(() => {
+                updateSeconds++;
+                const el = document.getElementById("lastUpdated");
+                if (el) {
+                    el.innerText = `Last updated: ${updateSeconds}s ago`;
+                }
+            }, 1000);
         }
     </script>
     <nav class="bottom-nav-mobile" aria-label="Mobile navigation">

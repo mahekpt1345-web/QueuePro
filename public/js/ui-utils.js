@@ -22,25 +22,39 @@ class UIUtils {
     }
 
     static showNotification(message) {
-        const box = document.createElement("div");
-        box.innerText = message;
+        const notification = document.createElement("div");
+        notification.innerText = message;
         
-        box.style.position = "fixed";
-        box.style.top = "20px";
-        box.style.right = "20px";
-        box.style.background = "#3b82f6";
-        box.style.color = "#fff";
-        box.style.padding = "12px 16px";
-        box.style.borderRadius = "8px";
-        box.style.zIndex = "9999";
-        box.style.boxShadow = "0 5px 15px rgba(0,0,0,0.2)";
-        box.style.transition = "opacity 0.3s ease";
+        notification.style.position = "fixed";
+        notification.style.top = "20px";
+        notification.style.right = "20px";
+        notification.style.background = "#3b82f6";
+        notification.style.color = "#fff";
+        notification.style.padding = "12px 16px";
+        notification.style.borderRadius = "8px";
+        notification.style.zIndex = "9999";
+        notification.style.opacity = "0";
+        notification.style.transform = "translateY(-10px)";
+        notification.style.transition = "all 0.3s ease";
+        notification.style.boxShadow = "0 5px 15px rgba(0,0,0,0.2)";
         
-        document.body.appendChild(box);
+        document.body.appendChild(notification);
         
+        // Animate in
         setTimeout(() => {
-            box.style.opacity = "0";
-            setTimeout(() => box.remove(), 300);
+            notification.style.opacity = "1";
+            notification.style.transform = "translateY(0)";
+        }, 100);
+        
+        // Play sound
+        const audio = new Audio("notification.mp3");
+        audio.play().catch(() => {});
+        
+        // Remove after 4 sec
+        setTimeout(() => {
+            notification.style.opacity = "0";
+            notification.style.transform = "translateY(-10px)";
+            setTimeout(() => notification.remove(), 300);
         }, 4000);
     }
 
