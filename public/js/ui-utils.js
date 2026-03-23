@@ -47,8 +47,24 @@ class UIUtils {
         }, 100);
         
         // Play sound
+        const playFallbackSound = () => {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.frequency.value = 660;
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+                osc.start(); osc.stop(ctx.currentTime + 0.5);
+            } catch (e) { /* AudioContext not supported */ }
+        };
+
         const audio = new Audio("notification.mp3");
-        audio.play().catch(() => {});
+        audio.play().catch(() => {
+            // If mp3 fails (missing/blocked), use synthesized fallback
+            playFallbackSound();
+        });
         
         // Remove after 4 sec
         setTimeout(() => {
