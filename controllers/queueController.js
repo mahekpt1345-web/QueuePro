@@ -63,8 +63,9 @@ exports.createToken = async (req, res) => {
 // ─────────────────────────────────────────────
 exports.myTokens = async (req, res) => {
     try {
-        if (req.user._id === 'admin_001') return res.json({ success: true, message: 'Admin session (no tokens)', data: [] });
-        const tokens = await Token.find({ userId: req.user.userId }).sort({ createdAt: -1 });
+        const mongoose = require('mongoose');
+        const query = mongoose.Types.ObjectId.isValid(req.user.userId) ? { userId: req.user.userId } : { _id: null };
+        const tokens = await Token.find(query).sort({ createdAt: -1 });
         res.json({ success: true, message: `Found ${tokens.length} tokens`, data: tokens });
     } catch (error) {
         console.error('Error fetching tokens:', error);
@@ -248,7 +249,7 @@ exports.skipToken = async (req, res) => {
             ip: req.ip, get: (header) => req.get(header)
         });
 
-        await emitQueueUpdate(req);
+        await queueService.emitQueueUpdate(req.app.get('io'));
 
         res.json({ success: true, message: `Token ${token.tokenId} returned to pending queue`, data: token });
     } catch (error) {
@@ -277,7 +278,7 @@ exports.startServing = async (req, res) => {
             ip: req.ip, get: (header) => req.get(header)
         });
 
-        await emitQueueUpdate(req);
+        await queueService.emitQueueUpdate(req.app.get('io'));
 
         res.json({ success: true, message: 'Token status updated to serving', data: token });
     } catch (error) {
@@ -304,7 +305,7 @@ exports.completeTokenLegacy = async (req, res) => {
             ip: req.ip, get: (header) => req.get(header)
         });
 
-        await emitQueueUpdate(req);
+        await queueService.emitQueueUpdate(req.app.get('io'));
 
         res.json({ success: true, message: 'Token marked as completed', data: token });
     } catch (error) {
@@ -371,8 +372,9 @@ exports.officerStats = async (req, res) => {
 // ─────────────────────────────────────────────
 exports.officerActivity = async (req, res) => {
     try {
-        if (req.user.userId === 'admin_001') return res.json({ success: true, data: [] });
-        const logs = await ActivityLog.find({ userId: req.user.userId })
+        const mongoose = require('mongoose');
+        const query = mongoose.Types.ObjectId.isValid(req.user.userId) ? { userId: req.user.userId } : { _id: null };
+        const logs = await ActivityLog.find(query)
             .sort({ createdAt: -1 })
             .limit(10)
             .lean();
@@ -388,18 +390,14 @@ exports.officerActivity = async (req, res) => {
 // ─────────────────────────────────────────────
 exports.citizenStats = async (req, res) => {
     try {
+        const mongoose = require('mongoose');
         const userId = req.user.userId;
-        if (userId === 'admin_001') {
-            return res.json({
-                success: true,
-                data: { total: 0, completed: 0, pending: 0, avgWaitTime: 0, tokens: [] }
-            });
-        }
+        const query = mongoose.Types.ObjectId.isValid(userId) ? { userId } : { _id: null };
 
         const [allTokens, completed, pending] = await Promise.all([
-            Token.find({ userId }).select('status actualWaitTime createdAt completedAt serviceType tokenId').lean(),
-            Token.countDocuments({ userId, status: 'completed' }),
-            Token.countDocuments({ userId, status: { $in: ['pending', 'serving'] } })
+            Token.find(query).select('status actualWaitTime createdAt completedAt serviceType tokenId').lean(),
+            Token.countDocuments({ ...query, status: 'completed' }),
+            Token.countDocuments({ ...query, status: { $in: ['pending', 'serving'] } })
         ]);
 
         const completedTokens = allTokens.filter(t => t.status === 'completed' && t.actualWaitTime != null);
@@ -449,10 +447,11 @@ exports.getOfficerTokens = async (req, res) => {
 // ─────────────────────────────────────────────
 exports.getCitizenTokens = async (req, res) => {
     try {
+        const mongoose = require('mongoose');
         const userId = req.user.userId;
-        if (userId === 'admin_001') return res.json({ success: true, message: 'Admin session (no tokens)', data: [] });
+        const query = mongoose.Types.ObjectId.isValid(userId) ? { userId } : { _id: null };
         
-        const tokens = await Token.find({ userId })
+        const tokens = await Token.find(query)
             .select('_id tokenId userId userName serviceType description status createdAt completedAt actualWaitTime cancelReason')
             .sort({ createdAt: -1 })
             .lean();
@@ -474,12 +473,13 @@ exports.getCitizenTokens = async (req, res) => {
 // ─────────────────────────────────────────────
 exports.getUserActivity = async (req, res) => {
     try {
+        const mongoose = require('mongoose');
         const userId = req.user.userId;
-        if (userId === 'admin_001') return res.json({ success: true, message: 'Admin session (no logs)', data: [] });
+        const query = mongoose.Types.ObjectId.isValid(userId) ? { userId } : { _id: null };
         
         const limit = req.query.limit ? parseInt(req.query.limit) : 50;
         
-        const logs = await ActivityLog.find({ userId })
+        const logs = await ActivityLog.find(query)
             .select('_id userId username userRole action details resourceType status createdAt')
             .sort({ createdAt: -1 })
             .limit(limit)

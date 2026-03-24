@@ -38,7 +38,7 @@ exports.getUsers = async (req, res) => {
 exports.adminGetUsers = async (req, res) => {
     try {
         const users = await adminService.getUsers(req.user.userId);
-        return res.json({ success: true, data: users });
+        return res.json({ success: true, users });
     } catch (err) {
         console.error('GET /api/admin/users error:', err);
         return res.status(500).json({ success: false, message: 'Failed to fetch users' });

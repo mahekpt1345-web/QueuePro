@@ -149,6 +149,26 @@ class QueueService {
     }
 
     /**
+     * Complete a token
+     */
+    async completeToken(tokenId, officer, ip, userAgent) {
+        let token = tokenId.length === 24 ? await Token.findById(tokenId) : await Token.findOne({ tokenId });
+        if (!token) throw new Error('Token not found');
+        if (token.status !== 'serving') throw new Error(`Token must be in serving status. Current: ${token.status}`);
+
+        token.status = 'completed';
+        token.completedAt = new Date();
+        await token.save();
+
+        await logActivity('COMPLETE_TOKEN', `Completed ${token.tokenId}`, 'TOKEN', officer.userId, 'success', null, {
+            user: { _id: officer.userId, username: officer.username, role: officer.role },
+            ip, get: (h) => userAgent[h]
+        });
+
+        return token;
+    }
+
+    /**
      * Get queue statistics
      */
     async getStatistics() {

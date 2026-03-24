@@ -1737,13 +1737,18 @@
             // Users strip
             fetch('/api/admin/users', { credentials: 'include' })
                 .then(r => r.json()).then(d => {
+                    console.log("USERS DATA:", d);
                     if (!d.success) return;
-                    document.getElementById('totalUsers').textContent = d.data.length;
-                    var citizens = d.data.filter(function (u) { return u.role === 'citizen'; }).length;
-                    var officers = d.data.filter(function (u) { return u.role === 'officer'; }).length;
+                    const users = d.users || [];
+                    if (!users.length) {
+                        console.log("No users returned");
+                    }
+                    document.getElementById('totalUsers').textContent = users.length;
+                    var citizens = users.filter(function (u) { return u.role === 'citizen'; }).length;
+                    var officers = users.filter(function (u) { return u.role === 'officer'; }).length;
                     document.getElementById('qa_citizens').textContent = citizens;
                     document.getElementById('qa_officers').textContent = officers;
-                }).catch(() => { });
+                }).catch((err) => { console.error("Users load error:", err); });
 
             // Recent tokens list
             var container = document.getElementById('qa_recentTokens');
@@ -1888,7 +1893,7 @@
             fetch('/api/admin/users', { credentials: 'include' })
                 .then(r => r.json()).then(d => {
                     if (!d.success) { document.getElementById('usersList').innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>Failed to load users</p></div>'; return; }
-                    const users = d.data;
+                    const users = d.users || [];
                     document.getElementById('usersList').innerHTML = users.length ? users.map(u => `
                     <div class="user-item" id="user-${u._id}">
                         <div class="item-header">
@@ -1990,7 +1995,8 @@
         function performBackup() {
             showToast('Collecting backup data...', 'success');
             fetch('/api/admin/users', { credentials: 'include' }).then(r => r.json()).then(d => {
-                const backup = { exportedAt: new Date().toISOString(), totalUsers: (d.data || []).length, users: d.data || [] };
+                const users = d.users || [];
+                const backup = { exportedAt: new Date().toISOString(), totalUsers: users.length, users: users };
                 const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob); const a = document.createElement('a');
                 a.href = url; a.download = 'queuepro-backup-' + new Date().toISOString().slice(0, 10) + '.json'; a.click();
