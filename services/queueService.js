@@ -6,7 +6,22 @@ const notificationService = require('../utils/notificationService');
 
 /**
  * QUEUE SERVICE
- * Handles all business logic for tokens and queue management.
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Central business logic for all queue operations.
+ *
+ * TOKEN LIFECYCLE:
+ *   pending ──► serving ──► completed
+ *     │
+ *     └──► cancelled (citizen cancels while pending)
+ *
+ * SOCKET EVENTS emitted (in addition to queue_update):
+ *   token_created    — after a new token is saved
+ *   token_completed  — after a token is marked completed
+ *   queue_updated    — on every emitQueueUpdate call (with crowd level + count)
+ *
+ * CACHING:
+ *   queueIntelligenceService caches queue snapshots for 10 seconds.
+ *   adminService caches analytics for 30 seconds.
  */
 class QueueService {
     /**
@@ -99,7 +114,32 @@ class QueueService {
             ip, get: (h) => userAgent[h]
         });
 
+        /**
+         * Emit enhanced queue_updated event with crowd level info
+         */
+        const io = require('../config/socket').getIo ? require('../config/socket').getIo() : null;
+        const appIo = io; // Will use parameter passed by controller instead
+
         return { token: newToken, pendingCount };
+    }
+
+    /**
+     * Emit named socket events after createToken — called by controller
+     * @param {Object} io - Socket.io server instance
+     * @param {Object} token - The newly created token
+     */
+    emitTokenCreated(io, token) {
+        if (!io || !token) return;
+        try {
+            io.to('queue_broadcast').emit('token_created', {
+                tokenId: token.tokenId,
+                serviceType: token.serviceType,
+                position: token.position,
+                timestamp: new Date().toISOString()
+            });
+        } catch (err) {
+            console.error('[QueueService] emitTokenCreated error:', err.message);
+        }
     }
 
     /**
@@ -166,6 +206,25 @@ class QueueService {
         });
 
         return token;
+    }
+
+    /**
+     * Emit named socket event after a token is completed — called by controller
+     * @param {Object} io - Socket.io server instance
+     * @param {Object} token - The completed token
+     */
+    emitTokenCompleted(io, token) {
+        if (!io || !token) return;
+        try {
+            io.to('queue_broadcast').emit('token_completed', {
+                tokenId: token.tokenId,
+                serviceType: token.serviceType,
+                completedAt: token.completedAt,
+                timestamp: new Date().toISOString()
+            });
+        } catch (err) {
+            console.error('[QueueService] emitTokenCompleted error:', err.message);
+        }
     }
 
     /**

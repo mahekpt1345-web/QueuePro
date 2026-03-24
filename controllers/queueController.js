@@ -569,3 +569,61 @@ exports.saveUserPrefs = async (req, res) => {
         res.status(500).json({ success: false, message: 'Failed to save user preferences' });
     }
 };
+
+// ─────────────────────────────────────────────
+// GET /api/queue/my-position  (citizen)
+// Returns the citizen's live queue position + ETA for their pending token.
+// Uses queueIntelligenceService (cached, non-blocking).
+// ─────────────────────────────────────────────
+exports.getMyPosition = async (req, res) => {
+    try {
+        const queueIntelligence = require('../services/queueIntelligenceService');
+        const mongoose = require('mongoose');
+        const userId = req.user.userId;
+
+        // Find the citizen's most recent pending token
+        const query = mongoose.Types.ObjectId.isValid(userId)
+            ? { userId, status: 'pending' }
+            : { _id: null }; // admin_001 safe fallback
+
+        const myToken = await Token.findOne(query).sort({ createdAt: -1 }).lean();
+
+        if (!myToken) {
+            return res.json({
+                success: true,
+                message: 'No pending token found',
+                data: null
+            });
+        }
+
+        const positionData = await queueIntelligence.getTokenPosition(
+            myToken._id.toString(),
+            userId
+        );
+
+        return res.json({
+            success: true,
+            message: positionData ? 'Position retrieved' : 'Token not in queue',
+            data: positionData
+        });
+    } catch (error) {
+        console.error('[MY POSITION] Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to get queue position' });
+    }
+};
+
+// ─────────────────────────────────────────────
+// GET /api/queue/stats  (public — no auth required)
+// Returns a real-time public queue snapshot.
+// Uses queueIntelligenceService (cached, non-blocking).
+// ─────────────────────────────────────────────
+exports.getPublicStats = async (req, res) => {
+    try {
+        const queueIntelligence = require('../services/queueIntelligenceService');
+        const snapshot = await queueIntelligence.getQueueSnapshot();
+        return res.json({ success: true, data: snapshot });
+    } catch (error) {
+        console.error('[PUBLIC STATS] Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch queue stats' });
+    }
+};

@@ -40,4 +40,10 @@ router.get('/user-activity',  verifyToken,                                  queu
 router.get('/user-prefs',     verifyToken,                                  queueController.getUserPrefs);
 router.post('/user-prefs',    verifyToken,                                  queueController.saveUserPrefs);
 
+// ── Smart Queue Intelligence (NEW - Additive Only) ──────────────────
+// These endpoints do NOT replace any existing endpoint.
+// They call queueIntelligenceService which uses a short TTL cache.
+router.get('/my-position',    verifyToken,                                  queueController.getMyPosition);
+router.get('/stats',          queueController.getPublicStats);  // No auth — public snapshot
+
 module.exports = router;

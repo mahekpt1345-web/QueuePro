@@ -21,6 +21,13 @@ const config = {
     queue: {
         maxPendingTokens: 100,
         cleanupSchedule: '0 0 * * *', // Every day at midnight
+        crowdThresholdModerate: 10,   // pending > this → "Moderate"
+        crowdThresholdHigh: 25,       // pending > this → "High"
+    },
+    cache: {
+        analyticsTtl: 30,     // seconds — admin analytics cache
+        intelligenceTtl: 10,  // seconds — queue position/snapshot cache
+        sweepIntervalMs: 60_000, // ms — how often stale entries are evicted
     },
     logging: {
         level: process.env.LOG_LEVEL || 'info',
