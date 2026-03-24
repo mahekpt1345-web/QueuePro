@@ -211,6 +211,9 @@ exports.getProfileActivity = async (req, res) => {
         // Admins can see everything
         if (req.user.role !== 'admin') {
             query.userId = req.user.userId;
+        } else if (req.user.userId === 'admin_001') {
+            // Hardcoded admin doesn't filter by userId as it would crash BSON
+            // They see all logs by default if no other filters
         }
 
         const logs = await ActivityLog.find(query)

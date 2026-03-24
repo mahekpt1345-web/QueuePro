@@ -54,9 +54,7 @@ const checkRole = (roles = []) => {
     };
 };
 
-/**
- * Middleware to check if user is authenticated (for EJS pages)
- */
+// Middleware to check if user is authenticated (for EJS pages)
 const ensureAuthenticated = async (req, res, next) => {
     try {
         const publicRoutes = [
@@ -75,36 +73,27 @@ const ensureAuthenticated = async (req, res, next) => {
             user: req.user ? 'exists' : 'missing'
         });
 
-        // Skip auth for public routes (normalized)
+        // 1. Skip auth for public routes (normalized)
         if (publicRoutes.includes(normalizedPath)) {
             return next();
         }
 
-        // Fail-safe for /login if already authenticated
-        if (normalizedPath === '/login' && req.user) {
+        // 2. TRUST loadUser: If already decoded & verified by loadUser → proceed
+        if (req.user) {
             return next();
         }
 
-        const token = req.headers.authorization?.split(' ')[1] || req.cookies?.token;
-
-        if (!token) {
-            if (normalizedPath === '/login') return next();
-            return res.redirect('/login?error=auth_required');
+        // 3. Fail-safe: If no user and not on login page → redirect to login
+        if (normalizedPath !== '/login') {
+            console.log("[NO USER - REDIRECTING]", normalizedPath);
+            return res.redirect('/login');
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'queuepro_secret_2024');
-        const user = await User.findById(decoded.userId);
-
-        if (!user) {
-            return res.redirect('/login?error=auth_required');
-        }
-
-        req.user = user;
-        res.locals.user = user;
         next();
     } catch (error) {
+        console.log('[AUTH ERROR]', error.message);
         if (req.path === '/login') return next();
-        return res.redirect('/login?error=invalid_token');
+        return res.redirect('/login');
     }
 };
 
@@ -144,12 +133,14 @@ const logActivity = async (action, details = '', resourceType = null, resourceId
     try {
         if (!req.user) return;
 
+        // BSON Safety: If ID is not a valid ObjectId, don't try to save it in a strict field if it exists
+        // Here we just ensure we don't crash the log if the userId is a string like 'admin_001'
         const activity = new ActivityLog({
-            userId: req.user._id || req.user.id,
+            userId: /^[0-9a-fA-F]{24}$/.test(req.user._id || req.user.id) ? (req.user._id || req.user.id) : null,
             username: req.user.username,
             userRole: req.user.role,
             action,
-            details,
+            details: details || `User ID: ${req.user._id || req.user.id}`,
             resourceType,
             resourceId,
             status,
@@ -193,16 +184,33 @@ const activityLogger = (action, resourceType = null) => {
 
 /**
  * Global User Loader (Optional)
- * Attaches decoded JWT user to req.user for every request if token exists.
- * Does not block if token is missing.
+ * Attaches verified database user to req.user for every request if token exists.
+ * Does not block if token is missing or invalid.
  */
-const loadUser = (req, res, next) => {
+const loadUser = async (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1] || req.cookies?.token;
     if (token) {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET || 'queuepro_secret_2024');
-            req.user = decoded;
-            res.locals.user = decoded;
+            
+            let user = null;
+            if (decoded.userId && /^[0-9a-fA-F]{24}$/.test(decoded.userId)) {
+                user = await User.findById(decoded.userId).select('-password');
+            }
+            // HANDLE HARDCODED ADMIN (admin_001)
+            if (!user && decoded.userId === 'admin_001') {
+                user = {
+                    _id: 'admin_001',
+                    userId: 'admin_001',
+                    username: 'mahek',
+                    role: 'admin',
+                    name: 'System Admin'
+                };
+            }
+            if (user) {
+                req.user = user;
+                res.locals.user = user;
+            }
         } catch (error) {
             // invalid token — continue without user
         }

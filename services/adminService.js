@@ -32,6 +32,8 @@ class AdminService {
      * Get all users
      */
     async getUsers(currentAdminId) {
+        if (currentAdminId === 'admin_001') return [];
+        
         return await User.find({ _id: { $ne: currentAdminId } })
             .select('-password')
             .sort({ createdAt: -1 })

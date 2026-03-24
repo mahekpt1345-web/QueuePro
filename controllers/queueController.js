@@ -63,6 +63,7 @@ exports.createToken = async (req, res) => {
 // ─────────────────────────────────────────────
 exports.myTokens = async (req, res) => {
     try {
+        if (req.user._id === 'admin_001') return res.json({ success: true, message: 'Admin session (no tokens)', data: [] });
         const tokens = await Token.find({ userId: req.user.userId }).sort({ createdAt: -1 });
         res.json({ success: true, message: `Found ${tokens.length} tokens`, data: tokens });
     } catch (error) {
@@ -370,6 +371,7 @@ exports.officerStats = async (req, res) => {
 // ─────────────────────────────────────────────
 exports.officerActivity = async (req, res) => {
     try {
+        if (req.user.userId === 'admin_001') return res.json({ success: true, data: [] });
         const logs = await ActivityLog.find({ userId: req.user.userId })
             .sort({ createdAt: -1 })
             .limit(10)
@@ -387,6 +389,13 @@ exports.officerActivity = async (req, res) => {
 exports.citizenStats = async (req, res) => {
     try {
         const userId = req.user.userId;
+        if (userId === 'admin_001') {
+            return res.json({
+                success: true,
+                data: { total: 0, completed: 0, pending: 0, avgWaitTime: 0, tokens: [] }
+            });
+        }
+
         const [allTokens, completed, pending] = await Promise.all([
             Token.find({ userId }).select('status actualWaitTime createdAt completedAt serviceType tokenId').lean(),
             Token.countDocuments({ userId, status: 'completed' }),
@@ -441,6 +450,7 @@ exports.getOfficerTokens = async (req, res) => {
 exports.getCitizenTokens = async (req, res) => {
     try {
         const userId = req.user.userId;
+        if (userId === 'admin_001') return res.json({ success: true, message: 'Admin session (no tokens)', data: [] });
         
         const tokens = await Token.find({ userId })
             .select('_id tokenId userId userName serviceType description status createdAt completedAt actualWaitTime cancelReason')
@@ -465,6 +475,8 @@ exports.getCitizenTokens = async (req, res) => {
 exports.getUserActivity = async (req, res) => {
     try {
         const userId = req.user.userId;
+        if (userId === 'admin_001') return res.json({ success: true, message: 'Admin session (no logs)', data: [] });
+        
         const limit = req.query.limit ? parseInt(req.query.limit) : 50;
         
         const logs = await ActivityLog.find({ userId })
@@ -491,6 +503,13 @@ exports.getUserActivity = async (req, res) => {
 exports.getUserPrefs = async (req, res) => {
     try {
         const User = require('../models/User');
+        if (req.user.userId === 'admin_001') {
+             return res.json({
+                success: true,
+                message: 'Admin session (default prefs)',
+                data: { emailNotif: true, queueNotif: true, announceNotif: true, promoNotif: false }
+            });
+        }
         const user = await User.findById(req.user.userId).select('preferences').lean();
         
         const prefs = user?.preferences || {
@@ -520,6 +539,9 @@ exports.saveUserPrefs = async (req, res) => {
         const User = require('../models/User');
         const { emailNotif, queueNotif, announceNotif, promoNotif } = req.body;
         
+        if (req.user.userId === 'admin_001') {
+            return res.json({ success: true, message: 'Preferences saved (Admin Local Only)' });
+        }
         const user = await User.findById(req.user.userId);
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 

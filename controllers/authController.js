@@ -49,7 +49,12 @@ exports.apiLogin = async (req, res) => {
         // Update last login
         await User.updateOne({ _id: user.id }, { $set: { lastLogin: new Date() } });
 
-        res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+        res.cookie('token', token, { 
+            httpOnly: true, 
+            maxAge: 24 * 60 * 60 * 1000,
+            secure: false, // Ensure cookie is sent over HTTP/HTTPS proxy
+            sameSite: 'lax'
+        });
 
         await logActivity('LOGIN', `User logged in as ${user.role}`, 'USER', user.id, 'success', null, {
             user: { _id: user.id, username: user.username, role: user.role },
@@ -82,7 +87,12 @@ exports.apiAdminLogin = async (req, res) => {
             await User.updateOne({ _id: user.id }, { $set: { lastLogin: new Date() } });
         }
 
-        res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+        res.cookie('token', token, { 
+            httpOnly: true, 
+            maxAge: 24 * 60 * 60 * 1000,
+            secure: false, // Ensure cookie is sent over HTTP/HTTPS proxy
+            sameSite: 'lax'
+        });
 
         await logActivity('ADMIN_LOGIN', 'Admin logged in', 'USER', user.id || user._id, 'success', null, {
             user: { _id: user.id || user._id, username: user.username, role: 'admin' },
@@ -103,8 +113,16 @@ exports.apiMe = async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1] || req.cookies?.token;
         if (!token) return res.status(401).json({ success: false, message: 'No token provided' });
+        
         const decoded = jwt.verify(token, config.auth.jwtSecret);
-        const user = await User.findById(decoded.userId).select('-password');
+        
+        let user = null;
+        if (decoded.userId && /^[0-9a-fA-F]{24}$/.test(decoded.userId)) {
+            user = await User.findById(decoded.userId).select('-password');
+        } else if (decoded.userId === 'admin_001') {
+            user = { _id: 'admin_001', username: 'mahek', role: 'admin', name: 'System Admin' };
+        }
+
         if (!user) return res.status(401).json({ success: false, message: 'User not found' });
         return res.json({ success: true, user: user.toObject ? user.toObject() : user });
     } catch (error) {
@@ -269,7 +287,12 @@ exports.postLogin = async (req, res) => {
             { userId: user._id, username: user.username, role: user.role, name: user.name, email: user.email },
             config.auth.jwtSecret, { expiresIn: '24h' }
         );
-        res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+        res.cookie('token', token, { 
+            httpOnly: true, 
+            maxAge: 24 * 60 * 60 * 1000,
+            secure: false, // Ensure cookie is sent over HTTP/HTTPS proxy
+            sameSite: 'lax'
+        });
 
         // Handle "Remember Me"
         if (req.body.rememberMe === 'on' || req.body.rememberMe === true) {
@@ -341,7 +364,12 @@ exports.postAdminLogin = async (req, res) => {
             { userId: admin._id, username: admin.username, role: 'admin', name: admin.name, email: admin.email },
             config.auth.jwtSecret, { expiresIn: '24h' }
         );
-        res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+        res.cookie('token', token, { 
+            httpOnly: true, 
+            maxAge: 24 * 60 * 60 * 1000,
+            secure: false, // Ensure cookie is sent over HTTP/HTTPS proxy
+            sameSite: 'lax'
+        });
 
         await logActivity('ADMIN_LOGIN', 'Admin logged in', 'USER', admin._id, 'success', null, {
             user: { _id: admin._id, username: admin.username, role: 'admin' }, ip: req.ip, get: (h) => req.get(h)
