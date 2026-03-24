@@ -1,11 +1,11 @@
-/**
- * REQUEST LOGGER
- * Simple logging for every incoming request.
- */
-
 const morgan = require('morgan');
 
-// Custom format: method path status response-time ms
-const logger = morgan(':method :url :status :response-time ms');
+// Custom token for request ID
+morgan.token('id', (req) => req.id || 'initial');
+
+// Custom format: [:id] :method :url :status :response-time ms - :res[content-length]
+const format = '[:id] :method :url :status :response-time ms - :res[content-length]';
+
+const logger = morgan(format);
 
 module.exports = logger;

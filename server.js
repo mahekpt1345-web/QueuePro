@@ -12,11 +12,25 @@ const connectDB = require('./config/database');
 const sessionConfig = require('./config/session');
 const setupSocket = require('./config/socket');
 const logger = require('./middleware/logger');
+const requestId = require('./middleware/requestId');
 const { errorHandler } = require('./middleware/errorHandler');
 const { loadUser } = require('./middleware/auth');
 
+const { initTokenCleanup } = require('./jobs/tokenCleanup');
+
 const app = express();
 const server = http.createServer(app);
+
+// Initialize Background Jobs
+initTokenCleanup();
+
+// Trust proxy for rate limiting if behind a proxy
+app.set('trust proxy', 1);
+
+// Standard Middlewares
+app.use(requestId);
+app.use(logger);
+app.use(express.json());
 const io = new Server(server, {
     cors: { origin: '*', methods: ['GET', 'POST'] }
 });

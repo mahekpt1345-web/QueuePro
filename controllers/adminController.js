@@ -17,6 +17,7 @@ let QRCode;
 try { QRCode = require('qrcode'); } catch (e) { QRCode = null; }
 const SystemConfig = require('../models/SystemConfig');
 const { logActivity } = require('../middleware/auth');
+const adminService = require('../services/adminService');
 const response = require('../utils/response');
 
 // ─────────────────────────────────────────────
@@ -24,7 +25,7 @@ const response = require('../utils/response');
 // ─────────────────────────────────────────────
 exports.getUsers = async (req, res) => {
     try {
-        const users = await User.find().select('-password').sort({ createdAt: -1 });
+        const users = await adminService.getUsers(req.user.userId);
         return res.json({ success: true, users });
     } catch (err) {
         return res.status(500).json({ success: false, message: 'Failed to fetch users' });
@@ -36,7 +37,7 @@ exports.getUsers = async (req, res) => {
 // ─────────────────────────────────────────────
 exports.adminGetUsers = async (req, res) => {
     try {
-        const users = await User.find().select('-password').sort({ createdAt: -1 });
+        const users = await adminService.getUsers(req.user.userId);
         return res.json({ success: true, data: users });
     } catch (err) {
         console.error('GET /api/admin/users error:', err);
@@ -50,21 +51,20 @@ exports.adminGetUsers = async (req, res) => {
 exports.deleteUser = async (req, res) => {
     try {
         const { userId } = req.params;
-        const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-        if (user.role === 'admin') return res.status(403).json({ success: false, message: 'Cannot delete admin accounts' });
+        await adminService.deleteUser(userId);
 
-        await User.findByIdAndDelete(userId);
-
-        await logActivity('DELETE_USER', `User ${user.username} deleted by admin`, 'USER', userId, 'success', null, {
+        await logActivity('DELETE_USER', `Account ID: ${userId} deleted by admin`, 'USER', userId, 'success', null, {
             user: { _id: req.user.userId, username: req.user.username, role: 'admin' },
             ip: req.ip, get: (h) => req.get(h)
         });
 
-        return res.json({ success: true, message: `User "${user.username}" deleted successfully` });
+        return res.json({ success: true, message: `User deleted successfully` });
     } catch (err) {
-        console.error('DELETE /api/admin/users/:userId error:', err);
-        return res.status(500).json({ success: false, message: 'Failed to delete user' });
+        console.error('DELETE /api/admin/users/:userId error:', err.message);
+        return res.status(err.message.includes('not found') ? 404 : 403).json({ 
+            success: false, 
+            message: err.message 
+        });
     }
 };
 
@@ -101,38 +101,10 @@ exports.createUser = async (req, res) => {
 // ─────────────────────────────────────────────
 exports.getAnalytics = async (req, res) => {
     try {
-        const now = new Date();
-        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-        const [
-            totalTokens, todayTokens, pending, serving, completed, cancelled,
-            byService, dailyLast7, completedWithTime
-        ] = await Promise.all([
-            Token.countDocuments(),
-            Token.countDocuments({ createdAt: { $gte: todayStart } }),
-            Token.countDocuments({ status: 'pending' }),
-            Token.countDocuments({ status: 'serving' }),
-            Token.countDocuments({ status: 'completed' }),
-            Token.countDocuments({ status: 'cancelled' }),
-            Token.aggregate([
-                { $group: { _id: '$serviceType', count: { $sum: 1 } } },
-                { $sort: { count: -1 } }
-            ]),
-            Token.aggregate([
-                { $match: { createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } } },
-                { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } }, count: { $sum: 1 } } },
-                { $sort: { _id: 1 } }
-            ]),
-            Token.find({ status: { $in: ['completed', 'serving'] }, actualWaitTime: { $ne: null } }).select('actualWaitTime').lean()
-        ]);
-
-        const avgWaitTime = completedWithTime.length
-            ? Math.round(completedWithTime.reduce((s, t) => s + t.actualWaitTime, 0) / completedWithTime.length)
-            : null;
-
+        const analytics = await adminService.getAnalytics();
         return res.json({
             success: true,
-            data: { totalTokens, todayTokens, pending, serving, completed, cancelled, avgWaitTime, byService, dailyLast7 }
+            data: analytics
         });
     } catch (err) {
         console.error('GET /api/admin/analytics error:', err);

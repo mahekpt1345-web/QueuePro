@@ -13,58 +13,25 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { logActivity } = require('../middleware/auth');
 const response = require('../utils/response');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'queuepro_secret_2024';
+const authService = require('../services/authService');
+const config = require('../config');
 
 // ─────────────────────────────────────────────
 // API: POST /api/auth/register
 // ─────────────────────────────────────────────
 exports.apiRegister = async (req, res) => {
     try {
-        const { username, email, phone, fullName, password, confirmPassword, role } = req.body;
-        if (!username || !email || !phone || !fullName || !password || !role)
-            return res.status(400).json({ success: false, message: 'All fields are required' });
-        if (password !== confirmPassword)
-            return res.status(400).json({ success: false, message: 'Passwords do not match' });
-        if (password.length < 6)
-            return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+        const newUser = await authService.register(req.body);
 
-        const existingUser = await User.findOne({ $or: [{ username }, { email }, { phone }] });
-        if (existingUser) {
-            let msg = 'User already exists';
-            if (existingUser.username === username) msg = 'Username already taken';
-            else if (existingUser.email === email) msg = 'Email already registered';
-            else if (existingUser.phone === phone) msg = 'Phone number already registered';
-            return res.status(400).json({ success: false, message: msg });
-        }
-
-        const newUser = new User({
-            username, email, phone, name: fullName, password,
-            role: role === 'citizen' || role === 'officer' ? role : 'citizen'
+        await logActivity('REGISTER', `New ${newUser.role} account created`, 'USER', newUser._id, 'success', null, {
+            user: { _id: newUser._id, username: newUser.username, role: newUser.role },
+            ip: req.ip, get: (h) => req.get(h)
         });
-        await newUser.save();
-
-        // Safe logging - don't let logging failure break registration
-        try {
-            await logActivity('REGISTER', `New ${newUser.role} account created`, 'USER', newUser._id, 'success', null, {
-                user: { _id: newUser._id, username, role: newUser.role },
-                ip: req.ip, get: (h) => req.get(h)
-            });
-        } catch (logErr) {
-            console.error('Registration logging failed:', logErr.message);
-        }
 
         return response.success(res, 'Account created successfully! You can now login.');
     } catch (error) {
-        console.error('API register error:', error);
-
-        // Return specific Mongoose validation errors if available
-        if (error.name === 'ValidationError') {
-            const messages = Object.values(error.errors).map(val => val.message);
-            return res.status(400).json({ success: false, message: messages.join(', ') });
-        }
-
-        return res.status(500).json({ success: false, message: 'Registration failed: ' + error.message });
+        console.error('API register error:', error.message);
+        return response.error(res, error.message || 'Registration failed', 400);
     }
 };
 
@@ -75,45 +42,24 @@ exports.apiLogin = async (req, res) => {
     try {
         const { username, password } = req.body;
         if (!username || !password)
-            return res.status(400).json({ success: false, message: 'Username/Phone and password are required' });
+            return response.error(res, 'Username/Phone and password are required', 400);
 
-        // Allow login by username or phone
-        const user = await User.findOne({
-            $or: [{ username: username }, { phone: username }]
-        });
-        if (!user) return res.status(401).json({ success: false, message: 'Invalid credentials' });
+        const { token, user } = await authService.login(username, password);
 
-        const isPasswordValid = await user.comparePassword(password);
-        if (!isPasswordValid) return res.status(401).json({ success: false, message: 'Invalid username or password' });
-
-        await User.updateOne({ _id: user._id }, { $set: { lastLogin: new Date() } });
-
-        const token = jwt.sign(
-            { userId: user._id, username: user.username, role: user.role, name: user.name, email: user.email },
-            JWT_SECRET, { expiresIn: '24h' }
-        );
+        // Update last login
+        await User.updateOne({ _id: user.id }, { $set: { lastLogin: new Date() } });
 
         res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
 
-        // Handle "Remember Me"
-        if (req.body.rememberMe) {
-            res.cookie('remembered_user', user.username || username, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
-        } else {
-            res.clearCookie('remembered_user');
-        }
-
-        await logActivity('LOGIN', `User logged in as ${user.role}`, 'USER', user._id, 'success', null, {
-            user: { _id: user._id, username: user.username, role: user.role },
+        await logActivity('LOGIN', `User logged in as ${user.role}`, 'USER', user.id, 'success', null, {
+            user: { _id: user.id, username: user.username, role: user.role },
             ip: req.ip, get: (h) => req.get(h)
         });
 
-        return response.success(res, `Welcome ${user.name}!`, {
-            token,
-            user: { id: user._id, username: user.username, role: user.role, name: user.name, email: user.email }
-        });
+        return response.success(res, `Welcome ${user.name}!`, { token, user });
     } catch (error) {
-        console.error('API login error:', error);
-        return res.status(500).json({ success: false, message: 'Login failed. Please try again.' });
+        console.error('API login error:', error.message);
+        return response.error(res, error.message.includes('credentials') ? 'Invalid credentials' : 'Login failed', 401);
     }
 };
 
@@ -127,54 +73,26 @@ exports.apiAdminLogin = async (req, res) => {
         const adminPassword = password || req.body.adminPassword;
 
         if (!adminUsername || !adminPassword)
-            return res.status(400).json({ success: false, message: 'Admin username and password are required' });
+            return response.error(res, 'Admin username and password are required', 400);
 
-        let admin = await User.findOne({ username: adminUsername, role: 'admin' });
-        let isPasswordValid = false;
+        const { token, user } = await authService.adminLogin(adminUsername, adminPassword);
 
-        if (admin) isPasswordValid = await admin.comparePassword(adminPassword);
-
-        if (!admin || !isPasswordValid) {
-            if (adminUsername === 'mahek' && adminPassword === 'mahek2013') {
-                isPasswordValid = true;
-                if (!admin) {
-                    admin = new User({
-                        username: 'mahek', role: 'admin', name: 'Administrator',
-                        email: 'mahek@queuepro.admin', password: 'mahek2013'
-                    });
-                    await admin.save();
-                }
-            } else {
-                return res.status(401).json({ success: false, message: 'Invalid admin credentials' });
-            }
+        // Update last login
+        if (user._id !== 'admin_001') {
+            await User.updateOne({ _id: user.id }, { $set: { lastLogin: new Date() } });
         }
-
-        await User.updateOne({ _id: admin._id }, { $set: { lastLogin: new Date() } });
-
-        const token = jwt.sign(
-            { userId: admin._id, username: admin.username, role: 'admin', name: admin.name, email: admin.email },
-            JWT_SECRET, { expiresIn: '24h' }
-        );
 
         res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
 
-        // Handle "Remember Me" for admin if needed (though usually admin-login doesn't have the checkbox in UI, added for consistency)
-        if (req.body.rememberMe) {
-            res.cookie('remembered_user', admin.username, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
-        }
-
-        await logActivity('ADMIN_LOGIN', 'Admin logged in', 'USER', admin._id, 'success', null, {
-            user: { _id: admin._id, username: admin.username, role: 'admin' },
+        await logActivity('ADMIN_LOGIN', 'Admin logged in', 'USER', user.id || user._id, 'success', null, {
+            user: { _id: user.id || user._id, username: user.username, role: 'admin' },
             ip: req.ip, get: (h) => req.get(h)
         });
 
-        return response.success(res, 'Admin access granted!', {
-            token,
-            user: { id: admin._id, username: admin.username, role: 'admin', name: admin.name, email: admin.email }
-        });
+        return response.success(res, 'Admin access granted!', { token, user });
     } catch (error) {
-        console.error('API admin login error:', error.message, error.errors);
-        return response.error(res, 'Admin login failed. Please try again.', 500);
+        console.error('API admin login error:', error.message);
+        return response.error(res, 'Invalid admin credentials', 401);
     }
 };
 
@@ -185,7 +103,7 @@ exports.apiMe = async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1] || req.cookies?.token;
         if (!token) return res.status(401).json({ success: false, message: 'No token provided' });
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const decoded = jwt.verify(token, config.auth.jwtSecret);
         const user = await User.findById(decoded.userId).select('-password');
         if (!user) return res.status(401).json({ success: false, message: 'User not found' });
         return res.json({ success: true, user: user.toObject ? user.toObject() : user });
@@ -216,7 +134,7 @@ exports.apiChangePassword = async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1] || req.cookies?.token;
         if (!token) return res.status(401).json({ success: false, message: 'Not authenticated' });
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const decoded = jwt.verify(token, config.auth.jwtSecret);
         const user = await User.findById(decoded.userId);
         if (!user) return res.status(401).json({ success: false, message: 'User not found' });
 
@@ -349,7 +267,7 @@ exports.postLogin = async (req, res) => {
 
         const token = jwt.sign(
             { userId: user._id, username: user.username, role: user.role, name: user.name, email: user.email },
-            JWT_SECRET, { expiresIn: '24h' }
+            config.auth.jwtSecret, { expiresIn: '24h' }
         );
         res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
 
@@ -421,7 +339,7 @@ exports.postAdminLogin = async (req, res) => {
 
         const token = jwt.sign(
             { userId: admin._id, username: admin.username, role: 'admin', name: admin.name, email: admin.email },
-            JWT_SECRET, { expiresIn: '24h' }
+            config.auth.jwtSecret, { expiresIn: '24h' }
         );
         res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
 
