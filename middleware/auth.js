@@ -59,9 +59,32 @@ const checkRole = (roles = []) => {
  */
 const ensureAuthenticated = async (req, res, next) => {
     try {
+        const publicRoutes = [
+            '/', '/login', '/api/auth/login', '/logout', '/health', 
+            '/api/health', '/public-queue-status', '/about', '/contact', 
+            '/help', '/admin-login', '/register'
+        ];
+        
+        // Debug Logging
+        console.log('[AUTH CHECK]', {
+            path: req.originalUrl || req.path,
+            user: req.user ? 'exists' : 'missing'
+        });
+
+        // Skip auth for public routes
+        if (publicRoutes.includes(req.path)) {
+            return next();
+        }
+
+        // Fail-safe for /login if already authenticated
+        if (req.path === '/login' && req.user) {
+            return next();
+        }
+
         const token = req.headers.authorization?.split(' ')[1] || req.cookies?.token;
 
         if (!token) {
+            if (req.path === '/login') return next();
             return res.redirect('/login?error=auth_required');
         }
 
@@ -76,6 +99,7 @@ const ensureAuthenticated = async (req, res, next) => {
         res.locals.user = user;
         next();
     } catch (error) {
+        if (req.path === '/login') return next();
         return res.redirect('/login?error=invalid_token');
     }
 };
