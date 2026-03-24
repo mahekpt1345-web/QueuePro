@@ -12,6 +12,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { logActivity } = require('../middleware/auth');
+const response = require('../utils/response');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'queuepro_secret_2024';
 
@@ -53,7 +54,7 @@ exports.apiRegister = async (req, res) => {
             console.error('Registration logging failed:', logErr.message);
         }
 
-        return res.json({ success: true, message: 'Account created successfully! You can now login.' });
+        return response.success(res, 'Account created successfully! You can now login.');
     } catch (error) {
         console.error('API register error:', error);
 
@@ -106,8 +107,8 @@ exports.apiLogin = async (req, res) => {
             ip: req.ip, get: (h) => req.get(h)
         });
 
-        return res.json({
-            success: true, message: `Welcome ${user.name}!`, token,
+        return response.success(res, `Welcome ${user.name}!`, {
+            token,
             user: { id: user._id, username: user.username, role: user.role, name: user.name, email: user.email }
         });
     } catch (error) {
@@ -167,13 +168,13 @@ exports.apiAdminLogin = async (req, res) => {
             ip: req.ip, get: (h) => req.get(h)
         });
 
-        return res.json({
-            success: true, message: 'Admin access granted!', token,
+        return response.success(res, 'Admin access granted!', {
+            token,
             user: { id: admin._id, username: admin.username, role: 'admin', name: admin.name, email: admin.email }
         });
     } catch (error) {
         console.error('API admin login error:', error.message, error.errors);
-        return res.status(500).json({ success: false, message: 'Admin login failed. Please try again.' });
+        return response.error(res, 'Admin login failed. Please try again.', 500);
     }
 };
 

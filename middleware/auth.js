@@ -155,11 +155,31 @@ const activityLogger = (action, resourceType = null) => {
     };
 };
 
+/**
+ * Global User Loader (Optional)
+ * Attaches decoded JWT user to req.user for every request if token exists.
+ * Does not block if token is missing.
+ */
+const loadUser = (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1] || req.cookies?.token;
+    if (token) {
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'queuepro_secret_2024');
+            req.user = decoded;
+            res.locals.user = decoded;
+        } catch (error) {
+            // invalid token — continue without user
+        }
+    }
+    next();
+};
+
 module.exports = {
     verifyToken,
     checkRole,
     ensureAuthenticated,
     ensureRole,
     logActivity,
-    activityLogger
+    activityLogger,
+    loadUser
 };

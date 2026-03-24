@@ -12,14 +12,25 @@ const router = express.Router();
 const { verifyToken, checkRole } = require('../middleware/auth');
 const { ensureAuthenticated, ensureRole } = require('../middleware/auth');
 const adminController = require('../controllers/adminController');
+const { body } = require('express-validator');
+const { validate } = require('../utils/validation');
 
 const isAdmin = [verifyToken, checkRole(['admin'])];
+
+const userValidation = [
+    body('fullName').notEmpty().withMessage('Full name is required'),
+    body('email').isEmail().withMessage('Valid email is required'),
+    body('username').isLength({ min: 3 }).withMessage('Username must be at least 3 characters'),
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+    body('role').isIn(['citizen', 'officer', 'admin']).withMessage('Invalid role'),
+    validate
+];
 
 // ── User Management ──────────────────────────
 router.get('/api/users', ...isAdmin, adminController.getUsers);
 router.get('/api/admin/users', ...isAdmin, adminController.adminGetUsers);
 router.delete('/api/admin/users/:userId', ...isAdmin, adminController.deleteUser);
-router.post('/api/admin/create-user', ...isAdmin, adminController.createUser);
+router.post('/api/admin/create-user', ...isAdmin, ...userValidation, adminController.createUser);
 
 // ── Analytics & Logs ─────────────────────────
 router.get('/api/admin/analytics', ...isAdmin, adminController.getAnalytics);

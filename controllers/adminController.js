@@ -17,6 +17,7 @@ let QRCode;
 try { QRCode = require('qrcode'); } catch (e) { QRCode = null; }
 const SystemConfig = require('../models/SystemConfig');
 const { logActivity } = require('../middleware/auth');
+const response = require('../utils/response');
 
 // ─────────────────────────────────────────────
 // GET /api/users  (alias for admin)
@@ -74,15 +75,6 @@ exports.createUser = async (req, res) => {
     try {
         const { fullName, email, username, password, role } = req.body;
 
-        if (!fullName || !email || !username || !password || !role)
-            return res.status(400).json({ success: false, message: 'All fields are required' });
-        if (username.length < 3)
-            return res.status(400).json({ success: false, message: 'Username must be at least 3 characters' });
-        if (password.length < 6)
-            return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
-        if (!['citizen', 'officer', 'admin'].includes(role))
-            return res.status(400).json({ success: false, message: 'Invalid role' });
-
         const existing = await User.findOne({ $or: [{ username }, { email }] });
         if (existing) {
             const msg = existing.username === username ? 'Username already taken' : 'Email already registered';
@@ -97,10 +89,10 @@ exports.createUser = async (req, res) => {
             ip: req.ip, get: (h) => req.get(h)
         });
 
-        return res.json({ success: true, message: `User "${username}" created successfully`, data: newUser });
+        return response.success(res, `User "${username}" created successfully`, { data: newUser }, 201);
     } catch (err) {
         console.error('POST /api/admin/create-user error:', err);
-        return res.status(500).json({ success: false, message: 'Failed to create user' });
+        return response.error(res, 'Failed to create user', 500);
     }
 };
 

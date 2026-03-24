@@ -11,10 +11,11 @@ const router = express.Router();
 
 const authController = require('../controllers/authController');
 const { verifyToken } = require('../middleware/auth');
+const { authValidation } = require('../utils/validation');
 
 // ── API JSON Routes ──────────────────────────
-router.post('/api/auth/register', authController.apiRegister);
-router.post('/api/auth/login', authController.apiLogin);
+router.post('/api/auth/register', authValidation.register, authController.apiRegister);
+router.post('/api/auth/login', authValidation.login, authController.apiLogin);
 router.post('/api/auth/admin-login', authController.apiAdminLogin);
 router.get('/api/auth/me', authController.apiMe);
 router.post('/api/auth/logout', authController.apiLogout);
@@ -24,10 +25,10 @@ router.post('/api/auth/change-password', authController.apiChangePassword);
 
 // ── EJS Form Routes ──────────────────────────
 router.get('/register', authController.showRegister);
-router.post('/register', authController.postRegister);
+router.post('/register', authValidation.register, authController.postRegister);
 
 router.get('/login', authController.showLogin);
-router.post('/login', authController.postLogin);
+router.post('/login', authValidation.login, authController.postLogin);
 
 router.get('/admin-login', authController.showAdminLogin);
 router.post('/admin-login', authController.postAdminLogin);
