@@ -1,0 +1,44 @@
+<% if (typeof user !== 'undefined' && user && user.role) { %>
+    <nav class="bottom-nav-mobile" aria-label="Mobile navigation">
+        <% if (user.role === 'citizen') { %>
+            <a href="/citizen-dashboard" class="bottom-nav-item <%= currentPage === 'dashboard' ? 'active' : '' %>">
+                <i class="fas fa-th-large"></i><span>Dashboard</span>
+            </a>
+            <a href="/citizen-dashboard#tokenSection" class="bottom-nav-item">
+                <i class="fas fa-ticket-alt"></i><span>Token</span>
+            </a>
+            <a href="/public-queue-status" class="bottom-nav-item <%= currentPage === 'status' ? 'active' : '' %>">
+                <i class="fas fa-list-ul"></i><span>Status</span>
+            </a>
+            <a href="/age-selection" class="bottom-nav-item <%= currentPage === 'engagement' ? 'active' : '' %>">
+                <i class="fas fa-gamepad"></i><span>Fun Zone</span>
+            </a>
+            <a href="/citizen-profile" class="bottom-nav-item <%= currentPage === 'profile' ? 'active' : '' %>">
+                <i class="fas fa-user-circle"></i><span>Profile</span>
+            </a>
+        <% } else if (user.role === 'officer') { %>
+            <a href="/officer-dashboard" class="bottom-nav-item <%= currentPage === 'dashboard' ? 'active' : '' %>">
+                <i class="fas fa-chart-line"></i><span>Dashboard</span>
+            </a>
+            <a href="/officer-dashboard#serving-section" class="bottom-nav-item">
+                <i class="fas fa-play-circle"></i><span>Serving</span>
+            </a>
+            <a href="/public-queue-status" class="bottom-nav-item <%= currentPage === 'status' ? 'active' : '' %>">
+                <i class="fas fa-list-ul"></i><span>Status</span>
+            </a>
+            <a href="/officer-profile" class="bottom-nav-item <%= currentPage === 'profile' ? 'active' : '' %>">
+                <i class="fas fa-user-circle"></i><span>Profile</span>
+            </a>
+        <% } else if (user.role === 'admin') { %>
+            <a href="/admin-dashboard" class="bottom-nav-item <%= currentPage === 'dashboard' ? 'active' : '' %>">
+                <i class="fas fa-shield-alt"></i><span>Admin</span>
+            </a>
+            <a href="/public-queue-status" class="bottom-nav-item <%= currentPage === 'status' ? 'active' : '' %>">
+                <i class="fas fa-list-ul"></i><span>Status</span>
+            </a>
+            <a href="/admin-profile" class="bottom-nav-item <%= currentPage === 'profile' ? 'active' : '' %>">
+                <i class="fas fa-user-cog"></i><span>Profile</span>
+            </a>
+        <% } %>
+    </nav>
+<% } %>

@@ -725,13 +725,7 @@
             });
         }
     </script>
-    <nav class="bottom-nav-mobile" aria-label="Mobile navigation">
-        <a href="/citizen-dashboard" class="bottom-nav-item"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
-        <a href="/citizen-dashboard#tokenSection" class="bottom-nav-item"><i class="fas fa-ticket-alt"></i><span>Token</span></a>
-        <a href="/public-queue-status" class="bottom-nav-item"><i class="fas fa-list"></i><span>Status</span></a>
-        <a href="/age-selection" class="bottom-nav-item"><i class="fas fa-puzzle-piece"></i><span>Engagement</span></a>
-        <a href="/citizen-profile" class="bottom-nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
-    </nav>
+    <%- include('partials/bottom-nav', { currentPage: 'profile' }) %>
     <%- include('partials/scroll-to-top') %>
 </body>
 
