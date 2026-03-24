@@ -7,6 +7,7 @@ const express = require('express');
 const router = express.Router();
 const { verifyToken, checkRole } = require('../middleware/auth');
 const queueController = require('../controllers/queueController');
+console.log('[DEBUG] queueController keys:', Object.keys(queueController));
 
 // ── Citizen Routes ────────────────────────────
 router.post('/create-token',          verifyToken,                                queueController.createToken);
