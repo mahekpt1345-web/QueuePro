@@ -65,26 +65,30 @@ const ensureAuthenticated = async (req, res, next) => {
             '/help', '/admin-login', '/register'
         ];
         
+        // Normalize path: lowercase and remove trailing slash (except for '/')
+        const normalizedPath = req.path === '/' ? '/' : req.path.toLowerCase().replace(/\/$/, '');
+        
         // Debug Logging
         console.log('[AUTH CHECK]', {
             path: req.originalUrl || req.path,
+            normalized: normalizedPath,
             user: req.user ? 'exists' : 'missing'
         });
 
-        // Skip auth for public routes
-        if (publicRoutes.includes(req.path)) {
+        // Skip auth for public routes (normalized)
+        if (publicRoutes.includes(normalizedPath)) {
             return next();
         }
 
         // Fail-safe for /login if already authenticated
-        if (req.path === '/login' && req.user) {
+        if (normalizedPath === '/login' && req.user) {
             return next();
         }
 
         const token = req.headers.authorization?.split(' ')[1] || req.cookies?.token;
 
         if (!token) {
-            if (req.path === '/login') return next();
+            if (normalizedPath === '/login') return next();
             return res.redirect('/login?error=auth_required');
         }
 
@@ -110,8 +114,16 @@ const ensureAuthenticated = async (req, res, next) => {
 const ensureRole = (roles = []) => {
     return async (req, res, next) => {
         try {
+            const normalizedPath = req.path === '/' ? '/' : req.path.toLowerCase().replace(/\/$/, '');
+
+            // Fallback: If no user but on a public route, just next() and let ensureAuthenticated handle it
+            const publicRoutes = ['/', '/login', '/api/auth/login', '/logout', '/health', '/api/health', '/public-queue-status'];
+            if (publicRoutes.includes(normalizedPath)) {
+                return next();
+            }
+
             if (!req.user) {
-                return res.redirect('/login?admin?error=auth_required');
+                return res.redirect('/login?error=auth_required');
             }
 
             if (roles.length > 0 && !roles.includes(req.user.role)) {
