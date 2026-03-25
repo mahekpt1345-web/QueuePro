@@ -12,6 +12,7 @@ const router = express.Router();
 const { verifyToken, checkRole } = require('../middleware/auth');
 const { ensureAuthenticated, ensureRole } = require('../middleware/auth');
 const adminController = require('../controllers/adminController');
+const safeHandler = require('../utils/safeHandler');
 const { body } = require('express-validator');
 const { validate } = require('../utils/validation');
 
@@ -27,30 +28,30 @@ const userValidation = [
 ];
 
 // ── User Management ──────────────────────────
-router.get('/api/users', ...isAdmin, adminController.getUsers);
-router.get('/api/admin/users', ...isAdmin, adminController.adminGetUsers);
-router.delete('/api/admin/users/:userId', ...isAdmin, adminController.deleteUser);
-router.post('/api/admin/create-user', ...isAdmin, ...userValidation, adminController.createUser);
+router.get('/api/users', ...isAdmin, safeHandler(adminController.getUsers));
+router.get('/api/admin/users', ...isAdmin, safeHandler(adminController.adminGetUsers));
+router.delete('/api/admin/users/:userId', ...isAdmin, safeHandler(adminController.deleteUser));
+router.post('/api/admin/create-user', ...isAdmin, ...userValidation, safeHandler(adminController.createUser));
 
 // ── Analytics & Logs ─────────────────────────
-router.get('/api/admin/analytics', ...isAdmin, adminController.getAnalytics);
-router.get('/api/admin/activity-logs', ...isAdmin, adminController.getActivityLogs);
+router.get('/api/admin/analytics', ...isAdmin, safeHandler(adminController.getAnalytics));
+router.get('/api/admin/activity-logs', ...isAdmin, safeHandler(adminController.getActivityLogs));
 
 // ── Settings ─────────────────────────────────
-router.get('/api/admin/settings', ...isAdmin, adminController.getSettings);
-router.put('/api/admin/settings', ...isAdmin, adminController.updateSettings);
-router.get('/api/admin/config', verifyToken, adminController.getSystemConfig);
-router.post('/api/admin/config', ...isAdmin, adminController.updateSystemConfig);
+router.get('/api/admin/settings', ...isAdmin, safeHandler(adminController.getSettings));
+router.put('/api/admin/settings', ...isAdmin, safeHandler(adminController.updateSettings));
+router.get('/api/admin/config', verifyToken, safeHandler(adminController.getSystemConfig));
+router.post('/api/admin/config', ...isAdmin, safeHandler(adminController.updateSystemConfig));
 
 // ── Profile data ─────────────────────────────
-router.get('/api/admin/profile-stats', ...isAdmin, adminController.getProfileStats);
-router.get('/api/admin/profile-activity', ...isAdmin, adminController.getProfileActivity);
+router.get('/api/admin/profile-stats', ...isAdmin, safeHandler(adminController.getProfileStats));
+router.get('/api/admin/profile-activity', ...isAdmin, safeHandler(adminController.getProfileActivity));
 
 // ── All tokens (admin view) ───────────────────
-router.get('/api/queue/all-tokens', ...isAdmin, adminController.getAllTokens);
+router.get('/api/queue/all-tokens', ...isAdmin, safeHandler(adminController.getAllTokens));
 
 // ── EJS Page Renders (protected) ─────────────
-router.get('/admin-dashboard', ensureAuthenticated, ensureRole(['admin']), adminController.showDashboard);
-router.get('/admin-profile', ensureAuthenticated, ensureRole(['admin']), adminController.showProfile);
+router.get('/admin-dashboard', ensureAuthenticated, ensureRole(['admin']), safeHandler(adminController.showDashboard));
+router.get('/admin-profile', ensureAuthenticated, ensureRole(['admin']), safeHandler(adminController.showProfile));
 
 module.exports = router;
