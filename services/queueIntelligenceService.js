@@ -151,6 +151,63 @@ class QueueIntelligenceService {
             };
         }
     }
+
+    /**
+     * Helper: calculate token position in queue safely.
+     * @param {string} tokenId
+     * @returns {Promise<number|null>}
+     */
+    async calculateTokenPosition(tokenId) {
+        try {
+            const pending = await Token.find({ status: 'pending' }).sort({ position: 1, createdAt: 1 }).lean();
+            const index = pending.findIndex(t => t.tokenId === tokenId || t._id.toString() === tokenId);
+            return index >= 0 ? index + 1 : null;
+        } catch (error) {
+            console.error('[QueueIntelligence] calculateTokenPosition error:', error.message);
+            return null;
+        }
+    }
+
+    /**
+     * Helper: calculate tokens ahead of a position.
+     * @param {number} position
+     * @returns {number}
+     */
+    calculateTokensAhead(position) {
+        return position > 1 ? position - 1 : 0;
+    }
+
+    /**
+     * Helper: calculate simple estimated wait time (static formula).
+     * @param {string} serviceType
+     * @param {number} tokensAhead
+     * @returns {number} Wait time in minutes
+     */
+    calculateEstimatedWaitTime(serviceType, tokensAhead) {
+        try {
+            const avgServiceTime = SERVICE_TIME[serviceType] || SERVICE_TIME.other || 5;
+            return tokensAhead * avgServiceTime;
+        } catch (error) {
+            return 0; // Safe fallback
+        }
+    }
+
+    /**
+     * Helper: get basic queue analytics without intruding on existing stats APIs.
+     * @returns {Promise<Object>}
+     */
+    async getBasicQueueAnalytics() {
+        try {
+            const totalServed = await Token.countDocuments({ status: 'completed' });
+            return {
+                totalTokensServed: totalServed,
+                systemOverallWaitEstimateAvg: 5 // Static fallback based on config/knowledge
+            };
+        } catch (error) {
+            console.error('[QueueIntelligence] getBasicQueueAnalytics error:', error.message);
+            return { totalTokensServed: 0, systemOverallWaitEstimateAvg: 0 };
+        }
+    }
 }
 
 module.exports = new QueueIntelligenceService();

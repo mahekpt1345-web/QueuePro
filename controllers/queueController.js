@@ -14,6 +14,9 @@ const { logActivity } = require('../middleware/auth');
 const { SERVICE_TYPES } = require('../utils/serviceConfig');
 const queueService = require('../services/queueService');
 const response = require('../utils/response');
+const socketEnhancer = require('../utils/socketEnhancer');
+const queueIntelligenceService = require('../services/queueIntelligenceService');
+
 
 /**
  * createToken (citizen)
@@ -44,6 +47,14 @@ exports.createToken = async (req, res) => {
 
         // Emit socket update via service
         await queueService.emitQueueUpdate(req.app.get('io'));
+
+        // Smart Socket Enhancement
+        socketEnhancer.emitQueueUpdated(req.app.get('io'));
+        
+        // Log intelligence (safe, non-blocking)
+        queueIntelligenceService.getBasicQueueAnalytics().then(analytics => {
+            console.log(`[Queue Intelligence] Total tokens served globally: ${analytics.totalTokensServed}`);
+        }).catch(() => {});
 
         return res.status(201).json({
             success: true,
@@ -93,6 +104,8 @@ exports.cancelToken = async (req, res) => {
         );
 
         await queueService.emitQueueUpdate(req.app.get('io'));
+
+        socketEnhancer.emitQueueUpdated(req.app.get('io'));
 
         return res.json({ success: true, message: 'Token cancelled successfully', data: token });
     } catch (error) {
@@ -180,6 +193,9 @@ exports.serveToken = async (req, res) => {
 
         await queueService.emitQueueUpdate(io);
 
+        socketEnhancer.emitQueueUpdated(io);
+        socketEnhancer.emitTokenCalled(io, token, officer);
+
         return res.json({ success: true, message: `Now serving token ${token.tokenId}`, data: token });
     } catch (error) {
         console.error('[OFFICER API] Error serving token:', error.message);
@@ -213,6 +229,8 @@ exports.completeToken = async (req, res) => {
         );
 
         await queueService.emitQueueUpdate(req.app.get('io'));
+
+        socketEnhancer.emitQueueUpdated(req.app.get('io'));
 
         return res.json({ success: true, message: `Token ${token.tokenId} completed`, data: token });
     } catch (error) {
@@ -254,6 +272,8 @@ exports.skipToken = async (req, res) => {
         });
 
         await queueService.emitQueueUpdate(req.app.get('io'));
+
+        socketEnhancer.emitQueueUpdated(req.app.get('io'));
 
         res.json({ success: true, message: `Token ${token.tokenId} returned to pending queue`, data: token });
     } catch (error) {

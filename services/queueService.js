@@ -169,7 +169,7 @@ class QueueService {
         const token = await Token.findOneAndUpdate(
             query,
             { status: 'serving', handledBy: officer.username, startedAt: new Date() },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!token) throw new Error(`Token is already serving`);
@@ -199,7 +199,7 @@ class QueueService {
         const token = await Token.findOneAndUpdate(
             { _id: tokenId, userId, status: 'pending' },
             { status: 'cancelled', cancelledAt: new Date(), cancelReason: reason || 'Cancelled by citizen' },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!token) throw new Error(`Token is already serving`);
@@ -226,7 +226,7 @@ class QueueService {
         const token = await Token.findOneAndUpdate(
             query,
             { status: 'completed', completedAt: new Date() },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!token) throw new Error(`Token must be in serving status. Current: completed`);

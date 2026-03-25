@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const ActivityLog = require('../models/ActivityLog');
-
+const safeActivityLogger = require('../utils/safeActivityLogger');
 /**
  * Middleware to verify JWT token
  */
@@ -130,28 +130,15 @@ const ensureRole = (roles = []) => {
  * Middleware to log activity
  */
 const logActivity = async (action, details = '', resourceType = null, resourceId = null, status = 'success', errorMessage = null, req) => {
-    try {
-        if (!req.user) return;
-
-        // BSON Safety: If ID is not a valid ObjectId, don't try to save it in a strict field if it exists
-        // Here we just ensure we don't crash the log if the userId is a string like 'admin_001'
-        const activity = new ActivityLog({
-            userId: /^[0-9a-fA-F]{24}$/.test(req.user._id || req.user.id) ? (req.user._id || req.user.id) : null,
-            username: req.user.username,
-            userRole: req.user.role,
-            action,
-            details: details || `User ID: ${req.user._id || req.user.id}`,
-            resourceType,
-            resourceId,
-            status,
-            errorMessage,
-            ipAddress: req.ip
-        });
-
-        await activity.save();
-    } catch (error) {
-        console.error('Error logging activity:', error.message);
-    }
+    if (!req) return;
+    await safeActivityLogger({
+        action,
+        details,
+        resourceType,
+        resourceId,
+        status,
+        errorMessage
+    }, req);
 };
 
 /**

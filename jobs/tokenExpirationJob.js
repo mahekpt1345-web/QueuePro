@@ -34,7 +34,7 @@ const expireOldTokens = async () => {
                         cancelledAt: new Date(), 
                         cancelReason: 'Auto-expired system cleanup' 
                     },
-                    { new: true }
+                    { returnDocument: 'after' }
                 );
 
                 if (updated) {

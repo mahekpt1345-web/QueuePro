@@ -283,7 +283,7 @@ exports.updateSystemConfig = async (req, res) => {
         await SystemConfig.findOneAndUpdate(
             { key },
             { value, updatedBy: req.user.username },
-            { upsert: true, new: true }
+            { upsert: true, returnDocument: 'after' }
         );
 
         await logActivity('UPDATE_CONFIG', `System config updated: ${key}`, 'SYSTEM', req.user.userId, 'success', null, {
