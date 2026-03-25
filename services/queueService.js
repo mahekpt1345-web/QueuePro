@@ -3,6 +3,7 @@ const User = require('../models/User');
 const { logActivity } = require('../middleware/auth');
 const { calculateEstimatedWaitTime } = require('../utils/serviceConfig');
 const notificationService = require('../utils/notificationService');
+const emitWithRetry = require('../utils/socketRetry');
 
 /**
  * QUEUE SERVICE
@@ -37,7 +38,7 @@ class QueueService {
                 .lean();
 
             // Broadcast general update
-            io.to('queue_broadcast').emit('queue_update', {
+            emitWithRetry(io, 'queue_broadcast', 'queue_update', {
                 pendingCount: pendingTokens.length,
                 timestamp: new Date().toISOString()
             });
@@ -48,7 +49,7 @@ class QueueService {
                 const room = `token_${token._id}`;
 
                 if (position === 1) {
-                    io.to(room).emit('turn_notification', {
+                    emitWithRetry(io, room, 'turn_notification', {
                         type: 'next',
                         position,
                         message: '🔔 You are next. Please proceed to the counter.',
@@ -63,7 +64,7 @@ class QueueService {
                         }
                     }
                 } else if (position <= 3) {
-                    io.to(room).emit('turn_notification', {
+                    emitWithRetry(io, room, 'turn_notification', {
                         type: 'approaching',
                         position,
                         message: `🔔 Your turn is approaching (Position: ${position}).`,
@@ -90,6 +91,14 @@ class QueueService {
     async createToken(data, user, ip, userAgent) {
         const { serviceType, description } = data;
         const { userId, username, name: userName, role } = user;
+
+        // --- Soft Rate Limit (Anti-spam) ---
+        const lastToken = await Token.findOne({ userId }).sort({ createdAt: -1 });
+        if (lastToken && (Date.now() - lastToken.createdAt.getTime() < 5000)) {
+            const pendingCount = await Token.countDocuments({ status: 'pending' });
+            return { token: lastToken, pendingCount };
+        }
+        // ------------------------------------
 
         const pendingTokens = await Token.find({ status: 'pending' }).select('serviceType').lean();
         const pendingCount = pendingTokens.length;
@@ -131,7 +140,7 @@ class QueueService {
     emitTokenCreated(io, token) {
         if (!io || !token) return;
         try {
-            io.to('queue_broadcast').emit('token_created', {
+            emitWithRetry(io, 'queue_broadcast', 'token_created', {
                 tokenId: token.tokenId,
                 serviceType: token.serviceType,
                 position: token.position,
@@ -146,19 +155,30 @@ class QueueService {
      * Serve a token
      */
     async serveToken(tokenId, officer, ip, userAgent) {
-        let token = tokenId.length === 24 ? await Token.findById(tokenId) : await Token.findOne({ tokenId });
-        if (!token) throw new Error('Token not found');
-        if (token.status !== 'pending') throw new Error(`Token is already ${token.status}`);
+        let existing = tokenId.length === 24 ? await Token.findById(tokenId) : await Token.findOne({ tokenId });
+        if (!existing) throw new Error('Token not found');
+        if (existing.status !== 'pending') throw new Error(`Token is already ${existing.status}`);
 
         const currentServing = await Token.findOne({ status: 'serving' });
         if (currentServing) throw new Error('Another token is currently being served');
 
-        token.status = 'serving';
-        token.handledBy = officer.username;
-        token.startedAt = new Date();
-        await token.save();
+        // Atomic Transition to prevent race conditions
+        const query = tokenId.length === 24 ? { _id: tokenId } : { tokenId };
+        query.status = 'pending';
+
+        const token = await Token.findOneAndUpdate(
+            query,
+            { status: 'serving', handledBy: officer.username, startedAt: new Date() },
+            { new: true }
+        );
+
+        if (!token) throw new Error(`Token is already serving`);
 
         await logActivity('SERVE_TOKEN', `Serving ${token.tokenId}`, 'TOKEN', officer.userId, 'success', null, {
+            user: { _id: officer.userId, username: officer.username, role: officer.role },
+            ip, get: (h) => userAgent[h]
+        });
+        await logActivity('TOKEN_SERVED', `Token ${token.tokenId} served by ${officer.username}`, 'TOKEN', officer.userId, 'success', null, {
             user: { _id: officer.userId, username: officer.username, role: officer.role },
             ip, get: (h) => userAgent[h]
         });
@@ -170,15 +190,19 @@ class QueueService {
      * Cancel a token
      */
     async cancelToken(tokenId, userId, reason, ip, userAgent) {
-        let token = await Token.findById(tokenId);
-        if (!token) throw new Error('Token not found');
-        if (token.userId.toString() !== userId.toString()) throw new Error('Not authorized to cancel this token');
-        if (token.status !== 'pending') throw new Error(`Token is already ${token.status}`);
+        let existing = await Token.findById(tokenId);
+        if (!existing) throw new Error('Token not found');
+        if (existing.userId.toString() !== userId.toString()) throw new Error('Not authorized to cancel this token');
+        if (existing.status !== 'pending') throw new Error(`Token is already ${existing.status}`);
 
-        token.status = 'cancelled';
-        token.cancelledAt = new Date();
-        token.cancelReason = reason || 'Cancelled by citizen';
-        await token.save();
+        // Atomic Transition
+        const token = await Token.findOneAndUpdate(
+            { _id: tokenId, userId, status: 'pending' },
+            { status: 'cancelled', cancelledAt: new Date(), cancelReason: reason || 'Cancelled by citizen' },
+            { new: true }
+        );
+
+        if (!token) throw new Error(`Token is already serving`);
 
         await logActivity('CANCEL_TOKEN', `Cancelled ${token.tokenId}`, 'TOKEN', userId, 'success', null, {
             user: { _id: userId },
@@ -192,15 +216,26 @@ class QueueService {
      * Complete a token
      */
     async completeToken(tokenId, officer, ip, userAgent) {
-        let token = tokenId.length === 24 ? await Token.findById(tokenId) : await Token.findOne({ tokenId });
-        if (!token) throw new Error('Token not found');
-        if (token.status !== 'serving') throw new Error(`Token must be in serving status. Current: ${token.status}`);
+        let existing = tokenId.length === 24 ? await Token.findById(tokenId) : await Token.findOne({ tokenId });
+        if (!existing) throw new Error('Token not found');
+        if (existing.status !== 'serving') throw new Error(`Token must be in serving status. Current: ${existing.status}`);
 
-        token.status = 'completed';
-        token.completedAt = new Date();
-        await token.save();
+        // Atomic Transition
+        const query = tokenId.length === 24 ? { _id: tokenId, status: 'serving' } : { tokenId, status: 'serving' };
+        
+        const token = await Token.findOneAndUpdate(
+            query,
+            { status: 'completed', completedAt: new Date() },
+            { new: true }
+        );
+
+        if (!token) throw new Error(`Token must be in serving status. Current: completed`);
 
         await logActivity('COMPLETE_TOKEN', `Completed ${token.tokenId}`, 'TOKEN', officer.userId, 'success', null, {
+            user: { _id: officer.userId, username: officer.username, role: officer.role },
+            ip, get: (h) => userAgent[h]
+        });
+        await logActivity('TOKEN_COMPLETED', `Token ${token.tokenId} completed by ${officer.username}`, 'TOKEN', officer.userId, 'success', null, {
             user: { _id: officer.userId, username: officer.username, role: officer.role },
             ip, get: (h) => userAgent[h]
         });
@@ -216,7 +251,7 @@ class QueueService {
     emitTokenCompleted(io, token) {
         if (!io || !token) return;
         try {
-            io.to('queue_broadcast').emit('token_completed', {
+            emitWithRetry(io, 'queue_broadcast', 'token_completed', {
                 tokenId: token.tokenId,
                 serviceType: token.serviceType,
                 completedAt: token.completedAt,

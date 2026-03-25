@@ -125,5 +125,8 @@ tokenSchema.pre('save', async function () {
   }
 });
 
+// Performance Indexes
+tokenSchema.index({ status: 1, createdAt: 1 });
+
 const Token = mongoose.model('Token', tokenSchema);
 module.exports = Token;

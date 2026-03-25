@@ -248,6 +248,10 @@ exports.skipToken = async (req, res) => {
             user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
             ip: req.ip, get: (header) => req.get(header)
         });
+        await logActivity('TOKEN_SKIPPED', `Token ${token.tokenId} skipped by ${req.user.username}`, 'TOKEN', req.user.userId, 'success', null, {
+            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
+            ip: req.ip, get: (header) => req.get(header)
+        });
 
         await queueService.emitQueueUpdate(req.app.get('io'));
 
@@ -277,6 +281,10 @@ exports.startServing = async (req, res) => {
             user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
             ip: req.ip, get: (header) => req.get(header)
         });
+        await logActivity('TOKEN_SERVED', `Started serving token ${token.tokenId} (Legacy)`, 'TOKEN', req.user.userId, 'success', null, {
+            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
+            ip: req.ip, get: (header) => req.get(header)
+        });
 
         await queueService.emitQueueUpdate(req.app.get('io'));
 
@@ -301,6 +309,10 @@ exports.completeTokenLegacy = async (req, res) => {
         await token.save();
 
         await logActivity('COMPLETE_TOKEN', `Token ${token.tokenId} marked as completed (Legacy)`, 'TOKEN', req.user.userId, 'success', null, {
+            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
+            ip: req.ip, get: (header) => req.get(header)
+        });
+        await logActivity('TOKEN_COMPLETED', `Token ${token.tokenId} completed by ${req.user.username} (Legacy)`, 'TOKEN', req.user.userId, 'success', null, {
             user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
             ip: req.ip, get: (header) => req.get(header)
         });

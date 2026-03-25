@@ -17,12 +17,14 @@ const { errorHandler } = require('./middleware/errorHandler');
 const { loadUser } = require('./middleware/auth');
 
 const { initTokenCleanup } = require('./jobs/tokenCleanup');
+const { initTokenExpirationJob } = require('./jobs/tokenExpirationJob');
 
 const app = express();
 const server = http.createServer(app);
 
 // Initialize Background Jobs
 initTokenCleanup();
+initTokenExpirationJob();
 
 // Trust proxy for rate limiting if behind a proxy
 app.set('trust proxy', 1);
