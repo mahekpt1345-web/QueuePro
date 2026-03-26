@@ -72,17 +72,25 @@ class QueueIntelligenceService {
                 estimatedWaitMinutes += SERVICE_TIME[svcType] || SERVICE_TIME.other;
             }
 
+            // Find the latest token currently being served (Additive)
+            const currentServing = await Token.findOne({ status: 'serving' })
+                .sort({ startedAt: -1 })
+                .select('tokenId')
+                .lean();
+
             return {
                 tokenId: myToken.tokenId,
                 position,
                 tokensAhead,
                 estimatedWaitMinutes,
+                estimatedWait: estimatedWaitMinutes, 
                 estimatedWaitText: estimatedWaitMinutes > 0
                     ? `~${estimatedWaitMinutes} min`
                     : 'Your turn is next!',
                 queueSize: pendingTokens.length,
                 serviceType: myToken.serviceType,
-                createdAt: myToken.createdAt
+                createdAt: myToken.createdAt,
+                currentToken: currentServing ? currentServing.tokenId : "-"
             };
         } catch (err) {
             console.error('[QueueIntelligence] getTokenPosition error:', err.message);

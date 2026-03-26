@@ -239,7 +239,7 @@
             </div>
             <div class="metric-item">
                 <h4>Current</h4>
-                <div class="value" id="dispCurrent">-</div>
+                <div class="value" id="current">-</div>
             </div>
             <div class="metric-item">
                 <h4>Ahead</h4>
@@ -438,16 +438,15 @@
         }
 
         async function updateLiveStatus() {
-            if (!activeToken) return;
             try {
                 // Fetch latest stats and token position
-                const res = await fetch(`/api/queue/status/${activeToken.tokenId}`, { credentials: 'include' });
+                const res = await fetch('/api/queue/my-position', { credentials: 'include' });
                 const result = await res.json();
                 
-                if (result.success) {
-                    document.getElementById('dispAhead').textContent = result.data.positionAhead;
-                    document.getElementById('dispCurrent').textContent = result.data.currentlyServing || '-';
-                    document.getElementById('dispWait').textContent = (result.data.positionAhead + 1) * 5 + ' min';
+                if (result.success && result.data) {
+                    document.getElementById('dispAhead').textContent = result.data.tokensAhead ?? '-';
+                    document.getElementById('current').textContent = result.data.currentToken || '-';
+                    document.getElementById('dispWait').textContent = (result.data.estimatedWaitMinutes || 0) + ' min';
                 }
             } catch (err) {
                 console.error('Error updating live status:', err);
