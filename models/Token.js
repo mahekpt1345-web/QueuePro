@@ -7,7 +7,14 @@ const tokenSchema = new mongoose.Schema({
     type: String,
     unique: true,
     required: true,
-    // Format: TOKEN_1707478234567
+    // Format: A001
+  },
+
+  // Sequential number per service type per day
+  tokenNumber: {
+    type: Number,
+    required: true, 
+    default: 0
   },
 
   // Who requested it

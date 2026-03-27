@@ -59,21 +59,57 @@ class QueueIntelligenceService {
 
             if (!myToken) return null; // Not pending or doesn't exist
 
-            // Calculate position (1-indexed)
-            const position = pendingTokens.indexOf(myToken) + 1;
+            // Calculate position (1-indexed) based on DB count logic requested
+            let tokensAhead = 0;
+            if (myToken.tokenNumber && myToken.tokenNumber > 0) {
+                tokensAhead = await Token.countDocuments({
+                    serviceType: myToken.serviceType,
+                    tokenNumber: { $lt: myToken.tokenNumber },
+                    status: { $in: ["pending", "serving"] }
+                });
+            } else {
+                // Fallback to position to ensure no system breaks if tokenNumber isn't populated
+                tokensAhead = await Token.countDocuments({
+                    serviceType: myToken.serviceType,
+                    position: { $lt: myToken.position },
+                    status: { $in: ["pending", "serving"] }
+                });
+            }
+            
+            const position = tokensAhead + 1;
 
-            // Tokens ahead = position - 1
-            const tokensAhead = position - 1;
-
-            // Estimated wait = sum of service times of all tokens ahead
+            // Estimated wait = sum of service times of all tokens ahead (both serving and pending)
             let estimatedWaitMinutes = 0;
-            for (let i = 0; i < tokensAhead; i++) {
-                const svcType = pendingTokens[i].serviceType;
-                estimatedWaitMinutes += SERVICE_TIME[svcType] || SERVICE_TIME.other;
+            
+            // 1. Calculate time for tokens ahead from the pendingTokens snapshot
+            // We need to find how many pending tokens are ahead of us
+            const myIndexInPending = pendingTokens.findIndex(t => t._id.toString() === tokenId || t.tokenId === tokenId);
+            if (myIndexInPending > 0) {
+                for (let i = 0; i < myIndexInPending; i++) {
+                    const svcType = pendingTokens[i].serviceType;
+                    estimatedWaitMinutes += SERVICE_TIME[svcType] || SERVICE_TIME.other;
+                }
             }
 
-            // Find the latest token currently being served (Additive)
-            const currentServing = await Token.findOne({ status: 'serving' })
+            // 2. Add time for tokens currently being served ahead of us
+            // (If tokenNumber is used, we can find serving tokens with smaller tokenNumber)
+            if (myToken.tokenNumber > 0) {
+                const servingAhead = await Token.find({
+                    serviceType: myToken.serviceType,
+                    status: 'serving',
+                    tokenNumber: { $lt: myToken.tokenNumber }
+                }).select('serviceType').lean();
+
+                for (const t of servingAhead) {
+                    estimatedWaitMinutes += SERVICE_TIME[t.serviceType] || SERVICE_TIME.other;
+                }
+            }
+
+            // Find the latest token currently being served for THIS service type
+            const currentServing = await Token.findOne({ 
+                    serviceType: myToken.serviceType,
+                    status: 'serving' 
+                })
                 .sort({ startedAt: -1 })
                 .select('tokenId')
                 .lean();
@@ -83,7 +119,6 @@ class QueueIntelligenceService {
                 position,
                 tokensAhead,
                 estimatedWaitMinutes,
-                estimatedWait: estimatedWaitMinutes, 
                 estimatedWaitText: estimatedWaitMinutes > 0
                     ? `~${estimatedWaitMinutes} min`
                     : 'Your turn is next!',

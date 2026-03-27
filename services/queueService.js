@@ -104,11 +104,31 @@ class QueueService {
         const pendingCount = pendingTokens.length;
         const estimatedWaitTime = calculateEstimatedWaitTime(pendingTokens, serviceType);
 
-        const timestamp = Date.now();
-        const tokenId = `TOKEN-${String(timestamp).slice(-5)}${Math.random().toString().slice(2, 5)}`;
+        // --- Sequential Token Number Logic ---
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+
+        const countToday = await Token.countDocuments({
+            serviceType,
+            createdAt: { $gte: todayStart }
+        });
+
+        const tokenNumber = countToday + 1;
+        const prefixMap = {
+            'aadhaar_update': 'A',
+            'caste_certificate_verification': 'C',
+            'income_certificate_verification': 'I',
+            'birth_certificate_verification': 'B',
+            'municipal_enquiry': 'M',
+            'other': 'O'
+        };
+        const prefix = prefixMap[serviceType] || 'O';
+        const tokenId = `${prefix}${String(tokenNumber).padStart(3, '0')}`;
+        // --------------------------------------
 
         const newToken = new Token({
             tokenId, userId, username, userName, serviceType,
+            tokenNumber,
             description: description || '',
             status: 'pending',
             position: pendingCount + 1,
