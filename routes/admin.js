@@ -35,6 +35,7 @@ router.post('/api/admin/create-user', ...isAdmin, ...userValidation, safeHandler
 
 // ── Analytics & Logs ─────────────────────────
 router.get('/api/admin/analytics', ...isAdmin, safeHandler(adminController.getAnalytics));
+router.get('/api/admin/filter', ...isAdmin, safeHandler(adminController.getFilteredData));
 router.get('/api/admin/activity-logs', ...isAdmin, safeHandler(adminController.getActivityLogs));
 
 // ── Settings ─────────────────────────────────

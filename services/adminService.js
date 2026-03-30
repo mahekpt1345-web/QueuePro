@@ -102,6 +102,71 @@ class AdminService {
     }
 
     /**
+     * Get analytics filtered by date range.
+     * @param {string} type - today | week | month | sixMonths | year
+     */
+    async getFilteredAnalytics(type) {
+        const now = new Date();
+        let startDate;
+
+        switch (type) {
+            case 'today':
+                startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                break;
+            case 'week':
+                startDate = new Date(now);
+                startDate.setDate(now.getDate() - 7);
+                break;
+            case 'month':
+                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                break;
+            case 'sixMonths':
+                startDate = new Date(now);
+                startDate.setMonth(now.getMonth() - 6);
+                break;
+            case 'year':
+                startDate = new Date(now.getFullYear(), 0, 1);
+                break;
+            default:
+                startDate = new Date(0); // All time
+        }
+
+        const filter = { createdAt: { $gte: startDate } };
+
+        const [counts, avgWaitData, byService] = await Promise.all([
+            Token.aggregate([
+                { $match: filter },
+                { $group: { _id: '$status', count: { $sum: 1 } } }
+            ]),
+            Token.aggregate([
+                { $match: { ...filter, status: 'completed', actualWaitTime: { $ne: null } } },
+                { $group: { _id: null, avg: { $avg: '$actualWaitTime' } } }
+            ]),
+            Token.aggregate([
+                { $match: filter },
+                { $group: { _id: '$serviceType', count: { $sum: 1 } } }
+            ])
+        ]);
+
+        const countMap = {};
+        let totalRangeTokens = 0;
+        counts.forEach(c => {
+            countMap[c._id] = c.count;
+            totalRangeTokens += c.count;
+        });
+
+        return {
+            totalTokens: totalRangeTokens,
+            completed: countMap.completed || 0,
+            pending: countMap.pending || 0,
+            serving: countMap.serving || 0,
+            cancelled: countMap.cancelled || 0,
+            avgWaitTime: avgWaitData.length ? Math.round(avgWaitData[0].avg) : 0,
+            byService
+        };
+    }
+
+    /**
      * Get all users (safe for admin_001 — uses find({}) not findById)
      * @param {string} currentAdminId
      */

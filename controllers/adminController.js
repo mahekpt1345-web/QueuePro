@@ -113,6 +113,29 @@ exports.getAnalytics = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────
+// GET /api/admin/filter?type=today|week|month|sixMonths|year
+// ─────────────────────────────────────────────
+exports.getFilteredData = async (req, res) => {
+    try {
+        const { type } = req.query;
+        const validTypes = ['today', 'week', 'month', 'sixMonths', 'year', 'all'];
+        
+        if (type && !validTypes.includes(type)) {
+            return res.status(400).json({ success: false, message: 'Invalid filter type' });
+        }
+
+        const analytics = await adminService.getFilteredAnalytics(type || 'all');
+        return res.json({
+            success: true,
+            data: analytics
+        });
+    } catch (err) {
+        console.error('GET /api/admin/filter error:', err);
+        return res.status(500).json({ success: false, message: 'Failed to fetch filtered analytics' });
+    }
+};
+
+// ─────────────────────────────────────────────
 // GET /api/admin/activity-logs
 // ─────────────────────────────────────────────
 exports.getActivityLogs = async (req, res) => {

@@ -1265,7 +1265,32 @@
 
         <!-- ========== TAB: ANALYTICS ========== -->
         <div id="tab-analytics" class="tab-pane">
+            <!-- Date Filter Dropdown -->
+            <div style="display:flex; justify-content:flex-end; align-items:center; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap;">
+                <label for="dateFilterSelect" style="font-size:0.875rem; font-weight:600; color:var(--gray-600);">Filter by Period:</label>
+                <div style="position:relative; width:200px;">
+                    <select id="dateFilterSelect" onchange="updateFilteredAnalytics(this.value)" 
+                        style="width:100%; padding:0.6rem 1rem; border-radius:0.5rem; border:1.5px solid var(--gray-300); background:white; font-family:inherit; font-size:0.875rem; cursor:pointer; appearance:none; transition:0.3s;">
+                        <option value="today">Today</option>
+                        <option value="week">Past 7 Days</option>
+                        <option value="month">This Month</option>
+                        <option value="sixMonths">Last 6 Months</option>
+                        <option value="year">This Year</option>
+                        <option value="all">All Time</option>
+                    </select>
+                    <i class="fas fa-chevron-down" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--gray-400); font-size:0.8rem;"></i>
+                </div>
+            </div>
+
             <div class="stats-grid">
+                <div class="stat-card blue">
+                    <div class="stat-header">
+                        <div class="stat-icon blue"><i class="fas fa-plus-circle"></i></div><span
+                            class="stat-label-top">Generated</span>
+                    </div>
+                    <div class="stat-value" id="a_total">—</div>
+                    <div class="stat-sub">Tokens in period</div>
+                </div>
                 <div class="stat-card green">
                     <div class="stat-header">
                         <div class="stat-icon green"><i class="fas fa-check-circle"></i></div><span
@@ -1794,7 +1819,10 @@
                 .then(r => r.json()).then(d => {
                     clearTimeout(timeoutId);
                     if (!d.success) return;
-                    const { completed, pending, serving, cancelled, avgWaitTime, byService, dailyLast7 } = d.data;
+                    const { completed, pending, serving, cancelled, avgWaitTime, byService, dailyLast7, todayTokens } = d.data;
+
+                    const aTotalEl = document.getElementById('a_total');
+                    if (aTotalEl) aTotalEl.textContent = todayTokens || '0';
 
                     const avgWaitEl = document.getElementById('avgWait');
                     if (avgWaitEl) {
@@ -1842,6 +1870,88 @@
                     clearTimeout(timeoutId);
                     showToast('Failed to load analytics', 'error');
                 });
+        }
+
+        /**
+         * Advanced Date Filter Logic (Updated for Dropdown)
+         */
+        async function updateFilteredAnalytics(type) {
+            console.log("Applying filter:", type);
+            
+            // Show loading state on stat values
+            const ids = ['a_total', 'a_completed', 'a_pending', 'a_serving', 'a_cancelled', 'avgWait'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.opacity = '0.5';
+            });
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s timeout
+
+            try {
+                const res = await fetch(`/api/admin/filter?type=${type}`, { 
+                    credentials: 'include',
+                    signal: controller.signal 
+                });
+                
+                if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
+                
+                const result = await res.json();
+                clearTimeout(timeoutId);
+
+                if (result.success) {
+                    const { completed, pending, serving, cancelled, avgWaitTime, byService, totalTokens } = result.data;
+
+                    // Update Analytics Stats
+                    if (document.getElementById('a_total')) document.getElementById('a_total').textContent = totalTokens || '0';
+                    if (document.getElementById('a_completed')) document.getElementById('a_completed').textContent = completed || '0';
+                    if (document.getElementById('a_pending')) document.getElementById('a_pending').textContent = pending || '0';
+                    if (document.getElementById('a_serving')) document.getElementById('a_serving').textContent = serving || '0';
+                    if (document.getElementById('a_cancelled')) document.getElementById('a_cancelled').textContent = cancelled || '0';
+                    
+                    const avgWaitEl = document.getElementById('avgWait');
+                    if (avgWaitEl) avgWaitEl.textContent = avgWaitTime || '0';
+
+                    // Update Service Chart
+                    if (byService) {
+                        const allServices = ['aadhaar_update', 'caste_certificate_verification', 'income_certificate_verification', 'birth_certificate_verification', 'municipal_enquiry', 'other'];
+                        const serviceData = allServices.map(serviceId => {
+                            const found = byService.find(s => s._id === serviceId);
+                            return { _id: serviceId, count: found ? found.count : 0 };
+                        });
+
+                        const colors = { 
+                            aadhaar_update: '#3b82f6', 
+                            caste_certificate_verification: '#10b981', 
+                            income_certificate_verification: '#f59e0b', 
+                            birth_certificate_verification: '#8b5cf6', 
+                            municipal_enquiry: '#6366f1', 
+                            other: '#6b7280' 
+                        };
+
+                        const maxCount = serviceData.length ? Math.max(...serviceData.map(s => s.count), 1) : 1;
+                        document.getElementById('serviceChart').innerHTML = serviceData.map(s => `
+                            <div class="bar-row">
+                                <span class="bar-label" style="font-size:0.75rem;">${formatServiceLabel(s._id).slice(0, 18)}${formatServiceLabel(s._id).length > 18 ? '...' : ''}</span>
+                                <div class="bar-track"><div class="bar-fill" style="width:${Math.round(s.count / maxCount * 100)}%;background:${colors[s._id] || '#6b7280'};"></div></div>
+                                <span class="bar-count">${s.count}</span>
+                            </div>`).join('');
+                    }
+
+                    showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} data updated`, 'success');
+                } else {
+                    throw new Error(result.message || 'API returned failure');
+                }
+            } catch (err) {
+                clearTimeout(timeoutId);
+                console.error('Filter Error:', err);
+                showToast(err.name === 'AbortError' ? 'Request timed out' : 'Filter failed to load', 'error');
+            } finally {
+                ids.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.opacity = '1';
+                });
+            }
         }
 
         // ─── ACTIVITY LOGS ──────────────────────────────────────────────────────
