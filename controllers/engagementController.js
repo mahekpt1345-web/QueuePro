@@ -33,13 +33,13 @@ exports.getRandomPuzzle = async (req, res) => {
             status: { $in: ['pending', 'serving'] } 
         });
 
-        if (activeToken && activeToken.status === 'pending') {
+        if (activeToken && (activeToken.status === 'pending' || activeToken.status === 'serving')) {
             const countAhead = await Token.countDocuments({
-                serviceType: activeToken.serviceType,
-                status: 'pending',
+                status: { $in: ['pending', 'serving'] },
                 createdAt: { $lt: activeToken.createdAt }
             });
-            waitTime = (countAhead + 1) * 5; 
+            // Use 7 minutes as a consistent factor matching the dashboard's approx wait
+            waitTime = countAhead * 7; 
         }
 
         const preferredDifficulty = getDifficultyFromWaitTime(waitTime);

@@ -90,7 +90,9 @@ class QueueService {
      */
     async createToken(data, user, ip, userAgent) {
         const { serviceType, description } = data;
-        const { userId, username, name: userName, role } = user;
+        const { userId, username, role } = user;
+        // Safely resolve userName — JWT 'name' may be undefined
+        const userName = user.name || username;
 
         // --- Soft Rate Limit (Anti-spam) ---
         const lastToken = await Token.findOne({ userId }).sort({ createdAt: -1 });
@@ -104,16 +106,10 @@ class QueueService {
         const pendingCount = pendingTokens.length;
         const estimatedWaitTime = calculateEstimatedWaitTime(pendingTokens, serviceType);
 
-        // --- Sequential Token Number Logic ---
+        // --- Sequential Token Number Logic (with retry for race conditions) ---
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
 
-        const countToday = await Token.countDocuments({
-            serviceType,
-            createdAt: { $gte: todayStart }
-        });
-
-        const tokenNumber = countToday + 1;
         const prefixMap = {
             'aadhaar_update': 'A',
             'caste_certificate_verification': 'C',
@@ -123,33 +119,58 @@ class QueueService {
             'other': 'O'
         };
         const prefix = prefixMap[serviceType] || 'O';
-        const tokenId = `${prefix}${String(tokenNumber).padStart(3, '0')}`;
+
+        // Find the highest token number for this service type TODAY
+        const lastTodayToken = await Token.findOne({
+            serviceType,
+            createdAt: { $gte: todayStart }
+        }).sort({ tokenNumber: -1 }).select('tokenNumber').lean();
+
+        let tokenNumber = (lastTodayToken?.tokenNumber || 0) + 1;
+        let tokenId = `${prefix}${String(tokenNumber).padStart(3, '0')}`;
+
+        // Retry loop to handle race conditions (duplicate tokenId)
+        const MAX_RETRIES = 5;
+        let savedToken = null;
+
+        for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+            try {
+                const newToken = new Token({
+                    tokenId, userId, username, userName, serviceType,
+                    tokenNumber,
+                    description: description || '',
+                    status: 'pending',
+                    position: pendingCount + 1,
+                    estimatedWaitTime,
+                    checklistConfirmed: true
+                });
+
+                savedToken = await newToken.save();
+                break; // Success — exit retry loop
+            } catch (err) {
+                // Handle duplicate key error (code 11000) on tokenId
+                if (err.code === 11000 && err.keyPattern?.tokenId) {
+                    tokenNumber++;
+                    tokenId = `${prefix}${String(tokenNumber).padStart(3, '0')}`;
+                    console.warn(`[QueueService] tokenId collision, retrying with ${tokenId} (attempt ${attempt + 1})`);
+                    continue;
+                }
+                // Re-throw any other error (validation, etc.)
+                throw err;
+            }
+        }
+
+        if (!savedToken) {
+            throw new Error('Failed to generate a unique token after multiple attempts. Please try again.');
+        }
         // --------------------------------------
-
-        const newToken = new Token({
-            tokenId, userId, username, userName, serviceType,
-            tokenNumber,
-            description: description || '',
-            status: 'pending',
-            position: pendingCount + 1,
-            estimatedWaitTime,
-            checklistConfirmed: true
-        });
-
-        await newToken.save();
 
         await logActivity('CREATE_TOKEN', `Token ${tokenId} created`, 'TOKEN', userId, 'success', null, {
             user: { _id: userId, username, role },
-            ip, get: (h) => userAgent[h]
+            ip, get: (h) => userAgent?.get ? userAgent.get(h) : undefined
         });
 
-        /**
-         * Emit enhanced queue_updated event with crowd level info
-         */
-        const io = require('../config/socket').getIo ? require('../config/socket').getIo() : null;
-        const appIo = io; // Will use parameter passed by controller instead
-
-        return { token: newToken, pendingCount };
+        return { token: savedToken, pendingCount };
     }
 
     /**

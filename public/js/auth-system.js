@@ -248,4 +248,5 @@ class AuthSystem {
     }
 }
 
-const auth = new AuthSystem();
+// Define global auth instance
+window.auth = new AuthSystem();

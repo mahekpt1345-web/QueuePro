@@ -17,7 +17,6 @@ const response = require('../utils/response');
 const socketEnhancer = require('../utils/socketEnhancer');
 const queueIntelligenceService = require('../services/queueIntelligenceService');
 
-
 /**
  * createToken (citizen)
  */
@@ -40,18 +39,13 @@ exports.createToken = async (req, res) => {
             { get: (h) => req.get(h) }
         );
 
-        // Crowd level calculated in controller for response (to keep service pure)
         let crowdLevel = "Low";
         if (pendingCount > 10 && pendingCount <= 25) crowdLevel = "Moderate";
         else if (pendingCount > 25) crowdLevel = "High";
 
-        // Emit socket update via service
         await queueService.emitQueueUpdate(req.app.get('io'));
-
-        // Smart Socket Enhancement
         socketEnhancer.emitQueueUpdated(req.app.get('io'));
         
-        // Log intelligence (safe, non-blocking)
         queueIntelligenceService.getBasicQueueAnalytics().then(analytics => {
             console.log(`[Queue Intelligence] Total tokens served globally: ${analytics.totalTokensServed}`);
         }).catch(() => {});
@@ -65,13 +59,12 @@ exports.createToken = async (req, res) => {
         });
     } catch (error) {
         console.error('Error creating token:', error);
-        return response.error(res, 'Failed to create token', 500);
+        const statusCode = error.code === 11000 ? 409 : 500;
+        const message = error.message || 'Failed to create token';
+        return response.error(res, message, statusCode);
     }
 };
 
-// ─────────────────────────────────────────────
-// GET /api/queue/my-tokens  (citizen)
-// ─────────────────────────────────────────────
 exports.myTokens = async (req, res) => {
     try {
         const mongoose = require('mongoose');
@@ -84,12 +77,6 @@ exports.myTokens = async (req, res) => {
     }
 };
 
-// ─────────────────────────────────────────────
-// PUT /api/queue/cancel-token/:tokenId  (citizen)
-// ─────────────────────────────────────────────
-/**
- * cancelToken (citizen)
- */
 exports.cancelToken = async (req, res) => {
     try {
         const { tokenId } = req.params;
@@ -104,7 +91,6 @@ exports.cancelToken = async (req, res) => {
         );
 
         await queueService.emitQueueUpdate(req.app.get('io'));
-
         socketEnhancer.emitQueueUpdated(req.app.get('io'));
 
         return res.json({ success: true, message: 'Token cancelled successfully', data: token });
@@ -117,9 +103,6 @@ exports.cancelToken = async (req, res) => {
     }
 };
 
-// ─────────────────────────────────────────────
-// GET /api/queue/pending  (officer/admin)
-// ─────────────────────────────────────────────
 exports.getPending = async (req, res) => {
     try {
         const tokens = await Token.find({ status: 'pending' }).sort({ position: 1 }).limit(20);
@@ -130,9 +113,6 @@ exports.getPending = async (req, res) => {
     }
 };
 
-// ─────────────────────────────────────────────
-// GET /api/queue/pending-tokens  (officer/admin)
-// ─────────────────────────────────────────────
 exports.getPendingTokens = async (req, res) => {
     try {
         const pendingTokens = await Token.find({ status: 'pending' })
@@ -146,9 +126,6 @@ exports.getPendingTokens = async (req, res) => {
     }
 };
 
-// ─────────────────────────────────────────────
-// GET /api/queue/serving-token  (officer/admin)
-// ─────────────────────────────────────────────
 exports.getServingToken = async (req, res) => {
     try {
         const servingToken = await Token.findOne({ status: 'serving' })
@@ -161,9 +138,6 @@ exports.getServingToken = async (req, res) => {
     }
 };
 
-/**
- * serveToken (officer/admin)
- */
 exports.serveToken = async (req, res) => {
     try {
         const { tokenId } = req.params;
@@ -180,7 +154,6 @@ exports.serveToken = async (req, res) => {
             { get: (h) => req.get(h) }
         );
 
-        // Notify via service
         const io = req.app.get('io');
         if (io) {
             io.to(`token_${token._id}`).emit('token_called', {
@@ -192,7 +165,6 @@ exports.serveToken = async (req, res) => {
         }
 
         await queueService.emitQueueUpdate(io);
-
         socketEnhancer.emitQueueUpdated(io);
         socketEnhancer.emitTokenCalled(io, token, officer);
 
@@ -206,12 +178,6 @@ exports.serveToken = async (req, res) => {
     }
 };
 
-// ─────────────────────────────────────────────
-// PUT /api/queue/token/:tokenId/complete  (officer/admin)
-// ─────────────────────────────────────────────
-/**
- * completeToken (officer/admin)
- */
 exports.completeToken = async (req, res) => {
     try {
         const { tokenId } = req.params;
@@ -229,7 +195,6 @@ exports.completeToken = async (req, res) => {
         );
 
         await queueService.emitQueueUpdate(req.app.get('io'));
-
         socketEnhancer.emitQueueUpdated(req.app.get('io'));
 
         return res.json({ success: true, message: `Token ${token.tokenId} completed`, data: token });
@@ -242,13 +207,9 @@ exports.completeToken = async (req, res) => {
     }
 };
 
-// ─────────────────────────────────────────────
-// PUT /api/queue/token/:tokenId/skip  (officer/admin)
-// ─────────────────────────────────────────────
 exports.skipToken = async (req, res) => {
     try {
         const { tokenId } = req.params;
-
         let token = null;
         if (tokenId.length === 24) token = await Token.findById(tokenId);
         if (!token) token = await Token.findOne({ tokenId });
@@ -262,17 +223,12 @@ exports.skipToken = async (req, res) => {
         token.startedAt = null;
         await token.save();
 
+        const officer = { userId: req.user.userId, username: req.user.username, role: req.user.role };
         await logActivity('SKIP_TOKEN', `Token ${token.tokenId} returned to pending queue`, 'TOKEN', req.user.userId, 'success', null, {
-            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
-            ip: req.ip, get: (header) => req.get(header)
-        });
-        await logActivity('TOKEN_SKIPPED', `Token ${token.tokenId} skipped by ${req.user.username}`, 'TOKEN', req.user.userId, 'success', null, {
-            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
-            ip: req.ip, get: (header) => req.get(header)
+            user: officer, ip: req.ip, get: (h) => req.get(h)
         });
 
         await queueService.emitQueueUpdate(req.app.get('io'));
-
         socketEnhancer.emitQueueUpdated(req.app.get('io'));
 
         res.json({ success: true, message: `Token ${token.tokenId} returned to pending queue`, data: token });
@@ -282,330 +238,170 @@ exports.skipToken = async (req, res) => {
     }
 };
 
-// ─────────────────────────────────────────────
-// PUT /api/queue/start-serving/:tokenId  (legacy)
-// ─────────────────────────────────────────────
 exports.startServing = async (req, res) => {
     try {
         const token = await Token.findById(req.params.tokenId);
         if (!token) return res.status(404).json({ success: false, message: 'Token not found' });
-        if (token.status !== 'pending')
-            return res.status(400).json({ success: false, message: `Token is already ${token.status}` });
-
         token.status = 'serving';
         token.handledBy = req.user.username;
         token.startedAt = new Date();
         await token.save();
-
-        await logActivity('SERVE_TOKEN', `Started serving token ${token.tokenId} (Legacy)`, 'TOKEN', req.user.userId, 'success', null, {
-            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
-            ip: req.ip, get: (header) => req.get(header)
-        });
-        await logActivity('TOKEN_SERVED', `Started serving token ${token.tokenId} (Legacy)`, 'TOKEN', req.user.userId, 'success', null, {
-            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
-            ip: req.ip, get: (header) => req.get(header)
-        });
-
         await queueService.emitQueueUpdate(req.app.get('io'));
-
         res.json({ success: true, message: 'Token status updated to serving', data: token });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Failed to start serving token' });
     }
 };
 
-// ─────────────────────────────────────────────
-// PUT /api/queue/complete-token/:tokenId  (legacy)
-// ─────────────────────────────────────────────
 exports.completeTokenLegacy = async (req, res) => {
     try {
         const token = await Token.findById(req.params.tokenId);
         if (!token) return res.status(404).json({ success: false, message: 'Token not found' });
-        if (token.status !== 'serving')
-            return res.status(400).json({ success: false, message: 'Token must be in serving status' });
-
         token.status = 'completed';
         token.completedAt = new Date();
         await token.save();
-
-        await logActivity('COMPLETE_TOKEN', `Token ${token.tokenId} marked as completed (Legacy)`, 'TOKEN', req.user.userId, 'success', null, {
-            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
-            ip: req.ip, get: (header) => req.get(header)
-        });
-        await logActivity('TOKEN_COMPLETED', `Token ${token.tokenId} completed by ${req.user.username} (Legacy)`, 'TOKEN', req.user.userId, 'success', null, {
-            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
-            ip: req.ip, get: (header) => req.get(header)
-        });
-
         await queueService.emitQueueUpdate(req.app.get('io'));
-
         res.json({ success: true, message: 'Token marked as completed', data: token });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Failed to complete token' });
     }
 };
 
-// ─────────────────────────────────────────────
-// GET /api/queue/statistics  (officer/admin)
-// ─────────────────────────────────────────────
-/**
- * getStatistics (officer/admin)
- */
 exports.getStatistics = async (req, res) => {
     try {
         const stats = await queueService.getStatistics();
-        return res.json({
-            success: true,
-            message: 'Queue statistics retrieved',
-            data: stats
-        });
+        return res.json({ success: true, message: 'Queue statistics retrieved', data: stats });
     } catch (error) {
         console.error('Error fetching statistics:', error);
-        return response.error(res, 'Failed to fetch statistics', 500);
+        return res.status(500).json({ success: false, message: 'Failed to fetch statistics' });
     }
 };
 
-// ─────────────────────────────────────────────
-// GET /api/queue/officer-stats  (officer/admin)
-// ─────────────────────────────────────────────
 exports.officerStats = async (req, res) => {
     try {
         const officerUsername = req.user.username;
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
-
         const completedToday = await Token.find({
             handledBy: officerUsername,
             status: 'completed',
             completedAt: { $gte: todayStart }
         }).select('startedAt completedAt').lean();
-
         const tokensToday = completedToday.length;
         let avgServiceTime = null;
-
         if (tokensToday > 0) {
             const totalMs = completedToday.reduce((sum, t) => {
                 if (t.startedAt && t.completedAt) return sum + (new Date(t.completedAt) - new Date(t.startedAt));
                 return sum;
             }, 0);
-            const validTokens = completedToday.filter(t => t.startedAt && t.completedAt).length;
-            if (validTokens > 0) avgServiceTime = Math.round(totalMs / validTokens / (1000 * 60));
+            const valid = completedToday.filter(t => t.startedAt && t.completedAt).length;
+            if (valid > 0) avgServiceTime = Math.round(totalMs / valid / 60000);
         }
-
         res.json({ success: true, data: { tokensToday, avgServiceTime } });
     } catch (error) {
-        console.error('[OFFICER STATS] Error:', error);
         res.status(500).json({ success: false, message: 'Failed to fetch officer stats' });
     }
 };
 
-// ─────────────────────────────────────────────
-// GET /api/queue/officer-activity  (officer/admin)
-// ─────────────────────────────────────────────
 exports.officerActivity = async (req, res) => {
     try {
         const mongoose = require('mongoose');
         const query = mongoose.Types.ObjectId.isValid(req.user.userId) ? { userId: req.user.userId } : { _id: null };
-        const logs = await ActivityLog.find(query)
-            .sort({ createdAt: -1 })
-            .limit(10)
-            .lean();
+        const logs = await ActivityLog.find(query).sort({ createdAt: -1 }).limit(10).lean();
         res.json({ success: true, data: logs });
     } catch (error) {
-        console.error('[OFFICER ACTIVITY] Error:', error);
         res.status(500).json({ success: false, message: 'Failed to fetch activity log' });
     }
 };
 
-// ─────────────────────────────────────────────
-// GET /api/queue/citizen-stats  (citizen)
-// ─────────────────────────────────────────────
 exports.citizenStats = async (req, res) => {
     try {
         const mongoose = require('mongoose');
         const userId = req.user.userId;
         const query = mongoose.Types.ObjectId.isValid(userId) ? { userId } : { _id: null };
-
         const [allTokens, completed, pending] = await Promise.all([
             Token.find(query).select('status actualWaitTime createdAt completedAt serviceType tokenId').lean(),
             Token.countDocuments({ ...query, status: 'completed' }),
             Token.countDocuments({ ...query, status: { $in: ['pending', 'serving'] } })
         ]);
-
         const completedTokens = allTokens.filter(t => t.status === 'completed' && t.actualWaitTime != null);
         let avgWaitTime = null;
         if (completedTokens.length > 0) {
             const total = completedTokens.reduce((s, t) => s + t.actualWaitTime, 0);
             avgWaitTime = Math.round(total / completedTokens.length);
         }
-
-        res.json({
-            success: true,
-            data: { total: allTokens.length, completed, pending, avgWaitTime, tokens: allTokens }
-        });
+        res.json({ success: true, data: { total: allTokens.length, completed, pending, avgWaitTime, tokens: allTokens } });
     } catch (error) {
-        console.error('[CITIZEN STATS] Error:', error);
         res.status(500).json({ success: false, message: 'Failed to fetch citizen stats' });
     }
 };
 
-// ─────────────────────────────────────────────
-// GET /api/queue/officer-tokens  (officer/admin)
-// Return all tokens handled by this officer for profile display
-// ─────────────────────────────────────────────
 exports.getOfficerTokens = async (req, res) => {
     try {
-        const officerUsername = req.user.username;
-        
-        const tokens = await Token.find({ handledBy: officerUsername })
+        const tokens = await Token.find({ handledBy: req.user.username })
             .select('_id tokenId userId userName serviceType status createdAt startedAt completedAt actualWaitTime handledBy')
-            .sort({ createdAt: -1 })
-            .lean();
-
-        res.json({
-            success: true,
-            message: `Found ${tokens.length} tokens handled by officer`,
-            data: tokens
-        });
+            .sort({ createdAt: -1 }).lean();
+        res.json({ success: true, data: tokens });
     } catch (error) {
-        console.error('[OFFICER TOKENS] Error:', error);
         res.status(500).json({ success: false, message: 'Failed to fetch officer tokens' });
     }
 };
 
-// ─────────────────────────────────────────────
-// GET /api/queue/citizen-tokens  (citizen)
-// Return all tokens created by this citizen for profile display
-// ─────────────────────────────────────────────
 exports.getCitizenTokens = async (req, res) => {
     try {
         const mongoose = require('mongoose');
         const userId = req.user.userId;
         const query = mongoose.Types.ObjectId.isValid(userId) ? { userId } : { _id: null };
-        
-        const tokens = await Token.find(query)
-            .select('_id tokenId userId userName serviceType description status createdAt completedAt actualWaitTime cancelReason')
-            .sort({ createdAt: -1 })
-            .lean();
-
-        res.json({
-            success: true,
-            message: `Found ${tokens.length} tokens created by citizen`,
-            data: tokens
-        });
+        const tokens = await Token.find(query).sort({ createdAt: -1 }).lean();
+        res.json({ success: true, data: tokens });
     } catch (error) {
-        console.error('[CITIZEN TOKENS] Error:', error);
         res.status(500).json({ success: false, message: 'Failed to fetch citizen tokens' });
     }
 };
 
-// ─────────────────────────────────────────────
-// GET /api/queue/user-activity  (citizen/officer/admin)
-// Return activity logs for the authenticated user
-// ─────────────────────────────────────────────
 exports.getUserActivity = async (req, res) => {
     try {
         const mongoose = require('mongoose');
         const userId = req.user.userId;
         const query = mongoose.Types.ObjectId.isValid(userId) ? { userId } : { _id: null };
-        
-        const limit = req.query.limit ? parseInt(req.query.limit) : 50;
-        
-        const logs = await ActivityLog.find(query)
-            .select('_id userId username userRole action details resourceType status createdAt')
-            .sort({ createdAt: -1 })
-            .limit(limit)
-            .lean();
-
-        res.json({
-            success: true,
-            message: `Found ${logs.length} activity logs for user`,
-            data: logs
-        });
+        const logs = await ActivityLog.find(query).sort({ createdAt: -1 }).limit(parseInt(req.query.limit) || 50).lean();
+        res.json({ success: true, data: logs });
     } catch (error) {
-        console.error('[USER ACTIVITY] Error:', error);
-        res.status(500).json({ success: false, message: 'Failed to fetch user activity logs' });
+        res.status(500).json({ success: false, message: 'Failed to fetch activity logs' });
     }
 };
 
-// ─────────────────────────────────────────────
-// GET /api/queue/user-prefs  (citizen/officer/admin)
-// Get user notification preferences from User model
-// ─────────────────────────────────────────────
 exports.getUserPrefs = async (req, res) => {
     try {
         const User = require('../models/User');
         if (req.user.userId === 'admin_001') {
-             return res.json({
-                success: true,
-                message: 'Admin session (default prefs)',
-                data: { emailNotif: true, queueNotif: true, announceNotif: true, promoNotif: false }
-            });
+            return res.json({ success: true, data: { emailNotif: true, queueNotif: true, announceNotif: true, promoNotif: false } });
         }
         const user = await User.findById(req.user.userId).select('preferences').lean();
-        
-        const prefs = user?.preferences || {
-            emailNotif: true,
-            queueNotif: true,
-            announceNotif: true,
-            promoNotif: false
-        };
-
-        res.json({
-            success: true,
-            message: 'User preferences retrieved',
-            data: prefs
-        });
+        res.json({ success: true, data: user?.preferences || { emailNotif: true, queueNotif: true, announceNotif: true, promoNotif: false } });
     } catch (error) {
-        console.error('[USER PREFS GET] Error:', error);
-        res.status(500).json({ success: false, message: 'Failed to fetch user preferences' });
+        res.status(500).json({ success: false, message: 'Failed to fetch preferences' });
     }
 };
 
-// ─────────────────────────────────────────────
-// POST /api/queue/user-prefs  (citizen/officer/admin)
-// Save user notification preferences to User model
-// ─────────────────────────────────────────────
 exports.saveUserPrefs = async (req, res) => {
     try {
         const User = require('../models/User');
         const { emailNotif, queueNotif, announceNotif, promoNotif } = req.body;
-        
-        if (req.user.userId === 'admin_001') {
-            return res.json({ success: true, message: 'Preferences saved (Admin Local Only)' });
-        }
+        if (req.user.userId === 'admin_001') return res.json({ success: true });
         const user = await User.findById(req.user.userId);
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-
-        user.preferences = {
-            emailNotif: emailNotif !== false,
-            queueNotif: queueNotif !== false,
-            announceNotif: announceNotif !== false,
-            promoNotif: promoNotif === true
-        };
-
+        user.preferences = { emailNotif, queueNotif, announceNotif, promoNotif };
         await user.save();
-
-        await logActivity('UPDATE_PREFERENCES', 'User updated notification preferences', 'USER', req.user.userId, 'success', null, {
-            user: { _id: req.user.userId, username: req.user.username, role: req.user.role },
-            ip: req.ip, get: (header) => req.get(header)
-        });
-
-        res.json({
-            success: true,
-            message: 'Preferences saved successfully',
-            data: user.preferences
-        });
+        res.json({ success: true, data: user.preferences });
     } catch (error) {
-        console.error('[USER PREFS SAVE] Error:', error);
-        res.status(500).json({ success: false, message: 'Failed to save user preferences' });
+        res.status(500).json({ success: false, message: 'Failed to save preferences' });
     }
 };
 
 // ─────────────────────────────────────────────
 // GET /api/queue/my-position  (citizen)
-// Returns the citizen's live queue position + ETA for their pending token.
-// Uses queueIntelligenceService (cached, non-blocking).
+// Returns the citizen's live queue position + ETA for their pending/serving token.
 // ─────────────────────────────────────────────
 exports.getMyPosition = async (req, res) => {
     try {
@@ -613,17 +409,16 @@ exports.getMyPosition = async (req, res) => {
         const mongoose = require('mongoose');
         const userId = req.user.userId;
 
-        // Find the citizen's most recent pending token
         const query = mongoose.Types.ObjectId.isValid(userId)
-            ? { userId, status: 'pending' }
-            : { _id: null }; // admin_001 safe fallback
+            ? { userId, status: { $in: ['pending', 'serving'] } }
+            : { _id: null };
 
         const myToken = await Token.findOne(query).sort({ createdAt: -1 }).lean();
 
         if (!myToken) {
             return res.json({
                 success: true,
-                message: 'No pending token found',
+                message: 'No active token found',
                 data: null
             });
         }
@@ -645,9 +440,8 @@ exports.getMyPosition = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────
-// GET /api/queue/stats  (public — no auth required)
+// GET /api/queue/stats  (public)
 // Returns a real-time public queue snapshot.
-// Uses queueIntelligenceService (cached, non-blocking).
 // ─────────────────────────────────────────────
 exports.getPublicStats = async (req, res) => {
     try {

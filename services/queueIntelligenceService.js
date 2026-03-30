@@ -44,9 +44,9 @@ class QueueIntelligenceService {
             let pendingTokens = cache.get(cacheKey);
 
             if (!pendingTokens) {
-                pendingTokens = await Token.find({ status: 'pending' })
+                pendingTokens = await Token.find({ status: { $in: ['pending', 'serving'] } })
                     .sort({ position: 1, createdAt: 1 })
-                    .select('_id tokenId userId serviceType position estimatedWaitTime createdAt')
+                    .select('_id tokenId userId serviceType position estimatedWaitTime createdAt status')
                     .lean();
                 cache.set(cacheKey, pendingTokens, CACHE_TTL);
             }
@@ -59,55 +59,17 @@ class QueueIntelligenceService {
 
             if (!myToken) return null; // Not pending or doesn't exist
 
-            // Calculate position (1-indexed) based on DB count logic requested
-            let tokensAhead = 0;
-            if (myToken.tokenNumber && myToken.tokenNumber > 0) {
-                tokensAhead = await Token.countDocuments({
-                    serviceType: myToken.serviceType,
-                    tokenNumber: { $lt: myToken.tokenNumber },
-                    status: { $in: ["pending", "serving"] }
-                });
-            } else {
-                // Fallback to position to ensure no system breaks if tokenNumber isn't populated
-                tokensAhead = await Token.countDocuments({
-                    serviceType: myToken.serviceType,
-                    position: { $lt: myToken.position },
-                    status: { $in: ["pending", "serving"] }
-                });
-            }
-            
+            const myIndexInPending = pendingTokens.findIndex(t => t._id.toString() === tokenId || t.tokenId === tokenId);
+            if (myIndexInPending === -1) return null; // Not found in pending list
+
+            const tokensAhead = myIndexInPending;
             const position = tokensAhead + 1;
 
-            // Estimated wait = sum of service times of all tokens ahead (both serving and pending)
-            let estimatedWaitMinutes = 0;
-            
-            // 1. Calculate time for tokens ahead from the pendingTokens snapshot
-            // We need to find how many pending tokens are ahead of us
-            const myIndexInPending = pendingTokens.findIndex(t => t._id.toString() === tokenId || t.tokenId === tokenId);
-            if (myIndexInPending > 0) {
-                for (let i = 0; i < myIndexInPending; i++) {
-                    const svcType = pendingTokens[i].serviceType;
-                    estimatedWaitMinutes += SERVICE_TIME[svcType] || SERVICE_TIME.other;
-                }
-            }
+            // Standardized wait time = tokens ahead * 7 minutes (as shown on main dashboard)
+            const estimatedWaitMinutes = tokensAhead * 7;
 
-            // 2. Add time for tokens currently being served ahead of us
-            // (If tokenNumber is used, we can find serving tokens with smaller tokenNumber)
-            if (myToken.tokenNumber > 0) {
-                const servingAhead = await Token.find({
-                    serviceType: myToken.serviceType,
-                    status: 'serving',
-                    tokenNumber: { $lt: myToken.tokenNumber }
-                }).select('serviceType').lean();
-
-                for (const t of servingAhead) {
-                    estimatedWaitMinutes += SERVICE_TIME[t.serviceType] || SERVICE_TIME.other;
-                }
-            }
-
-            // Find the latest token currently being served for THIS service type
+            // Find the latest token currently being served in the whole office (GLOBAL)
             const currentServing = await Token.findOne({ 
-                    serviceType: myToken.serviceType,
                     status: 'serving' 
                 })
                 .sort({ startedAt: -1 })
@@ -164,8 +126,8 @@ class QueueIntelligenceService {
             const hoursElapsed = Math.max(1, (Date.now() - todayStart.getTime()) / 3_600_000);
             const tokensPerHour = +(completedToday / hoursElapsed).toFixed(1);
 
-            // Estimated average wait for a new token joining now
-            const avgServiceTime = 5; // conservative fallback in minutes
+            // Estimated average wait for a new token joining now (fixed 7-min multiplier)
+            const avgServiceTime = 7; 
             const estimatedWaitForNew = pending * avgServiceTime;
 
             const snapshot = {
@@ -228,8 +190,8 @@ class QueueIntelligenceService {
      */
     calculateEstimatedWaitTime(serviceType, tokensAhead) {
         try {
-            const avgServiceTime = SERVICE_TIME[serviceType] || SERVICE_TIME.other || 5;
-            return tokensAhead * avgServiceTime;
+            // Global standardized wait time: 7 minutes per token
+            return tokensAhead * 7;
         } catch (error) {
             return 0; // Safe fallback
         }

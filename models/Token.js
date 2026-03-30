@@ -5,9 +5,8 @@ const tokenSchema = new mongoose.Schema({
   // Token identification
   tokenId: {
     type: String,
-    unique: true,
     required: true,
-    // Format: A001
+    // Format: A001 — resets daily per service type
   },
 
   // Sequential number per service type per day

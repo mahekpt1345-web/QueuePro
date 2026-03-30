@@ -8,6 +8,9 @@ class UIUtils {
         const toast = document.getElementById('toast');
         if (!toast) return;
 
+        // Guard against blank/empty toast messages
+        if (!message || String(message).trim() === '') return;
+
         toast.textContent = message;
         toast.className = `toast toast-${type} show`;
 
@@ -187,7 +190,9 @@ class UIUtils {
     }
 
     static logout() {
-        auth.logout();
+        if (typeof auth !== 'undefined' && auth.logout) {
+            auth.logout();
+        }
         UIUtils.showToast('Logged out successfully', 'success');
         setTimeout(() => {
             UIUtils.redirectTo('/');
@@ -212,6 +217,11 @@ class UIUtils {
     }
 
     static updateNavigationBar() {
+        if (typeof auth === 'undefined' || !auth.getSession) {
+            console.warn('[UIUtils] Auth system is not available.');
+            UIUtils.setNavigation(null, false);
+            return;
+        }
         const session = auth.getSession();
         if (session) {
             UIUtils.setNavigation(session.name || session.username, true);
@@ -250,7 +260,7 @@ function setupAuthPage() {
 
     // Prevent access if already logged in
     const currentPage = window.location.pathname.split('/').pop();
-    const session = auth.getSession();
+    const session = (typeof auth !== 'undefined' && auth.getSession) ? auth.getSession() : null;
 
     if (session && (currentPage === 'login.html' || currentPage === 'register.html' || currentPage === 'admin-login.html')) {
         UIUtils.redirect();
