@@ -338,14 +338,16 @@
     <%- include('partials/footer') %>
 
         <script src="/socket.io/socket.io.js"></script>
+        <script src="/js/auth-system.js"></script>
+        <script src="/js/ui-utils.js"></script>
         <script>
             let currentMode = 'puzzle';
             let ageGroup = sessionStorage.getItem('queuepro_age') || 'adults';
             let currentContent = null;
             let activeToken = null;
 
-            document.addEventListener('DOMContentLoaded', () => {
-                initQueueTracking();
+            document.addEventListener('DOMContentLoaded', async () => {
+                await initQueueTracking();
                 fetchContent();
                 initSocket();
             });
