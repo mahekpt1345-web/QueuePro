@@ -347,15 +347,16 @@ exports.showDashboard = async (req, res) => {
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
         const [
-            totalTokens, todayTokens, pending, serving, completed, cancelled,
+            totalTokens, todayTokens, pending, serving, 
+            completedToday, cancelledToday,
             completedWithTime, totalUsers, userBreakdown
         ] = await Promise.all([
             Token.countDocuments(),
             Token.countDocuments({ createdAt: { $gte: todayStart } }),
             Token.countDocuments({ status: 'pending' }),
             Token.countDocuments({ status: 'serving' }),
-            Token.countDocuments({ status: 'completed' }),
-            Token.countDocuments({ status: 'cancelled' }),
+            Token.countDocuments({ status: 'completed', completedAt: { $gte: todayStart } }),
+            Token.countDocuments({ status: 'cancelled', cancelledAt: { $gte: todayStart } }),
             Token.find({ status: { $in: ['completed', 'serving'] }, actualWaitTime: { $ne: null } }).select('actualWaitTime').lean(),
             User.countDocuments(),
             User.aggregate([{ $group: { _id: '$role', count: { $sum: 1 } } }])
@@ -365,7 +366,15 @@ exports.showDashboard = async (req, res) => {
             ? Math.round(completedWithTime.reduce((s, t) => s + t.actualWaitTime, 0) / completedWithTime.length)
             : 0;
 
-        initialStats = { totalTokens, todayTokens, avgWaitTime, pending, serving, completed, cancelled };
+        initialStats = { 
+            totalTokens, 
+            todayTokens, 
+            avgWaitTime, 
+            pending, 
+            serving, 
+            completed: completedToday, 
+            cancelled: cancelledToday 
+        };
 
         const citizens = (userBreakdown.find(u => u._id === 'citizen') || {}).count || 0;
         const officers = (userBreakdown.find(u => u._id === 'officer') || {}).count || 0;

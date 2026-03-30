@@ -1315,7 +1315,7 @@
                         <div class="stat-icon blue"><i class="fas fa-plus-circle"></i></div><span
                             class="stat-label-top">Generated</span>
                     </div>
-                    <div class="stat-value" id="a_total">—</div>
+                    <div class="stat-value" id="a_total"><%=initialStats.todayTokens%></div>
                     <div class="stat-sub">Tokens in period</div>
                 </div>
                 <div class="stat-card green">
@@ -1323,7 +1323,7 @@
                         <div class="stat-icon green"><i class="fas fa-check-circle"></i></div><span
                             class="stat-label-top">Completed</span>
                     </div>
-                    <div class="stat-value" id="a_completed">—</div>
+                    <div class="stat-value" id="a_completed"><%=initialStats.completed%></div>
                     <div class="stat-sub">Tokens served</div>
                 </div>
                 <div class="stat-card yellow">
@@ -1331,7 +1331,7 @@
                         <div class="stat-icon yellow"><i class="fas fa-hourglass-half"></i></div><span
                             class="stat-label-top">Pending</span>
                     </div>
-                    <div class="stat-value" id="a_pending">—</div>
+                    <div class="stat-value" id="a_pending"><%=initialStats.pending%></div>
                     <div class="stat-sub">In queue now</div>
                 </div>
                 <div class="stat-card blue">
@@ -1339,7 +1339,7 @@
                         <div class="stat-icon blue"><i class="fas fa-concierge-bell"></i></div><span
                             class="stat-label-top">Being Served</span>
                     </div>
-                    <div class="stat-value" id="a_serving">—</div>
+                    <div class="stat-value" id="a_serving"><%=initialStats.serving%></div>
                     <div class="stat-sub">Active right now</div>
                 </div>
                 <div class="stat-card red">
@@ -1347,7 +1347,7 @@
                         <div class="stat-icon red"><i class="fas fa-times-circle"></i></div><span
                             class="stat-label-top">Cancelled</span>
                     </div>
-                    <div class="stat-value" id="a_cancelled">—</div>
+                    <div class="stat-value" id="a_cancelled"><%=initialStats.cancelled%></div>
                     <div class="stat-sub">By users</div>
                 </div>
             </div>
@@ -1849,7 +1849,7 @@
                 .then(r => r.json()).then(d => {
                     clearTimeout(timeoutId);
                     if (!d.success) return;
-                    const { completed, pending, serving, cancelled, avgWaitTime, byService, dailyLast7, todayTokens } = d.data;
+                    const { completedToday, pending, serving, cancelledToday, avgWaitTime, byService, dailyLast7, todayTokens } = d.data;
 
                     const aTotalEl = document.getElementById('a_total');
                     if (aTotalEl) aTotalEl.textContent = todayTokens || '0';
@@ -1859,10 +1859,10 @@
                         avgWaitEl.textContent = (avgWaitTime !== null && avgWaitTime !== undefined) ? avgWaitTime : '0';
                     }
 
-                    document.getElementById('a_completed').textContent = completed;
-                    document.getElementById('a_pending').textContent = pending;
-                    document.getElementById('a_serving').textContent = serving;
-                    document.getElementById('a_cancelled').textContent = cancelled;
+                    document.getElementById('a_completed').textContent = completedToday || '0';
+                    document.getElementById('a_pending').textContent = pending || '0';
+                    document.getElementById('a_serving').textContent = serving || '0';
+                    document.getElementById('a_cancelled').textContent = cancelledToday || '0';
 
                     // Service bar chart
                     const allServices = ['aadhaar_update', 'caste_certificate_verification', 'income_certificate_verification', 'birth_certificate_verification', 'municipal_enquiry', 'other'];
@@ -1871,30 +1871,48 @@
                         return { _id: serviceId, count: found ? found.count : 0 };
                     });
 
-                    const colors = { aadhaar_update: '#3b82f6', caste_certificate_verification: '#10b981', income_certificate_verification: '#f59e0b', birth_certificate_verification: '#8b5cf6', municipal_enquiry: '#6366f1', other: '#6b7280' };
+                    const colors = {
+                        aadhaar_update: '#3b82f6',
+                        caste_certificate_verification: '#10b981',
+                        income_certificate_verification: '#f59e0b',
+                        birth_certificate_verification: '#8b5cf6',
+                        municipal_enquiry: '#6366f1',
+                        other: '#6b7280'
+                    };
 
                     const maxCount = serviceData.length ? Math.max(...serviceData.map(s => s.count), 1) : 1;
-                    document.getElementById('serviceChart').innerHTML = serviceData.map(s => `
-                    <div class="bar-row">
-                        <span class="bar-label">${formatServiceLabel(s._id)}</span>
-                        <div class="bar-track"><div class="bar-fill" style="width:${Math.round(s.count / maxCount * 100)}%;background:${colors[s._id] || '#6b7280'};"></div></div>
-                        <span class="bar-count">${s.count}</span>
-                    </div>`).join('');
+                    const chartContainer = document.getElementById('serviceChart');
+                    if (chartContainer) {
+                        chartContainer.innerHTML = serviceData.map(s => `
+                            <div class="bar-row">
+                                <span class="bar-label">${formatServiceLabel(s._id)}</span>
+                                <div class="bar-track"><div class="bar-fill" style="width:${Math.max(2, Math.round(s.count / maxCount * 100))}%;background:${colors[s._id] || '#6b7280'};"></div></div>
+                                <span class="bar-count">${s.count}</span>
+                            </div>`).join('');
+                    }
 
                     // Sparkline for last 7 days
-                    const maxDay = dailyLast7.length ? Math.max(...dailyLast7.map(d => d.count), 1) : 1;
-                    const days = [];
-                    for (let i = 6; i >= 0; i--) {
-                        const d2 = new Date(); d2.setDate(d2.getDate() - i);
-                        const key = d2.toISOString().slice(0, 10);
-                        const found = dailyLast7.find(x => x._id === key);
-                        days.push({ date: key, count: found ? found.count : 0, label: d2.toLocaleDateString('en', { weekday: 'short' }) });
+                    if (dailyLast7 && Array.isArray(dailyLast7)) {
+                        const maxDay = dailyLast7.length ? Math.max(...dailyLast7.map(d => d.count), 1) : 1;
+                        const days = [];
+                        for (let i = 6; i >= 0; i--) {
+                            const d2 = new Date(); d2.setDate(d2.getDate() - i);
+                            const key = d2.toISOString().slice(0, 10);
+                            const found = dailyLast7.find(x => x._id === key);
+                            days.push({ date: key, count: found ? found.count : 0, label: d2.toLocaleDateString('en', { weekday: 'short' }) });
+                        }
+                        const sparkContainer = document.getElementById('sparkline');
+                        if (sparkContainer) {
+                            sparkContainer.innerHTML = days.map(d => `
+                                <div class="spark-bar" style="height:${Math.max(8, Math.round(d.count / maxDay * 100))}%;">
+                                    <span class="tip">${d.label}: ${d.count}</span>
+                                </div>`).join('');
+                        }
+                        const labelContainer = document.getElementById('sparkLabels');
+                        if (labelContainer) {
+                            labelContainer.innerHTML = days.map(d => `<span class="spark-label">${d.label}</span>`).join('');
+                        }
                     }
-                    document.getElementById('sparkline').innerHTML = days.map(d => `
-                    <div class="spark-bar" style="height:${Math.max(8, Math.round(d.count / maxDay * 100))}%;">
-                        <span class="tip">${d.label}: ${d.count}</span>
-                    </div>`).join('');
-                    document.getElementById('sparkLabels').innerHTML = days.map(d => `<span class="spark-label">${d.label}</span>`).join('');
 
                 }).catch(err => {
                     clearTimeout(timeoutId);

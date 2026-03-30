@@ -40,7 +40,8 @@ class AdminService {
             byService,
             dailyLast7,
             todayTokens,
-            completedToday
+            completedToday,
+            cancelledToday
         ] = await Promise.all([
             Token.aggregate([
                 { $group: { _id: '$status', count: { $sum: 1 } } }
@@ -63,7 +64,8 @@ class AdminService {
                 { $sort: { _id: 1 } }
             ]),
             Token.countDocuments({ createdAt: { $gte: todayStart } }),
-            Token.countDocuments({ status: 'completed', completedAt: { $gte: todayStart } })
+            Token.countDocuments({ status: 'completed', completedAt: { $gte: todayStart } }),
+            Token.countDocuments({ status: 'cancelled', cancelledAt: { $gte: todayStart } })
         ]);
 
         const countMap = {};
@@ -94,7 +96,9 @@ class AdminService {
             tokensPerHour,
             queueEfficiency,
             byService,
-            dailyLast7
+            dailyLast7,
+            completedToday,
+            cancelledToday
         };
 
         cache.set(CACHE_KEY, result, 30); // 30s TTL
