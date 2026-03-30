@@ -21,6 +21,7 @@ router.post('/api/auth/admin-login', safeHandler(authController.apiAdminLogin));
 router.get('/api/auth/me', safeHandler(authController.apiMe));
 router.post('/api/auth/logout', safeHandler(authController.apiLogout));
 router.post('/api/auth/change-password', safeHandler(authController.apiChangePassword));
+router.post('/api/auth/fcm-token', verifyToken, safeHandler(authController.saveFcmToken));
 
 // phone number management logic removed as it was for OAuth users.
 

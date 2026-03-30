@@ -90,6 +90,11 @@ const userSchema = new mongoose.Schema({
   engagementHistory: {
     puzzles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Puzzle' }],
     reading: [{ type: mongoose.Schema.Types.ObjectId, ref: 'EngagementContent' }]
+  },
+  
+  fcmToken: {
+    type: String,
+    default: null
   }
 });
 

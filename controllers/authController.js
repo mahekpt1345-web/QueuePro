@@ -17,6 +17,24 @@ const authService = require('../services/authService');
 const config = require('../config');
 
 // ─────────────────────────────────────────────
+// API: POST /api/auth/fcm-token
+// ─────────────────────────────────────────────
+exports.saveFcmToken = async (req, res) => {
+    try {
+        const { fcmToken } = req.body;
+        if (!fcmToken) {
+            return response.error(res, 'FCM token is required', 400);
+        }
+
+        await User.findByIdAndUpdate(req.user.userId, { fcmToken });
+        return response.success(res, 'FCM token saved successfully');
+    } catch (error) {
+        console.error('Save FCM token error:', error.message);
+        return response.error(res, 'Failed to save FCM token', 500);
+    }
+};
+
+// ─────────────────────────────────────────────
 // API: POST /api/auth/register
 // ─────────────────────────────────────────────
 exports.apiRegister = async (req, res) => {

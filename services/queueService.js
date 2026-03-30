@@ -3,6 +3,7 @@ const User = require('../models/User');
 const { logActivity } = require('../middleware/auth');
 const { calculateEstimatedWaitTime } = require('../utils/serviceConfig');
 const notificationService = require('../utils/notificationService');
+const fcmNotificationService = require('./notificationService');
 const emitWithRetry = require('../utils/socketRetry');
 
 /**
@@ -170,6 +171,14 @@ class QueueService {
             ip, get: (h) => userAgent?.get ? userAgent.get(h) : undefined
         });
 
+        // FCM Notification
+        fcmNotificationService.sendToUser(
+            userId, 
+            'Token Generated ✅', 
+            `Your token ${tokenId} for ${fcmNotificationService.formatLabel(serviceType)} has been generated successfully.`,
+            { type: 'TOKEN_CREATED', tokenId }
+        );
+
         return { token: savedToken, pendingCount };
     }
 
@@ -223,6 +232,15 @@ class QueueService {
             user: { _id: officer.userId, username: officer.username, role: officer.role },
             ip, get: (h) => userAgent[h]
         });
+
+        // FCM Notifications
+        fcmNotificationService.sendToUser(
+            token.userId, 
+            'It is your turn! 📢', 
+            `Please proceed to the counter. Your token ${token.tokenId} is now being served.`,
+            { type: 'TOKEN_SERVING', tokenId: token.tokenId }
+        );
+        fcmNotificationService.notifyNearTurn(token.serviceType, token.position);
 
         return token;
     }
@@ -280,6 +298,9 @@ class QueueService {
             user: { _id: officer.userId, username: officer.username, role: officer.role },
             ip, get: (h) => userAgent[h]
         });
+
+        // FCM Notifications: Notify upcoming tokens in the same service category
+        fcmNotificationService.notifyNearTurn(token.serviceType, token.position);
 
         return token;
     }

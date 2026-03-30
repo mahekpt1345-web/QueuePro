@@ -42,6 +42,10 @@ const systemSettingsSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  fcmNotifications: {
+    type: Boolean,
+    default: true
+  },
 
   updatedAt: {
     type: Date,

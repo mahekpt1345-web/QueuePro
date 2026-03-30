@@ -7,7 +7,8 @@
     <title>Admin Dashboard - QueuePro</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/dashboard-styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/mobile-responsive.css">
     <style>
@@ -153,12 +154,15 @@
             overflow-x: auto;
             white-space: nowrap;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE and Edge */
         }
 
         .tabs::-webkit-scrollbar {
-            display: none; /* Chrome, Safari and Opera */
+            display: none;
+            /* Chrome, Safari and Opera */
         }
 
         .tab-btn {
@@ -1141,7 +1145,9 @@
                         <div class="stat-icon blue"><i class="fas fa-users"></i></div><span class="stat-label-top">Total
                             Users</span>
                     </div>
-                    <div class="stat-value" id="totalUsers"><%=initialUsers.total%></div>
+                    <div class="stat-value" id="totalUsers">
+                        <%=initialUsers.total%>
+                    </div>
                     <div class="stat-sub">All registered accounts</div>
                 </div>
                 <div class="stat-card green">
@@ -1149,7 +1155,9 @@
                         <div class="stat-icon green"><i class="fas fa-ticket-alt"></i></div><span
                             class="stat-label-top">Total Tokens</span>
                     </div>
-                    <div class="stat-value" id="totalTokens"><%=initialStats.totalTokens%></div>
+                    <div class="stat-value" id="totalTokens">
+                        <%=initialStats.totalTokens%>
+                    </div>
                     <div class="stat-sub">All time</div>
                 </div>
                 <div class="stat-card yellow">
@@ -1157,7 +1165,9 @@
                         <div class="stat-icon yellow"><i class="fas fa-calendar-day"></i></div><span
                             class="stat-label-top">Today's Tokens</span>
                     </div>
-                    <div class="stat-value" id="todayTokens"><%=initialStats.todayTokens%></div>
+                    <div class="stat-value" id="todayTokens">
+                        <%=initialStats.todayTokens%>
+                    </div>
                     <div class="stat-sub">Generated today</div>
                 </div>
                 <div class="stat-card indigo">
@@ -1165,7 +1175,9 @@
                         <div class="stat-icon indigo"><i class="fas fa-clock"></i></div><span class="stat-label-top">Avg
                             Wait Time</span>
                     </div>
-                    <div class="stat-value" id="avgWait"><%=initialStats.avgWaitTime%></div>
+                    <div class="stat-value" id="avgWait">
+                        <%=initialStats.avgWaitTime%>
+                    </div>
                     <div class="stat-sub">Minutes per token</div>
                 </div>
             </div>
@@ -1188,25 +1200,33 @@
                     <div
                         style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--gray-200);">
                         <div style="padding:.875rem .5rem;text-align:center;border-right:1px solid var(--gray-200);">
-                            <div style="font-size:1.5rem;font-weight:700;color:var(--warning);" id="qa_pending"><%=initialStats.pending%></div>
+                            <div style="font-size:1.5rem;font-weight:700;color:var(--warning);" id="qa_pending">
+                                <%=initialStats.pending%>
+                            </div>
                             <div
                                 style="font-size:.68rem;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em;margin-top:.15rem;">
                                 Pending</div>
                         </div>
                         <div style="padding:.875rem .5rem;text-align:center;border-right:1px solid var(--gray-200);">
-                            <div style="font-size:1.5rem;font-weight:700;color:var(--primary);" id="qa_serving"><%=initialStats.serving%></div>
+                            <div style="font-size:1.5rem;font-weight:700;color:var(--primary);" id="qa_serving">
+                                <%=initialStats.serving%>
+                            </div>
                             <div
                                 style="font-size:.68rem;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em;margin-top:.15rem;">
                                 Serving</div>
                         </div>
                         <div style="padding:.875rem .5rem;text-align:center;border-right:1px solid var(--gray-200);">
-                            <div style="font-size:1.5rem;font-weight:700;color:var(--success);" id="qa_completed"><%=initialStats.completed%></div>
+                            <div style="font-size:1.5rem;font-weight:700;color:var(--success);" id="qa_completed">
+                                <%=initialStats.completed%>
+                            </div>
                             <div
                                 style="font-size:.68rem;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em;margin-top:.15rem;">
                                 Completed</div>
                         </div>
                         <div style="padding:.875rem .5rem;text-align:center;">
-                            <div style="font-size:1.5rem;font-weight:700;color:var(--danger);" id="qa_cancelled"><%=initialStats.cancelled%></div>
+                            <div style="font-size:1.5rem;font-weight:700;color:var(--danger);" id="qa_cancelled">
+                                <%=initialStats.cancelled%>
+                            </div>
                             <div
                                 style="font-size:.68rem;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em;margin-top:.15rem;">
                                 Cancelled</div>
@@ -1230,8 +1250,12 @@
                         style="border-top:1px solid var(--gray-200);padding:.75rem 1.25rem;display:flex;justify-content:space-between;align-items:center;background:var(--gray-50);flex-wrap:wrap;gap:.5rem;">
                         <span style="font-size:.78rem;font-weight:600;color:var(--gray-700);"><i class="fas fa-users"
                                 style="color:var(--indigo);margin-right:.35rem;"></i><span id="qa_citizens"
-                                style="color:var(--primary);font-weight:700;"><%=initialUsers.citizens%></span> citizens &nbsp;·&nbsp; <span
-                                id="qa_officers" style="color:var(--warning);font-weight:700;"><%=initialUsers.officers%></span> officers</span>
+                                style="color:var(--primary);font-weight:700;">
+                                <%=initialUsers.citizens%>
+                            </span> citizens &nbsp;·&nbsp; <span id="qa_officers"
+                                style="color:var(--warning);font-weight:700;">
+                                <%=initialUsers.officers%>
+                            </span> officers</span>
                         <div style="display:flex;gap:.5rem;">
                             <button class="btn btn-secondary btn-sm" onclick="switchTab('logs')"><i
                                     class="fas fa-history"></i> Logs</button>
@@ -1266,10 +1290,12 @@
         <!-- ========== TAB: ANALYTICS ========== -->
         <div id="tab-analytics" class="tab-pane">
             <!-- Date Filter Dropdown -->
-            <div style="display:flex; justify-content:flex-end; align-items:center; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap;">
-                <label for="dateFilterSelect" style="font-size:0.875rem; font-weight:600; color:var(--gray-600);">Filter by Period:</label>
+            <div
+                style="display:flex; justify-content:flex-end; align-items:center; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap;">
+                <label for="dateFilterSelect" style="font-size:0.875rem; font-weight:600; color:var(--gray-600);">Filter
+                    by Period:</label>
                 <div style="position:relative; width:200px;">
-                    <select id="dateFilterSelect" onchange="updateFilteredAnalytics(this.value)" 
+                    <select id="dateFilterSelect" onchange="updateFilteredAnalytics(this.value)"
                         style="width:100%; padding:0.6rem 1rem; border-radius:0.5rem; border:1.5px solid var(--gray-300); background:white; font-family:inherit; font-size:0.875rem; cursor:pointer; appearance:none; transition:0.3s;">
                         <option value="today">Today</option>
                         <option value="week">Past 7 Days</option>
@@ -1278,7 +1304,8 @@
                         <option value="year">This Year</option>
                         <option value="all">All Time</option>
                     </select>
-                    <i class="fas fa-chevron-down" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--gray-400); font-size:0.8rem;"></i>
+                    <i class="fas fa-chevron-down"
+                        style="position:absolute; right:12px; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--gray-400); font-size:0.8rem;"></i>
                 </div>
             </div>
 
@@ -1678,11 +1705,14 @@
             </div>
             <div class="settings-section">
                 <h3><i class="fas fa-bell" style="margin-right:.5rem;color:var(--primary);"></i>Notifications</h3>
-                <div class="setting-item">
-                    <div class="setting-info"><strong>Toast Notifications</strong><span>Show popup messages to users on
-                            actions</span></div>
-                    <label class="toggle"><input type="checkbox" id="s_notifications"
-                            onchange="saveSetting('notifications',this.checked)"><span
+                <div class="setting-item"
+                    style="border-top:1px solid var(--gray-100); padding-top:1rem; margin-top:0.5rem;">
+                    <div class="setting-info">
+                        <strong>Push Notifications (FCM)</strong>
+                        <span>Enable external real-time alerts via Firebase</span>
+                    </div>
+                    <label class="toggle"><input type="checkbox" id="s_fcmNotif"
+                            onchange="saveSetting('fcmNotifications',this.checked)"><span
                             class="toggle-slider"></span></label>
                 </div>
             </div>
@@ -1722,7 +1752,7 @@
             document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + name).classList.add('active');
-            
+
             const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.textContent.toLowerCase().includes(name === 'logs' ? 'activity' : name));
             if (activeBtn) {
                 activeBtn.classList.add('active');
@@ -1877,7 +1907,7 @@
          */
         async function updateFilteredAnalytics(type) {
             console.log("Applying filter:", type);
-            
+
             // Show loading state on stat values
             const ids = ['a_total', 'a_completed', 'a_pending', 'a_serving', 'a_cancelled', 'avgWait'];
             ids.forEach(id => {
@@ -1889,13 +1919,13 @@
             const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s timeout
 
             try {
-                const res = await fetch(`/api/admin/filter?type=${type}`, { 
+                const res = await fetch(`/api/admin/filter?type=${type}`, {
                     credentials: 'include',
-                    signal: controller.signal 
+                    signal: controller.signal
                 });
-                
+
                 if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
-                
+
                 const result = await res.json();
                 clearTimeout(timeoutId);
 
@@ -1908,7 +1938,7 @@
                     if (document.getElementById('a_pending')) document.getElementById('a_pending').textContent = pending || '0';
                     if (document.getElementById('a_serving')) document.getElementById('a_serving').textContent = serving || '0';
                     if (document.getElementById('a_cancelled')) document.getElementById('a_cancelled').textContent = cancelled || '0';
-                    
+
                     const avgWaitEl = document.getElementById('avgWait');
                     if (avgWaitEl) avgWaitEl.textContent = avgWaitTime || '0';
 
@@ -1920,13 +1950,13 @@
                             return { _id: serviceId, count: found ? found.count : 0 };
                         });
 
-                        const colors = { 
-                            aadhaar_update: '#3b82f6', 
-                            caste_certificate_verification: '#10b981', 
-                            income_certificate_verification: '#f59e0b', 
-                            birth_certificate_verification: '#8b5cf6', 
-                            municipal_enquiry: '#6366f1', 
-                            other: '#6b7280' 
+                        const colors = {
+                            aadhaar_update: '#3b82f6',
+                            caste_certificate_verification: '#10b981',
+                            income_certificate_verification: '#f59e0b',
+                            birth_certificate_verification: '#8b5cf6',
+                            municipal_enquiry: '#6366f1',
+                            other: '#6b7280'
                         };
 
                         const maxCount = serviceData.length ? Math.max(...serviceData.map(s => s.count), 1) : 1;
@@ -2067,8 +2097,8 @@
         }
 
         // ─── SETTINGS ───────────────────────────────────────────────────────────
-        const SETTING_MAP = { s_tokenGen: 'tokenGeneration', s_tokenCancel: 'tokenCancellation', s_autoRefresh: 'autoRefresh', s_registrations: 'registrations', s_officerReg: 'officerRegistration', s_notifications: 'notifications' };
-        const DEFAULTS = { tokenGeneration: true, tokenCancellation: true, autoRefresh: true, registrations: true, officerRegistration: true, notifications: true };
+        const SETTING_MAP = { s_tokenGen: 'tokenGeneration', s_tokenCancel: 'tokenCancellation', s_autoRefresh: 'autoRefresh', s_registrations: 'registrations', s_officerReg: 'officerRegistration', s_notifications: 'notifications', s_fcmNotif: 'fcmNotifications' };
+        const DEFAULTS = { tokenGeneration: true, tokenCancellation: true, autoRefresh: true, registrations: true, officerRegistration: true, notifications: true, fcmNotifications: true };
 
         async function loadSettingsToModal() {
             try {
@@ -2319,7 +2349,7 @@
         }
     </script>
     <%- include('partials/bottom-nav', { currentPage: 'dashboard' }) %>
-    <%- include('partials/scroll-to-top') %>
+        <%- include('partials/scroll-to-top') %>
 </body>
 
 </html>

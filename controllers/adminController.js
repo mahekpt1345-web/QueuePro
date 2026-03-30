@@ -187,7 +187,7 @@ exports.updateSettings = async (req, res) => {
         try { SystemSettings = require('../models/SystemSettings'); } catch (e) {
             return res.status(500).json({ success: false, message: 'SystemSettings model not found.' });
         }
-        const allowed = ['tokenGeneration', 'tokenCancellation', 'autoRefresh', 'registrations', 'officerRegistration', 'notifications'];
+        const allowed = ['tokenGeneration', 'tokenCancellation', 'autoRefresh', 'registrations', 'officerRegistration', 'notifications', 'fcmNotifications'];
         const updates = { updatedAt: new Date(), updatedBy: req.user.username };
         allowed.forEach(key => { if (req.body[key] !== undefined) updates[key] = Boolean(req.body[key]); });
 
