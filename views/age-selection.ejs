@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
+    <title>
+        <%= title %>
+    </title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/mobile-responsive.css">
@@ -82,26 +85,29 @@
             padding: 1rem;
             font-size: 1.125rem;
         }
-
     </style>
 </head>
+
 <body class="bg-gray-50">
     <nav class="navbar" style="background: white; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); padding: 1rem 2rem;">
-        <div class="nav-container" style="max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between;">
-            <a href="/" class="logo-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: #3b82f6; font-weight: 700; font-size: 1.5rem;">
+        <div class="nav-container"
+            style="max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between;">
+            <a href="/" class="logo-link"
+                style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: #3b82f6; font-weight: 700; font-size: 1.5rem;">
                 <%- include('partials/logo') %>
-                <span>QueuePro</span>
             </a>
         </div>
     </nav>
 
     <div class="container" style="max-width: 1400px; margin: 1rem auto; padding: 0 2rem;">
-        <button class="back-to-dashboard-btn" onclick="window.location.href='/citizen-dashboard'">← Back to Dashboard</button>
+        <button class="back-to-dashboard-btn" onclick="window.location.href='/citizen-dashboard'">← Back to
+            Dashboard</button>
     </div>
 
     <main class="age-selection-container">
         <h1>Welcome!</h1>
-        <p>Before we start your waiting experience, please select your age group so we can show you the best content.</p>
+        <p>Before we start your waiting experience, please select your age group so we can show you the best content.
+        </p>
 
         <div class="age-grid">
             <div class="age-card" onclick="selectAge('kids', this)">
@@ -122,30 +128,32 @@
             </div>
         </div>
 
-        <button id="continueBtn" class="btn btn-primary btn-continue" disabled onclick="proceed()">Continue to Engagement</button>
+        <button id="continueBtn" class="btn btn-primary btn-continue" disabled onclick="proceed()">Continue to
+            Engagement</button>
     </main>
 
     <%- include('partials/footer') %>
 
-    <script>
-        let selectedAge = null;
+        <script>
+            let selectedAge = null;
 
-        function selectAge(age, element) {
-            selectedAge = age;
-            
-            // UI Update
-            document.querySelectorAll('.age-card').forEach(card => card.classList.remove('selected'));
-            element.classList.add('selected');
-            
-            // Enable button
-            document.getElementById('continueBtn').disabled = false;
-        }
+            function selectAge(age, element) {
+                selectedAge = age;
 
-        function proceed() {
-            if (!selectedAge) return;
-            sessionStorage.setItem('queuepro_age', selectedAge);
-            window.location.href = '/engagement-puzzles';
-        }
-    </script>
+                // UI Update
+                document.querySelectorAll('.age-card').forEach(card => card.classList.remove('selected'));
+                element.classList.add('selected');
+
+                // Enable button
+                document.getElementById('continueBtn').disabled = false;
+            }
+
+            function proceed() {
+                if (!selectedAge) return;
+                sessionStorage.setItem('queuepro_age', selectedAge);
+                window.location.href = '/engagement-puzzles';
+            }
+        </script>
 </body>
+
 </html>
