@@ -69,10 +69,11 @@ class QueueIntelligenceService {
             const estimatedWaitMinutes = tokensAhead * 7;
 
             // Find the latest token currently being served in the whole office (GLOBAL)
+            // We search for ANY token with 'serving' status, sorting by startedAt to get the latest active one
             const currentServing = await Token.findOne({ 
                     status: 'serving' 
                 })
-                .sort({ startedAt: -1 })
+                .sort({ startedAt: -1, createdAt: -1 })
                 .select('tokenId')
                 .lean();
 
@@ -87,7 +88,7 @@ class QueueIntelligenceService {
                 queueSize: pendingTokens.length,
                 serviceType: myToken.serviceType,
                 createdAt: myToken.createdAt,
-                currentToken: currentServing ? currentServing.tokenId : "-"
+                currentToken: currentServing ? currentServing.tokenId : (pendingTokens.length > 0 && pendingTokens[0].status === 'serving' ? pendingTokens[0].tokenId : "-")
             };
         } catch (err) {
             console.error('[QueueIntelligence] getTokenPosition error:', err.message);

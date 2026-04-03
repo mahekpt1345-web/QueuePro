@@ -479,9 +479,15 @@
                     const result = await res.json();
 
                     if (result.success && result.data) {
-                        document.getElementById('dispAhead').textContent = result.data.tokensAhead ?? '-';
-                        document.getElementById('current').textContent = result.data.currentToken || '-';
+                        const ahead = result.data.tokensAhead !== undefined ? result.data.tokensAhead : '-';
+                        const currentToken = result.data.currentToken || '-';
+                        
+                        document.getElementById('dispAhead').textContent = ahead;
+                        document.getElementById('current').textContent = currentToken;
                         document.getElementById('dispWait').textContent = (result.data.estimatedWaitMinutes || 0) + ' min';
+                        
+                        // Debugging logs to help identify what's being received
+                        console.log(`[Queue Update] Ahead: ${ahead}, Current: ${currentToken}`);
                     }
                 } catch (err) {
                     console.error('Error updating live status:', err);
